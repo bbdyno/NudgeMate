@@ -68,6 +68,35 @@ let project = Project(
                     "SWIFT_VERSION": "5.9"
                 ]
             )
+        ),
+        .target(
+            name: "NudgeMateUITests",
+            destinations: .iOS,
+            product: .uiTests,
+            bundleId: "com.nudgemate.app.uitests",
+            deploymentTargets: .iOS("17.0"),
+            infoPlist: .default,
+            sources: ["NudgeMateUITests/**"],
+            dependencies: [
+                .target(name: "NudgeMate")
+            ]
+        )
+    ],
+    schemes: [
+        .scheme(
+            name: "NudgeMate",
+            shared: true,
+            buildAction: .buildAction(targets: ["NudgeMate"]),
+            testAction: .targets([
+                .testableTarget(target: "NudgeMateTests", parallelization: .enabled),
+                .testableTarget(target: "NudgeMateUITests", parallelization: .disabled)
+            ]),
+            runAction: .runAction(
+                executable: "NudgeMate",
+                options: .options(
+                    storeKitConfigurationPath: "NudgeMate/Resources/NudgeMate.storekit"
+                )
+            )
         )
     ],
     resourceSynthesizers: [

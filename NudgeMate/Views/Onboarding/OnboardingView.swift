@@ -65,6 +65,7 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 24)
         .background(ColorTheme.background.ignoresSafeArea())
+        .accessibilityIdentifier("onboarding.screen")
         .fullScreenCover(isPresented: $isCalendarFlowPresented) {
             CalendarDiscoveryFlowView {
                 isCalendarFlowPresented = false

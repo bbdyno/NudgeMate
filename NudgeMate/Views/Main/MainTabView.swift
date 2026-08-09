@@ -68,6 +68,7 @@ struct MainTabView: View {
             .overlay(alignment: .top) {
                 Divider()
             }
+            .accessibilityIdentifier("main.tabbar")
         }
         .onReceive(NotificationCenter.default.publisher(for: .dailyRecapRequested)) { _ in
             appState.isDailyRecapPresented = true
