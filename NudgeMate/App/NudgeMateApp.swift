@@ -9,7 +9,8 @@ struct NudgeMateApp: App {
     init() {
         let state = AppState()
         modelContainerResult = Result {
-            let container = try PersistenceController.makeContainer()
+            let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            let container = try PersistenceController.makeContainer(inMemory: isRunningTests)
             state.configure(modelContainer: container)
             return container
         }

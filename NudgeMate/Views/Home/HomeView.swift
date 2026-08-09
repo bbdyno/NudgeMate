@@ -9,7 +9,7 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
 
-    @Query(sort: \RecurringEvent.nextPredictedDate)
+    @Query(sort: \RecurringEvent.nextExpectedCenterDate)
     private var recurringEvents: [RecurringEvent]
 
     @Query(sort: \EventPrep.targetDate)

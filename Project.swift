@@ -50,6 +50,23 @@ let project = Project(
                     "TARGETED_DEVICE_FAMILY": "1,2"
                 ]
             )
+        ),
+        .target(
+            name: "NudgeMateTests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "com.nudgemate.app.tests",
+            deploymentTargets: .iOS("17.0"),
+            infoPlist: .default,
+            sources: ["NudgeMateTests/**"],
+            dependencies: [
+                .target(name: "NudgeMate")
+            ],
+            settings: .settings(
+                base: [
+                    "SWIFT_VERSION": "5.9"
+                ]
+            )
         )
     ],
     resourceSynthesizers: [
