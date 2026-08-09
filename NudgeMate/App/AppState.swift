@@ -14,6 +14,7 @@ final class AppState {
     private(set) var isBootstrapped = false
     private(set) var onboardingCompleted = false
     private(set) var selectedCalendarIdentifiers = Set<String>()
+    private(set) var appearanceTheme: AppearanceTheme = .system
     var appErrorMessage: String?
 
     @ObservationIgnored
@@ -64,6 +65,7 @@ final class AppState {
             let settings = try SwiftDataSettingsRepository(context: modelContext).load()
             onboardingCompleted = settings.onboardingCompleted
             selectedCalendarIdentifiers = Set(settings.selectedCalendarIdentifiers)
+            appearanceTheme = settings.appearanceTheme
             isBootstrapped = true
         } catch {
             appErrorMessage = error.localizedDescription
@@ -85,6 +87,19 @@ final class AppState {
         try repository.save(settings)
         self.selectedCalendarIdentifiers = selectedCalendarIdentifiers
         onboardingCompleted = true
+    }
+
+    func updateSettings(_ settings: UserSettings) {
+        selectedCalendarIdentifiers = Set(settings.selectedCalendarIdentifiers)
+        appearanceTheme = settings.appearanceTheme
+    }
+
+    func resetAfterDataDeletion() {
+        selectedCalendarIdentifiers = []
+        appearanceTheme = .system
+        onboardingCompleted = false
+        isBootstrapped = false
+        isDailyRecapPresented = false
     }
 
     func evaluateDailyRecapPresentation(at date: Date = .now) {

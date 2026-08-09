@@ -28,5 +28,14 @@ struct RootView: View {
                 .presentationDetents([.large])
                 .interactiveDismissDisabled(appState.subscriptionManager.isPurchasing)
         }
+        .preferredColorScheme(preferredColorScheme)
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        switch appState.appearanceTheme {
+        case .system: nil
+        case .light: .light
+        case .dark, .pro: .dark
+        }
     }
 }

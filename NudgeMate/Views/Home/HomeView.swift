@@ -17,6 +17,7 @@ struct HomeView: View {
 
     @State private var viewModel = HomeViewModel()
     @State private var nudgeViewModel = NudgeViewModel()
+    @State private var isSettingsPresented = false
 
     private var activeNudges: [RecurringEvent] {
         recurringEvents.filter { !$0.isMuted }
@@ -49,6 +50,15 @@ struct HomeView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ColorTheme.background.ignoresSafeArea())
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isSettingsPresented = true
+                    } label: {
+                        SVGAssetImage(asset: .sync)
+                            .frame(width: 30, height: 30)
+                    }
+                    .accessibilityLabel(L10n.Settings.title)
+                }
                 ToolbarItem(placement: .principal) {
                     Text(L10n.App.name)
                         .pretendard(.headline, weight: .bold)
@@ -61,6 +71,10 @@ struct HomeView: View {
                 .environment(appState)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $isSettingsPresented) {
+            SettingsView()
+                .environment(appState)
         }
         .task {
             await viewModel.load(
