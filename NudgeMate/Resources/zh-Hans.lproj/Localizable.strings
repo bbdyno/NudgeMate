@@ -1,0 +1,66 @@
+"app.name" = "NudgeMate";
+"common.confirm" = "确定";
+"common.done" = "完成";
+"common.retry" = "重试";
+
+"prep.status.notReady" = "尚未准备";
+"prep.status.inProgress" = "准备中";
+"prep.status.ready" = "准备完成";
+
+"calendar.error.accessDenied" = "日历访问已被拒绝。请在“设置”中允许完全访问。";
+"calendar.error.writeOnly" = "分析重复日程需要完全访问日历。";
+"calendar.error.unavailable" = "此设备无法使用日历。";
+"calendar.error.saveFailed" = "无法保存日程。%@";
+"calendar.event.predictedNote" = "由 NudgeMate 预测的重复日程";
+"calendar.event.fallbackTitle" = "重复日程";
+
+"notification.error.permissionDenied" = "通知已关闭。请在“设置”中允许通知。";
+"notification.error.modelUnavailable" = "存储空间尚未就绪，无法处理通知操作。";
+"notification.error.invalidTargetDate" = "无法为已过期的目标安排准备提醒。";
+"notification.nudge.title" = "要安排下一次%@吗？";
+"notification.nudge.body" = "根据过往记录，间隔约为 %d 天。";
+"notification.prep.title" = "请确认%@的准备状态";
+"notification.prep.body" = "如果尚未准备好，我们会在剩余时间过半时再次提醒你。";
+"notification.action.scheduleNow" = "立即安排";
+"notification.action.snoozeWeek" = "推迟一周";
+"notification.action.skip" = "本次跳过";
+"notification.action.notReady" = "尚未准备";
+"notification.action.ready" = "准备完成";
+
+"home.loading" = "正在分析日历记录…";
+"home.error.loadTitle" = "无法载入";
+"home.permission.title" = "需要访问日历";
+"home.permission.message" = "请在“设置”中允许 NudgeMate 完全访问日历，以分析过去 12 个月的日程规律。";
+"home.permission.openSettings" = "打开设置";
+"home.prep.title" = "准备追踪";
+"home.prep.subtitle" = "为重要的日子做好准备";
+"home.prep.empty" = "目前没有正在准备的重要日程。";
+"home.nudge.title" = "即将到来的提醒";
+"home.nudge.subtitle" = "根据过往日程规律提供建议";
+"home.nudge.emptyTitle" = "暂时没有可预测的日程";
+"home.nudge.emptyMessage" = "同一日程在日历中出现至少两次后，我们会预测下一次时间。";
+"home.calendarAdded" = "已将%@添加到日历。";
+
+"nudge.card.interval" = "约每 %d 天 · %@";
+"nudge.action.enable" = "开启提醒";
+"nudge.action.disable" = "关闭提醒";
+"nudge.action.schedule" = "安排日程";
+"nudge.action.snooze" = "推迟一周";
+"nudge.action.skip" = "跳过";
+
+"prep.card.dayCount" = "D-%d";
+"prep.card.accessibility" = "%@，还剩 %d 天，%@";
+
+"recap.empty.title" = "今天没有需要确认的准备";
+"recap.empty.message" = "祝你今晚轻松愉快，明天我们会继续提醒你。";
+"recap.introduction" = "请确认今天为重要日程所做的准备。";
+"recap.title" = "今日准备回顾";
+"recap.error.title" = "无法完成操作";
+"recap.action.ready" = "准备完成";
+"recap.action.notReady" = "尚未准备";
+
+"subscription.error.productsUnavailable" = "暂时无法载入订阅商品，请稍后重试。";
+"subscription.error.productNotSupported" = "不支持此订阅商品。";
+"subscription.error.purchasesNotAllowed" = "此设备无法进行 App 内购买。";
+"subscription.error.failedVerification" = "无法验证 App Store 交易。";
+"subscription.error.unknownPurchaseResult" = "App Store 返回了未知的购买结果。";

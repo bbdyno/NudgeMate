@@ -1,0 +1,66 @@
+"app.name" = "NudgeMate";
+"common.confirm" = "OK";
+"common.done" = "完了";
+"common.retry" = "再試行";
+
+"prep.status.notReady" = "未準備";
+"prep.status.inProgress" = "準備中";
+"prep.status.ready" = "準備完了";
+
+"calendar.error.accessDenied" = "カレンダーへのアクセスが拒否されました。「設定」でフルアクセスを許可してください。";
+"calendar.error.writeOnly" = "繰り返し予定を分析するには、カレンダーへのフルアクセスが必要です。";
+"calendar.error.unavailable" = "このデバイスではカレンダーを利用できません。";
+"calendar.error.saveFailed" = "予定を保存できませんでした。%@";
+"calendar.event.predictedNote" = "NudgeMateが予測した繰り返し予定";
+"calendar.event.fallbackTitle" = "繰り返し予定";
+
+"notification.error.permissionDenied" = "通知がオフになっています。「設定」で通知を許可してください。";
+"notification.error.modelUnavailable" = "ストレージの準備ができていないため、通知操作を処理できません。";
+"notification.error.invalidTargetDate" = "過去の目標には準備リマインダーを設定できません。";
+"notification.nudge.title" = "次の%@を予定に入れませんか？";
+"notification.nudge.body" = "過去の記録では、約%d日間隔で行っています。";
+"notification.prep.title" = "%@の準備状況を確認しましょう";
+"notification.prep.body" = "まだ準備できていない場合は、残り期間の半分が過ぎた頃にもう一度お知らせします。";
+"notification.action.scheduleNow" = "今すぐ予定を入れる";
+"notification.action.snoozeWeek" = "1週間延期";
+"notification.action.skip" = "今回はスキップ";
+"notification.action.notReady" = "未準備";
+"notification.action.ready" = "準備完了";
+
+"home.loading" = "カレンダーの履歴を分析しています…";
+"home.error.loadTitle" = "読み込めませんでした";
+"home.permission.title" = "カレンダーへのアクセスが必要です";
+"home.permission.message" = "過去12か月の予定パターンを分析するため、「設定」でNudgeMateにカレンダーへのフルアクセスを許可してください。";
+"home.permission.openSettings" = "設定を開く";
+"home.prep.title" = "準備トラッカー";
+"home.prep.subtitle" = "大切な日に向けて忘れずに準備しましょう";
+"home.prep.empty" = "準備中の大切な予定はまだありません。";
+"home.nudge.title" = "次のナッジ";
+"home.nudge.subtitle" = "過去の予定パターンをもとに提案します";
+"home.nudge.emptyTitle" = "まだ予測できる予定がありません";
+"home.nudge.emptyMessage" = "同じ予定がカレンダーに2回以上登録されると、次の時期を提案します。";
+"home.calendarAdded" = "%@をカレンダーに追加しました。";
+
+"nudge.card.interval" = "約%d日ごと · %@";
+"nudge.action.enable" = "通知をオン";
+"nudge.action.disable" = "通知をオフ";
+"nudge.action.schedule" = "予定を入れる";
+"nudge.action.snooze" = "1週間延期";
+"nudge.action.skip" = "スキップ";
+
+"prep.card.dayCount" = "D-%d";
+"prep.card.accessibility" = "%@、残り%d日、%@";
+
+"recap.empty.title" = "今日は確認する準備がありません";
+"recap.empty.message" = "ゆっくりお過ごしください。明日またサポートします。";
+"recap.introduction" = "大切な予定に向けて、今日準備したことを確認しましょう。";
+"recap.title" = "今日の準備を振り返る";
+"recap.error.title" = "操作を完了できませんでした";
+"recap.action.ready" = "準備完了";
+"recap.action.notReady" = "未準備";
+
+"subscription.error.productsUnavailable" = "購入項目を読み込めません。しばらくしてからもう一度お試しください。";
+"subscription.error.productNotSupported" = "この購入項目はサポートされていません。";
+"subscription.error.purchasesNotAllowed" = "このデバイスではアプリ内課金を利用できません。";
+"subscription.error.failedVerification" = "App Storeの取引を検証できませんでした。";
+"subscription.error.unknownPurchaseResult" = "App Storeから不明な購入結果が返されました。";
