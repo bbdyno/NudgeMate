@@ -1,4 +1,6 @@
 "app.name" = "NudgeMate";
+"app.storage.title" = "데이터를 열 수 없어요";
+"app.storage.message" = "기기의 저장 공간을 확인한 뒤 앱을 다시 실행해 주세요. 기존 데이터는 변경하지 않았습니다.";
 "common.confirm" = "확인";
 "common.done" = "완료";
 "common.retry" = "다시 시도";

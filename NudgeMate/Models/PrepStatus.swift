@@ -9,6 +9,22 @@ enum PrepStatus: String, Codable, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    init(_ status: PrepReadinessStatus) {
+        switch status {
+        case .notReady: self = .notReady
+        case .inProgress: self = .inProgress
+        case .ready: self = .ready
+        }
+    }
+
+    var readinessStatus: PrepReadinessStatus {
+        switch self {
+        case .notReady: return .notReady
+        case .inProgress: return .inProgress
+        case .ready: return .ready
+        }
+    }
+
     var localizedTitle: String {
         switch self {
         case .notReady:

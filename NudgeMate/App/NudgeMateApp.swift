@@ -3,41 +3,36 @@ import SwiftUI
 
 @main
 struct NudgeMateApp: App {
-    private let modelContainer: ModelContainer
+    private let modelContainerResult: Result<ModelContainer, Error>
     @State private var appState: AppState
 
     init() {
-        let schema = Schema([
-            RecurringEvent.self,
-            EventPrep.self
-        ])
-        let configuration = ModelConfiguration(
-            "NudgeMate",
-            schema: schema,
-            isStoredInMemoryOnly: false
-        )
-
-        do {
-            let container = try ModelContainer(
-                for: schema,
-                configurations: [configuration]
-            )
-            let state = AppState()
+        let state = AppState()
+        modelContainerResult = Result {
+            let container = try PersistenceController.makeContainer()
             state.configure(modelContainer: container)
-
-            modelContainer = container
-            _appState = State(initialValue: state)
-        } catch {
-            fatalError("SwiftData 저장소를 만들 수 없습니다: \(error.localizedDescription)")
+            return container
         }
+        _appState = State(initialValue: state)
     }
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
-                .environment(appState)
-                .environment(\.font, TypographyManager.font(for: .body))
+            Group {
+                switch modelContainerResult {
+                case let .success(modelContainer):
+                    HomeView()
+                        .modelContainer(modelContainer)
+                case .failure:
+                    EmptyStateView(
+                        icon: .emptyState,
+                        title: NudgeMateStrings.Localizable.App.Storage.title,
+                        message: NudgeMateStrings.Localizable.App.Storage.message
+                    )
+                }
+            }
+            .environment(appState)
+            .environment(\.font, TypographyManager.font(for: .body))
         }
-        .modelContainer(modelContainer)
     }
 }

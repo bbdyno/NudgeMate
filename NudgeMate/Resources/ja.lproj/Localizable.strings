@@ -1,4 +1,6 @@
 "app.name" = "NudgeMate";
+"app.storage.title" = "データを開けませんでした";
+"app.storage.message" = "デバイスの空き容量を確認して、アプリを再度開いてください。既存のデータは変更されていません。";
 "common.confirm" = "OK";
 "common.done" = "完了";
 "common.retry" = "再試行";
