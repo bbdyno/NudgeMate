@@ -10,6 +10,56 @@
 "common.error" = "Error";
 "common.accept" = "Add";
 "common.reject" = "Exclude";
+"common.delete" = "Delete";
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+
+"tab.today" = "Today";
+"tab.rhythms" = "Rhythms";
+"tab.prep" = "Prep";
+
+"rhythm.title" = "Rhythms";
+"rhythm.add" = "Add Rhythm";
+"rhythm.pause" = "Pause";
+"rhythm.resume" = "Resume";
+"rhythm.paused" = "Paused";
+"rhythm.empty.title" = "No rhythms yet";
+"rhythm.empty.message" = "Add a recurring routine or scan your calendars from Settings.";
+"rhythm.row.detail" = "About every %d days · Next %@";
+"rhythm.editor.newTitle" = "New Rhythm";
+"rhythm.editor.editTitle" = "Edit Rhythm";
+"rhythm.editor.basic" = "Basics";
+"rhythm.editor.name" = "Rhythm name";
+"rhythm.editor.mode" = "Prediction";
+"rhythm.editor.fixed" = "Fixed cadence";
+"rhythm.editor.adaptive" = "Adapt to history";
+"rhythm.editor.schedule" = "Cadence & Notifications";
+"rhythm.editor.interval" = "Every %d days";
+"rhythm.editor.lastDate" = "Last occurrence";
+"rhythm.editor.leadTime" = "Notify %d days early";
+"rhythm.editor.notifications" = "Notifications";
+
+"prep.title" = "Prep";
+"prep.add" = "Add Prep";
+"prep.readiness" = "Readiness";
+"prep.empty.title" = "No important events to prepare for";
+"prep.empty.message" = "Add a target date and the next check-in will adapt to your readiness.";
+"prep.row.detail" = "D-%d · %@";
+"prep.editor.newTitle" = "New Prep";
+"prep.editor.editTitle" = "Edit Prep";
+"prep.editor.basic" = "Important Event";
+"prep.editor.title" = "What are you preparing for?";
+"prep.editor.targetDate" = "Target date";
+"prep.editor.nextAction" = "Next action note";
+"prep.editor.reminder" = "Check-ins";
+"prep.editor.intensity" = "Reminder frequency";
+"prep.intensity.low" = "Relaxed";
+"prep.intensity.normal" = "Normal";
+"prep.intensity.high" = "Frequent";
+
+"recap.rhythm.message" = "Tell us whether you completed this roughly %d-day rhythm.";
+"recap.action.done" = "Done";
+"recap.action.snoozed" = "Snoozed";
 
 "onboarding.welcome.title" = "Stay ahead of the things that matter";
 "onboarding.welcome.message" = "NudgeMate is your personal scheduling assistant for recurring routines and important preparation.";

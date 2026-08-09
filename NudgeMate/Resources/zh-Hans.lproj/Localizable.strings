@@ -10,6 +10,56 @@
 "common.error" = "错误";
 "common.accept" = "添加";
 "common.reject" = "排除";
+"common.delete" = "删除";
+"common.cancel" = "取消";
+"common.save" = "保存";
+
+"tab.today" = "今天";
+"tab.rhythms" = "节奏";
+"tab.prep" = "准备";
+
+"rhythm.title" = "节奏";
+"rhythm.add" = "添加节奏";
+"rhythm.pause" = "暂停";
+"rhythm.resume" = "继续";
+"rhythm.paused" = "已暂停";
+"rhythm.empty.title" = "尚无节奏";
+"rhythm.empty.message" = "可手动添加周期事项，或从设置扫描日历。";
+"rhythm.row.detail" = "约每 %d 天 · 下次 %@";
+"rhythm.editor.newTitle" = "新节奏";
+"rhythm.editor.editTitle" = "编辑节奏";
+"rhythm.editor.basic" = "基本信息";
+"rhythm.editor.name" = "节奏名称";
+"rhythm.editor.mode" = "预测方式";
+"rhythm.editor.fixed" = "固定周期";
+"rhythm.editor.adaptive" = "根据记录调整";
+"rhythm.editor.schedule" = "周期与通知";
+"rhythm.editor.interval" = "每 %d 天";
+"rhythm.editor.lastDate" = "最近执行日";
+"rhythm.editor.leadTime" = "提前 %d 天通知";
+"rhythm.editor.notifications" = "通知";
+
+"prep.title" = "准备";
+"prep.add" = "添加准备";
+"prep.readiness" = "准备状态";
+"prep.empty.title" = "暂无需要准备的重要日程";
+"prep.empty.message" = "添加目标日期后，将根据准备状态计算下次确认时间。";
+"prep.row.detail" = "D-%d · %@";
+"prep.editor.newTitle" = "新准备";
+"prep.editor.editTitle" = "编辑准备";
+"prep.editor.basic" = "重要日程";
+"prep.editor.title" = "准备事项";
+"prep.editor.targetDate" = "目标日期";
+"prep.editor.nextAction" = "下一步备注";
+"prep.editor.reminder" = "确认提醒";
+"prep.editor.intensity" = "提醒频率";
+"prep.intensity.low" = "宽松";
+"prep.intensity.normal" = "普通";
+"prep.intensity.high" = "频繁";
+
+"recap.rhythm.message" = "请确认是否完成约 %d 天周期的事项。";
+"recap.action.done" = "已完成";
+"recap.action.snoozed" = "已推迟";
 
 "onboarding.welcome.title" = "重要事项，提前为你提醒";
 "onboarding.welcome.message" = "NudgeMate 是帮助你管理周期日程和重要准备的个人日程助手。";

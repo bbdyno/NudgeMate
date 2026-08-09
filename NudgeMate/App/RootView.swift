@@ -14,7 +14,7 @@ struct RootView: View {
             } else if !appState.onboardingCompleted {
                 OnboardingView()
             } else {
-                HomeView()
+                MainTabView()
             }
         }
         .task {

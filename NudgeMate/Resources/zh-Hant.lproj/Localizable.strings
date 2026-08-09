@@ -10,6 +10,56 @@
 "common.error" = "錯誤";
 "common.accept" = "加入";
 "common.reject" = "排除";
+"common.delete" = "刪除";
+"common.cancel" = "取消";
+"common.save" = "儲存";
+
+"tab.today" = "今天";
+"tab.rhythms" = "節奏";
+"tab.prep" = "準備";
+
+"rhythm.title" = "節奏";
+"rhythm.add" = "加入節奏";
+"rhythm.pause" = "暫停";
+"rhythm.resume" = "繼續";
+"rhythm.paused" = "已暫停";
+"rhythm.empty.title" = "尚無節奏";
+"rhythm.empty.message" = "可手動加入週期事項，或從設定掃描行事曆。";
+"rhythm.row.detail" = "約每 %d 天・下次 %@";
+"rhythm.editor.newTitle" = "新節奏";
+"rhythm.editor.editTitle" = "編輯節奏";
+"rhythm.editor.basic" = "基本資訊";
+"rhythm.editor.name" = "節奏名稱";
+"rhythm.editor.mode" = "預測方式";
+"rhythm.editor.fixed" = "固定週期";
+"rhythm.editor.adaptive" = "依記錄調整";
+"rhythm.editor.schedule" = "週期與通知";
+"rhythm.editor.interval" = "每 %d 天";
+"rhythm.editor.lastDate" = "最近執行日";
+"rhythm.editor.leadTime" = "提前 %d 天通知";
+"rhythm.editor.notifications" = "通知";
+
+"prep.title" = "準備";
+"prep.add" = "加入準備";
+"prep.readiness" = "準備狀態";
+"prep.empty.title" = "暫無需要準備的重要行程";
+"prep.empty.message" = "加入目標日期後，將依準備狀態計算下次確認時間。";
+"prep.row.detail" = "D-%d・%@";
+"prep.editor.newTitle" = "新準備";
+"prep.editor.editTitle" = "編輯準備";
+"prep.editor.basic" = "重要行程";
+"prep.editor.title" = "準備事項";
+"prep.editor.targetDate" = "目標日期";
+"prep.editor.nextAction" = "下一步備註";
+"prep.editor.reminder" = "確認提醒";
+"prep.editor.intensity" = "提醒頻率";
+"prep.intensity.low" = "寬鬆";
+"prep.intensity.normal" = "一般";
+"prep.intensity.high" = "頻繁";
+
+"recap.rhythm.message" = "請確認是否完成約 %d 天週期的事項。";
+"recap.action.done" = "已完成";
+"recap.action.snoozed" = "已延後";
 
 "onboarding.welcome.title" = "重要事項，提前為你提醒";
 "onboarding.welcome.message" = "NudgeMate 是協助你管理週期行程與重要準備的個人行程助理。";

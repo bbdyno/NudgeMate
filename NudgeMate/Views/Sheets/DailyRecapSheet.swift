@@ -11,16 +11,30 @@ struct DailyRecapSheet: View {
     @Query(sort: \EventPrep.targetDate)
     private var eventPreps: [EventPrep]
 
+    @Query(sort: \RecurringEvent.nextExpectedCenterDate)
+    private var rhythms: [RecurringEvent]
+
     @State private var errorMessage: String?
 
     private var pendingPreps: [EventPrep] {
         eventPreps.filter { $0.status != .ready && $0.targetDate > .now }
     }
 
+    private var dueRhythms: [RecurringEvent] {
+        let endOfToday = Calendar.autoupdatingCurrent.date(
+            byAdding: .day,
+            value: 1,
+            to: Calendar.autoupdatingCurrent.startOfDay(for: .now)
+        ) ?? .now
+        return rhythms.filter {
+            !$0.isMuted && $0.nextExpectedStartDate < endOfToday
+        }
+    }
+
     var body: some View {
         NavigationStack {
             Group {
-                if pendingPreps.isEmpty {
+                if pendingPreps.isEmpty && dueRhythms.isEmpty {
                     EmptyStateView(
                         icon: .emptyState,
                         title: L10n.Recap.Empty.title,
@@ -37,6 +51,10 @@ struct DailyRecapSheet: View {
 
                             ForEach(pendingPreps) { prep in
                                 recapRow(for: prep)
+                            }
+
+                            ForEach(dueRhythms) { rhythm in
+                                rhythmRecapRow(for: rhythm)
                             }
                         }
                         .padding(20)
@@ -101,6 +119,46 @@ struct DailyRecapSheet: View {
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: prep.status)
     }
 
+    private func rhythmRecapRow(for rhythm: RecurringEvent) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                SVGAssetImage(asset: .nudgeAlert)
+                    .frame(width: 46, height: 46)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(rhythm.displayName)
+                        .pretendard(.headline, weight: .semibold)
+                    Text(L10n.Recap.Rhythm.message(rhythm.baseIntervalDays))
+                        .pretendard(.subheadline)
+                        .foregroundStyle(ColorTheme.secondaryText)
+                }
+            }
+            HStack(spacing: 10) {
+                Button(L10n.Recap.Action.done) {
+                    complete(rhythm)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(ColorTheme.primaryNudge)
+                Button(L10n.Recap.Action.snoozed) {
+                    Task {
+                        do {
+                            try await appState.nudgeManager.snooze(
+                                rhythm,
+                                modelContext: modelContext
+                            )
+                        } catch {
+                            errorMessage = error.localizedDescription
+                        }
+                    }
+                }
+                .buttonStyle(.bordered)
+                .tint(ColorTheme.secondarySnooze)
+            }
+        }
+        .padding(16)
+        .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
     private var errorBinding: Binding<Bool> {
         Binding(
             get: { errorMessage != nil },
@@ -119,6 +177,25 @@ struct DailyRecapSheet: View {
             } catch {
                 errorMessage = error.localizedDescription
             }
+        }
+    }
+
+    private func complete(_ rhythm: RecurringEvent) {
+        let now = Date.now
+        rhythm.historyDates.append(now)
+        rhythm.lastOccurrenceDate = now
+        let center = Calendar.autoupdatingCurrent.date(
+            byAdding: .day,
+            value: rhythm.baseIntervalDays,
+            to: now
+        ) ?? now.addingTimeInterval(TimeInterval(rhythm.baseIntervalDays * 86_400))
+        rhythm.nextPredictedDate = center
+        rhythm.updatedAt = now
+        do {
+            try modelContext.save()
+            Task { try? await appState.nudgeManager.scheduleNudge(for: rhythm) }
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }

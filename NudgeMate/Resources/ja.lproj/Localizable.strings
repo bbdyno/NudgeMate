@@ -10,6 +10,56 @@
 "common.error" = "エラー";
 "common.accept" = "追加";
 "common.reject" = "除外";
+"common.delete" = "削除";
+"common.cancel" = "キャンセル";
+"common.save" = "保存";
+
+"tab.today" = "今日";
+"tab.rhythms" = "リズム";
+"tab.prep" = "準備";
+
+"rhythm.title" = "リズム";
+"rhythm.add" = "リズムを追加";
+"rhythm.pause" = "一時停止";
+"rhythm.resume" = "再開";
+"rhythm.paused" = "停止中";
+"rhythm.empty.title" = "リズムがありません";
+"rhythm.empty.message" = "繰り返す予定を手動で追加するか、設定からカレンダーを分析してください。";
+"rhythm.row.detail" = "約%d日間隔・次回 %@";
+"rhythm.editor.newTitle" = "新しいリズム";
+"rhythm.editor.editTitle" = "リズムを編集";
+"rhythm.editor.basic" = "基本情報";
+"rhythm.editor.name" = "リズム名";
+"rhythm.editor.mode" = "予測方法";
+"rhythm.editor.fixed" = "固定間隔";
+"rhythm.editor.adaptive" = "履歴に合わせる";
+"rhythm.editor.schedule" = "間隔と通知";
+"rhythm.editor.interval" = "%d日間隔";
+"rhythm.editor.lastDate" = "前回の実行日";
+"rhythm.editor.leadTime" = "%d日前に通知";
+"rhythm.editor.notifications" = "通知";
+
+"prep.title" = "準備";
+"prep.add" = "準備を追加";
+"prep.readiness" = "準備状況";
+"prep.empty.title" = "準備する予定がありません";
+"prep.empty.message" = "目標日を追加すると、準備状況に応じて次の確認日を計算します。";
+"prep.row.detail" = "D-%d・%@";
+"prep.editor.newTitle" = "新しい準備";
+"prep.editor.editTitle" = "準備を編集";
+"prep.editor.basic" = "重要な予定";
+"prep.editor.title" = "準備すること";
+"prep.editor.targetDate" = "目標日";
+"prep.editor.nextAction" = "次の行動メモ";
+"prep.editor.reminder" = "チェックイン";
+"prep.editor.intensity" = "通知頻度";
+"prep.intensity.low" = "ゆっくり";
+"prep.intensity.normal" = "標準";
+"prep.intensity.high" = "頻繁";
+
+"recap.rhythm.message" = "約%d日リズムを実行したか教えてください。";
+"recap.action.done" = "完了";
+"recap.action.snoozed" = "延期";
 
 "onboarding.welcome.title" = "大切な予定を先回り";
 "onboarding.welcome.message" = "NudgeMateは、繰り返す習慣と大切な準備を支えるスケジュールアシスタントです。";
