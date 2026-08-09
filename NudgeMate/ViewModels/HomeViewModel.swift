@@ -80,7 +80,7 @@ final class HomeViewModel {
     ) async {
         do {
             let startDate = max(event.nextPredictedDate, nextAvailableHour())
-            try await eventKitManager.createCalendarEvent(
+            _ = try await eventKitManager.createCalendarEvent(
                 title: event.title,
                 startDate: startDate
             )
