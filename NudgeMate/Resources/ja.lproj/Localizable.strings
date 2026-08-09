@@ -4,6 +4,50 @@
 "common.confirm" = "OK";
 "common.done" = "完了";
 "common.retry" = "再試行";
+"common.loading" = "読み込み中";
+"common.next" = "次へ";
+"common.close" = "閉じる";
+"common.error" = "エラー";
+"common.accept" = "追加";
+"common.reject" = "除外";
+
+"onboarding.welcome.title" = "大切な予定を先回り";
+"onboarding.welcome.message" = "NudgeMateは、繰り返す習慣と大切な準備を支えるスケジュールアシスタントです。";
+"onboarding.rhythm.title" = "予定のリズムを見つけます";
+"onboarding.rhythm.message" = "端末内で予定名と日付を分析し、次の時期を予測します。分析データは端末外へ送信されません。";
+"onboarding.permission.title" = "選んだカレンダーだけを確認";
+"onboarding.permission.message" = "フルアクセスを許可した後、分析対象を選べます。誕生日・祝日・購読カレンダーは初期状態で除外されます。";
+"onboarding.permission.scan" = "カレンダーからリズムを探す";
+"onboarding.permission.manual" = "手動追加で始める";
+
+"calendar.selection.title" = "カレンダーを選択";
+"calendar.selection.loading" = "カレンダーを読み込み中…";
+"calendar.selection.message" = "パターンを探すカレンダーだけを選択してください。分析結果は端末内に保存されます。";
+"calendar.selection.scan" = "%d件のカレンダーをスキャン";
+"calendar.scan.progress" = "カレンダー分析の進行状況";
+"calendar.exclusion.birthdays" = "誕生日は初期状態で除外";
+"calendar.exclusion.holidays" = "祝日は初期状態で除外";
+"calendar.exclusion.subscribed" = "購読カレンダーは初期状態で除外";
+"calendar.exclusion.readOnly" = "読み取り専用は初期状態で除外";
+
+"candidate.title" = "リズム候補を確認";
+"candidate.message" = "候補を確認し、必要なリズムだけを追加してください。名前とカテゴリを編集できます。";
+"candidate.emptyTitle" = "リズム候補がありません";
+"candidate.emptyMessage" = "予定が増えたら設定からいつでも再分析できます。";
+"candidate.finish" = "確認を完了";
+"candidate.name" = "リズム名";
+"candidate.interval" = "約%d日間隔";
+"candidate.samples" = "%d件の記録";
+"candidate.category" = "カテゴリ";
+
+"category.personalCare" = "パーソナルケア";
+"category.health" = "健康";
+"category.vehicle" = "車両";
+"category.home" = "住まい";
+"category.pet" = "ペット";
+"category.finance" = "金融";
+"category.work" = "仕事";
+"category.other" = "その他";
 
 "prep.status.notReady" = "未準備";
 "prep.status.inProgress" = "準備中";

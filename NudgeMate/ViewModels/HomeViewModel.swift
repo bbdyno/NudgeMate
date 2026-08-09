@@ -33,8 +33,10 @@ final class HomeViewModel {
         }
 
         do {
-            try await eventKitManager.requestAccess()
-
+            await eventKitManager.refreshAuthorizationState()
+            guard eventKitManager.authorizationState == .fullAccess else {
+                return
+            }
             let existingDescriptor = FetchDescriptor<RecurringEvent>()
             let existingEvents = try modelContext.fetch(existingDescriptor)
 

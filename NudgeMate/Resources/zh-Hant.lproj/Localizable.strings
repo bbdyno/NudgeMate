@@ -4,6 +4,50 @@
 "common.confirm" = "確定";
 "common.done" = "完成";
 "common.retry" = "再試一次";
+"common.loading" = "載入中";
+"common.next" = "下一步";
+"common.close" = "關閉";
+"common.error" = "錯誤";
+"common.accept" = "加入";
+"common.reject" = "排除";
+
+"onboarding.welcome.title" = "重要事項，提前為你提醒";
+"onboarding.welcome.message" = "NudgeMate 是協助你管理週期行程與重要準備的個人行程助理。";
+"onboarding.rhythm.title" = "發現你的行程節奏";
+"onboarding.rhythm.message" = "App 僅在裝置上分析行程標題與日期並預測下次時間，分析資料不會離開裝置。";
+"onboarding.permission.title" = "只分析你選擇的行事曆";
+"onboarding.permission.message" = "允許完整取用後可自行選擇分析範圍。生日、假日及訂閱行事曆預設排除。";
+"onboarding.permission.scan" = "從行事曆尋找節奏";
+"onboarding.permission.manual" = "從手動加入開始";
+
+"calendar.selection.title" = "選擇行事曆";
+"calendar.selection.loading" = "正在載入行事曆…";
+"calendar.selection.message" = "只選擇要尋找重複模式的行事曆。分析結果只會儲存在此裝置。";
+"calendar.selection.scan" = "掃描 %d 個行事曆";
+"calendar.scan.progress" = "行事曆分析進度";
+"calendar.exclusion.birthdays" = "生日預設排除";
+"calendar.exclusion.holidays" = "假日預設排除";
+"calendar.exclusion.subscribed" = "訂閱行事曆預設排除";
+"calendar.exclusion.readOnly" = "唯讀行事曆預設排除";
+
+"candidate.title" = "檢視節奏候選";
+"candidate.message" = "請檢視候選並只加入需要的節奏。可修改名稱與分類。";
+"candidate.emptyTitle" = "尚未找到節奏候選";
+"candidate.emptyMessage" = "行程增加後可隨時從設定重新分析。";
+"candidate.finish" = "完成檢視";
+"candidate.name" = "節奏名稱";
+"candidate.interval" = "約每 %d 天";
+"candidate.samples" = "%d 筆記錄";
+"candidate.category" = "分類";
+
+"category.personalCare" = "個人護理";
+"category.health" = "健康";
+"category.vehicle" = "車輛";
+"category.home" = "居家";
+"category.pet" = "寵物";
+"category.finance" = "財務";
+"category.work" = "工作";
+"category.other" = "其他";
 
 "prep.status.notReady" = "尚未準備";
 "prep.status.inProgress" = "準備中";

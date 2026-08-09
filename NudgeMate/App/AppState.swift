@@ -9,6 +9,10 @@ final class AppState {
     let nudgeManager: NudgeManager
 
     var isDailyRecapPresented = false
+    private(set) var isBootstrapped = false
+    private(set) var onboardingCompleted = false
+    private(set) var selectedCalendarIdentifiers = Set<String>()
+    var appErrorMessage: String?
 
     @ObservationIgnored
     private let calendar: Calendar
@@ -47,6 +51,35 @@ final class AppState {
             modelContainer: modelContainer,
             nudgeManager: nudgeManager
         )
+    }
+
+    func bootstrap(modelContext: ModelContext) {
+        guard !isBootstrapped else { return }
+        do {
+            let settings = try SwiftDataSettingsRepository(context: modelContext).load()
+            onboardingCompleted = settings.onboardingCompleted
+            selectedCalendarIdentifiers = Set(settings.selectedCalendarIdentifiers)
+            isBootstrapped = true
+        } catch {
+            appErrorMessage = error.localizedDescription
+            isBootstrapped = true
+        }
+    }
+
+    func finishOnboarding(
+        selectedCalendarIdentifiers: Set<String>,
+        modelContext: ModelContext
+    ) throws {
+        let repository = SwiftDataSettingsRepository(context: modelContext)
+        var settings = try repository.load()
+        settings.onboardingCompleted = true
+        settings.calendarPermissionEducationCompleted = true
+        settings.selectedCalendarIdentifiers = selectedCalendarIdentifiers.sorted()
+        settings.lastCalendarScanDate = selectedCalendarIdentifiers.isEmpty ? nil : .now
+        settings.updatedAt = .now
+        try repository.save(settings)
+        self.selectedCalendarIdentifiers = selectedCalendarIdentifiers
+        onboardingCompleted = true
     }
 
     func evaluateDailyRecapPresentation(at date: Date = .now) {

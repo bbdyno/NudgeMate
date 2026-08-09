@@ -4,6 +4,50 @@
 "common.confirm" = "OK";
 "common.done" = "Done";
 "common.retry" = "Try Again";
+"common.loading" = "Loading";
+"common.next" = "Next";
+"common.close" = "Close";
+"common.error" = "Error";
+"common.accept" = "Add";
+"common.reject" = "Exclude";
+
+"onboarding.welcome.title" = "Stay ahead of the things that matter";
+"onboarding.welcome.message" = "NudgeMate is your personal scheduling assistant for recurring routines and important preparation.";
+"onboarding.rhythm.title" = "Discover your scheduling rhythm";
+"onboarding.rhythm.message" = "Event titles and dates are analyzed on this device to predict what comes next. Your analysis never leaves the device.";
+"onboarding.permission.title" = "Scan only calendars you choose";
+"onboarding.permission.message" = "After granting full access, you choose what to analyze. Birthdays, holidays, and subscribed calendars are excluded by default.";
+"onboarding.permission.scan" = "Find Rhythms in Calendar";
+"onboarding.permission.manual" = "Start by Adding Manually";
+
+"calendar.selection.title" = "Choose Calendars";
+"calendar.selection.loading" = "Loading calendars…";
+"calendar.selection.message" = "Select only the calendars to scan for patterns. Analysis stays on this device.";
+"calendar.selection.scan" = "Scan %d Calendars";
+"calendar.scan.progress" = "Calendar scan progress";
+"calendar.exclusion.birthdays" = "Birthdays excluded by default";
+"calendar.exclusion.holidays" = "Holidays excluded by default";
+"calendar.exclusion.subscribed" = "Subscribed calendar excluded by default";
+"calendar.exclusion.readOnly" = "Read-only calendar excluded by default";
+
+"candidate.title" = "Review Rhythms";
+"candidate.message" = "Review the suggestions and add only the rhythms you need. You can edit the name and category.";
+"candidate.emptyTitle" = "No rhythm suggestions yet";
+"candidate.emptyMessage" = "You can scan again from Settings after more events have accumulated.";
+"candidate.finish" = "Finish Review";
+"candidate.name" = "Rhythm name";
+"candidate.interval" = "About every %d days";
+"candidate.samples" = "%d events";
+"candidate.category" = "Category";
+
+"category.personalCare" = "Personal Care";
+"category.health" = "Health";
+"category.vehicle" = "Vehicle";
+"category.home" = "Home";
+"category.pet" = "Pet";
+"category.finance" = "Finance";
+"category.work" = "Work";
+"category.other" = "Other";
 
 "prep.status.notReady" = "Not Ready";
 "prep.status.inProgress" = "In Progress";

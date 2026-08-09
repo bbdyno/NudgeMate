@@ -71,6 +71,36 @@ final class PatternCandidateRecord {
         decision = value.decision
         createdAt = value.createdAt
     }
+
+    func domainValue(decoder: JSONDecoder = JSONDecoder()) throws -> PatternCandidate {
+        PatternCandidate(
+            id: id,
+            suggestedDisplayName: suggestedDisplayName,
+            normalizedKey: normalizedKey,
+            categorySuggestion: categorySuggestion,
+            eventReferences: try decoder.decode(
+                [CandidateEventReference].self,
+                from: eventReferencesData
+            ),
+            sampleCount: sampleCount,
+            intervalSamples: intervalSamples,
+            medianIntervalDays: medianIntervalDays,
+            variationDays: variationDays,
+            confidenceScore: confidenceScore,
+            confidenceBand: confidenceBand,
+            expectedWindow: DateWindow(
+                start: expectedStartDate,
+                center: expectedCenterDate,
+                end: expectedEndDate
+            ),
+            explanation: try decoder.decode(
+                PredictionExplanation.self,
+                from: explanationData
+            ),
+            decision: decision,
+            createdAt: createdAt
+        )
+    }
 }
 
 @Model

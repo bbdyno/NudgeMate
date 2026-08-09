@@ -4,6 +4,50 @@
 "common.confirm" = "확인";
 "common.done" = "완료";
 "common.retry" = "다시 시도";
+"common.loading" = "불러오는 중";
+"common.next" = "다음";
+"common.close" = "닫기";
+"common.error" = "오류";
+"common.accept" = "추가";
+"common.reject" = "제외";
+
+"onboarding.welcome.title" = "때가 되기 전에 챙겨드릴게요";
+"onboarding.welcome.message" = "NudgeMate는 반복되는 일과 중요한 준비를 미리 알려주는 개인 일정 도우미입니다.";
+"onboarding.rhythm.title" = "내 일정의 리듬을 발견해요";
+"onboarding.rhythm.message" = "기기에 저장된 일정 제목과 날짜를 분석해 다음 시점을 예측합니다. 분석 정보는 기기 밖으로 전송되지 않습니다.";
+"onboarding.permission.title" = "선택한 캘린더만 살펴볼게요";
+"onboarding.permission.message" = "전체 접근을 허용한 뒤 분석할 캘린더를 직접 고를 수 있습니다. 생일·공휴일·구독 캘린더는 기본 제외됩니다.";
+"onboarding.permission.scan" = "캘린더에서 리듬 찾기";
+"onboarding.permission.manual" = "직접 추가하며 시작하기";
+
+"calendar.selection.title" = "캘린더 선택";
+"calendar.selection.loading" = "캘린더를 불러오는 중…";
+"calendar.selection.message" = "반복 패턴을 찾을 캘린더만 선택하세요. 읽은 일정은 분석 후 기기에만 저장됩니다.";
+"calendar.selection.scan" = "%d개 캘린더 스캔";
+"calendar.scan.progress" = "캘린더 분석 진행률";
+"calendar.exclusion.birthdays" = "생일 캘린더는 기본 제외";
+"calendar.exclusion.holidays" = "공휴일 캘린더는 기본 제외";
+"calendar.exclusion.subscribed" = "구독 캘린더는 기본 제외";
+"calendar.exclusion.readOnly" = "읽기 전용 캘린더는 기본 제외";
+
+"candidate.title" = "리듬 후보 검토";
+"candidate.message" = "찾은 후보를 확인하고 필요한 리듬만 추가하세요. 이름과 분류를 바꿀 수 있습니다.";
+"candidate.emptyTitle" = "찾은 리듬 후보가 없어요";
+"candidate.emptyMessage" = "일정이 더 쌓이면 설정에서 언제든 다시 분석할 수 있습니다.";
+"candidate.finish" = "검토 마치기";
+"candidate.name" = "리듬 이름";
+"candidate.interval" = "약 %d일 간격";
+"candidate.samples" = "%d개 기록";
+"candidate.category" = "분류";
+
+"category.personalCare" = "개인 관리";
+"category.health" = "건강";
+"category.vehicle" = "차량";
+"category.home" = "집";
+"category.pet" = "반려동물";
+"category.finance" = "금융";
+"category.work" = "업무";
+"category.other" = "기타";
 
 "prep.status.notReady" = "준비 전";
 "prep.status.inProgress" = "준비 중";

@@ -23,7 +23,7 @@ struct NudgeMateApp: App {
             Group {
                 switch modelContainerResult {
                 case let .success(modelContainer):
-                    HomeView()
+                    RootView()
                         .modelContainer(modelContainer)
                 case .failure:
                     EmptyStateView(

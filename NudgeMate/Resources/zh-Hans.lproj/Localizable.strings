@@ -4,6 +4,50 @@
 "common.confirm" = "确定";
 "common.done" = "完成";
 "common.retry" = "重试";
+"common.loading" = "正在加载";
+"common.next" = "下一步";
+"common.close" = "关闭";
+"common.error" = "错误";
+"common.accept" = "添加";
+"common.reject" = "排除";
+
+"onboarding.welcome.title" = "重要事项，提前为你提醒";
+"onboarding.welcome.message" = "NudgeMate 是帮助你管理周期日程和重要准备的个人日程助手。";
+"onboarding.rhythm.title" = "发现你的日程节奏";
+"onboarding.rhythm.message" = "应用仅在设备上分析日程标题和日期，预测下一次时间，分析数据不会离开设备。";
+"onboarding.permission.title" = "只分析你选择的日历";
+"onboarding.permission.message" = "授予完全访问后可自行选择分析范围。生日、节假日和订阅日历默认排除。";
+"onboarding.permission.scan" = "从日历查找节奏";
+"onboarding.permission.manual" = "从手动添加开始";
+
+"calendar.selection.title" = "选择日历";
+"calendar.selection.loading" = "正在加载日历…";
+"calendar.selection.message" = "只选择需要查找重复模式的日历。分析结果仅保存在此设备。";
+"calendar.selection.scan" = "扫描 %d 个日历";
+"calendar.scan.progress" = "日历分析进度";
+"calendar.exclusion.birthdays" = "生日默认排除";
+"calendar.exclusion.holidays" = "节假日默认排除";
+"calendar.exclusion.subscribed" = "订阅日历默认排除";
+"calendar.exclusion.readOnly" = "只读日历默认排除";
+
+"candidate.title" = "审核节奏候选";
+"candidate.message" = "请审核候选并只添加需要的节奏。可修改名称和分类。";
+"candidate.emptyTitle" = "尚未找到节奏候选";
+"candidate.emptyMessage" = "日程增加后可随时从设置重新分析。";
+"candidate.finish" = "完成审核";
+"candidate.name" = "节奏名称";
+"candidate.interval" = "约每 %d 天";
+"candidate.samples" = "%d 条记录";
+"candidate.category" = "分类";
+
+"category.personalCare" = "个人护理";
+"category.health" = "健康";
+"category.vehicle" = "车辆";
+"category.home" = "居家";
+"category.pet" = "宠物";
+"category.finance" = "财务";
+"category.work" = "工作";
+"category.other" = "其他";
 
 "prep.status.notReady" = "尚未准备";
 "prep.status.inProgress" = "准备中";
