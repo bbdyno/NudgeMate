@@ -42,21 +42,10 @@ struct NudgeCardView: View {
                     .foregroundStyle(ColorTheme.secondaryText)
             }
 
-            HStack(spacing: 10) {
-                Button(L10n.Nudge.Action.schedule, action: onSchedule)
-                    .buttonStyle(.borderedProminent)
-                    .tint(ColorTheme.primaryNudge)
-
-                Button(L10n.Nudge.Action.snooze, action: onSnooze)
-                    .buttonStyle(.bordered)
-                    .tint(ColorTheme.secondarySnooze)
-
-                Button(L10n.Nudge.Action.skip, action: onSkip)
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(ColorTheme.secondaryText)
+            ViewThatFits(in: .horizontal) {
+                actionButtons(axis: .horizontal)
+                actionButtons(axis: .vertical)
             }
-            .pretendard(.subheadline, weight: .semibold)
-            .controlSize(.regular)
         }
         .padding(16)
         .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -67,5 +56,25 @@ struct NudgeCardView: View {
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: event.nextPredictedDate)
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: event.isMuted)
         .accessibilityElement(children: .contain)
+    }
+
+    @ViewBuilder
+    private func actionButtons(axis: Axis) -> some View {
+        let layout = axis == .horizontal
+            ? AnyLayout(HStackLayout(spacing: 10))
+            : AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
+        layout {
+            Button(L10n.Nudge.Action.schedule, action: onSchedule)
+                .buttonStyle(.borderedProminent)
+                .tint(ColorTheme.primaryNudge)
+            Button(L10n.Nudge.Action.snooze, action: onSnooze)
+                .buttonStyle(.bordered)
+                .tint(ColorTheme.secondarySnooze)
+            Button(L10n.Nudge.Action.skip, action: onSkip)
+                .buttonStyle(.borderless)
+                .foregroundStyle(ColorTheme.secondaryText)
+        }
+        .pretendard(.subheadline, weight: .semibold)
+        .controlSize(.regular)
     }
 }

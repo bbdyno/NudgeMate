@@ -282,6 +282,8 @@ struct HomeView: View {
 private struct PrepTrackerCard: View {
     let prep: EventPrep
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     private var daysRemaining: Int {
         max(
             0,
@@ -317,7 +319,11 @@ private struct PrepTrackerCard: View {
                 .foregroundStyle(ColorTheme.secondarySnooze)
         }
         .padding(16)
-        .frame(width: 190, height: 150, alignment: .leading)
+        .frame(width: dynamicTypeSize.isAccessibilitySize ? 250 : 190)
+        .frame(
+            minHeight: dynamicTypeSize.isAccessibilitySize ? 220 : 150,
+            alignment: .leading
+        )
         .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 18, style: .continuous)

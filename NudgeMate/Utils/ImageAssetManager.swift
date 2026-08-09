@@ -1,5 +1,4 @@
 import SwiftUI
-import WebKit
 
 enum ImageAssetManager {
     enum Asset: String, CaseIterable {
@@ -90,57 +89,12 @@ enum ImageAssetManager {
     ]
 }
 
-struct SVGAssetImage: UIViewRepresentable {
+struct SVGAssetImage: View {
     let asset: ImageAssetManager.Asset
 
-    func makeUIView(context: Context) -> WKWebView {
-        let configuration = WKWebViewConfiguration()
-        configuration.suppressesIncrementalRendering = true
-
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
-        webView.scrollView.isScrollEnabled = false
-        webView.isUserInteractionEnabled = false
-        webView.accessibilityElementsHidden = true
-        load(asset, in: webView)
-        return webView
-    }
-
-    func updateUIView(_ webView: WKWebView, context: Context) {
-        guard context.coordinator.loadedAsset != asset else { return }
-        load(asset, in: webView)
-        context.coordinator.loadedAsset = asset
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(loadedAsset: asset)
-    }
-
-    private func load(_ asset: ImageAssetManager.Asset, in webView: WKWebView) {
-        let svg = ImageAssetManager.svg(named: asset)
-        let html = """
-        <!doctype html>
-        <html>
-          <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-            <style>
-              html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
-              svg { display: block; width: 100%; height: 100%; }
-            </style>
-          </head>
-          <body>\(svg)</body>
-        </html>
-        """
-        webView.loadHTMLString(html, baseURL: nil)
-    }
-
-    final class Coordinator {
-        var loadedAsset: ImageAssetManager.Asset
-
-        init(loadedAsset: ImageAssetManager.Asset) {
-            self.loadedAsset = loadedAsset
-        }
+    var body: some View {
+        Image(asset.rawValue)
+            .resizable()
+            .scaledToFit()
     }
 }

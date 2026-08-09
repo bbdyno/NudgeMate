@@ -43,6 +43,7 @@ let project = Project(
             settings: .settings(
                 base: [
                     "CODE_SIGN_STYLE": "Automatic",
+                    "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
                     "CURRENT_PROJECT_VERSION": "1",
                     "MARKETING_VERSION": "1.0.0",
                     "PRODUCT_NAME": "NudgeMate",
