@@ -7,8 +7,10 @@ import SwiftData
 final class AppState {
     let eventKitManager: EventKitManager
     let nudgeManager: NudgeManager
+    let subscriptionManager: SubscriptionManager
 
     var isDailyRecapPresented = false
+    var isPaywallPresented = false
     private(set) var isBootstrapped = false
     private(set) var onboardingCompleted = false
     private(set) var selectedCalendarIdentifiers = Set<String>()
@@ -29,6 +31,7 @@ final class AppState {
     ) {
         eventKitManager = EventKitManager()
         nudgeManager = NudgeManager()
+        subscriptionManager = .shared
         self.calendar = calendar
         self.defaults = defaults
     }
@@ -36,11 +39,13 @@ final class AppState {
     init(
         eventKitManager: EventKitManager,
         nudgeManager: NudgeManager,
+        subscriptionManager: SubscriptionManager,
         calendar: Calendar = .autoupdatingCurrent,
         defaults: UserDefaults = .standard
     ) {
         self.eventKitManager = eventKitManager
         self.nudgeManager = nudgeManager
+        self.subscriptionManager = subscriptionManager
         self.calendar = calendar
         self.defaults = defaults
     }
@@ -114,6 +119,10 @@ final class AppState {
 
     func dismissDailyRecap() {
         isDailyRecapPresented = false
+    }
+
+    func presentPaywall() {
+        isPaywallPresented = true
     }
 
     private func nextTenPM(after date: Date) -> Date {

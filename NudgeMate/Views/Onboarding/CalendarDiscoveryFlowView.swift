@@ -206,9 +206,12 @@ private extension CalendarExclusionReason {
 }
 
 private struct CandidateReviewView: View {
+    @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \PatternCandidateRecord.confidenceScore, order: .reverse)
     private var candidates: [PatternCandidateRecord]
+
+    @Query private var rhythms: [RecurringEvent]
 
     let onFinished: () -> Void
 
@@ -260,6 +263,16 @@ private struct CandidateReviewView: View {
         name: String,
         category: RhythmCategory
     ) {
+        let activeAdaptiveCount = rhythms.filter {
+            $0.mode == .adaptive && $0.lifecycleState == .active
+        }.count
+        if EntitlementPolicy().adaptiveRhythmCreation(
+            activeAdaptiveCount: activeAdaptiveCount,
+            isPro: appState.subscriptionManager.isPro
+        ) == .requiresPro {
+            appState.presentPaywall()
+            return
+        }
         guard var candidate = try? record.domainValue() else { return }
         candidate.suggestedDisplayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         candidate.categorySuggestion = category

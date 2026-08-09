@@ -163,6 +163,8 @@ private struct PrepEditorView: View {
     @State private var notificationsEnabled: Bool
     @State private var errorMessage: String?
 
+    @Query private var allPreps: [EventPrep]
+
     init(prep: EventPrep?) {
         self.prep = prep
         _title = State(initialValue: prep?.title ?? "")
@@ -221,6 +223,16 @@ private struct PrepEditorView: View {
     }
 
     private func save() {
+        let activePrepCount = allPreps.filter {
+            $0.planState == .active && $0.id != prep?.id
+        }.count
+        if EntitlementPolicy().prepCreation(
+            activePrepCount: activePrepCount,
+            isPro: appState.subscriptionManager.isPro
+        ) == .requiresPro {
+            appState.presentPaywall()
+            return
+        }
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let schedule = PrepScheduleCalculator(calendar: .autoupdatingCurrent).nextCheckIn(
             now: .now,

@@ -158,6 +158,8 @@ private struct RhythmEditorView: View {
     @State private var notificationsEnabled: Bool
     @State private var errorMessage: String?
 
+    @Query private var allRhythms: [RecurringEvent]
+
     init(rhythm: RecurringEvent?) {
         self.rhythm = rhythm
         _name = State(initialValue: rhythm?.displayName ?? "")
@@ -217,6 +219,17 @@ private struct RhythmEditorView: View {
     }
 
     private func save() {
+        let activeAdaptiveCount = allRhythms.filter {
+            $0.mode == .adaptive && $0.lifecycleState == .active && $0.id != rhythm?.id
+        }.count
+        if mode == .adaptive,
+           EntitlementPolicy().adaptiveRhythmCreation(
+               activeAdaptiveCount: activeAdaptiveCount,
+               isPro: appState.subscriptionManager.isPro
+           ) == .requiresPro {
+            appState.presentPaywall()
+            return
+        }
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let center = Calendar.autoupdatingCurrent.date(
             byAdding: .day,

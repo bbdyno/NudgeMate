@@ -6,6 +6,8 @@ struct RootView: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
+        @Bindable var appState = appState
+
         Group {
             if !appState.isBootstrapped {
                 ProgressView()
@@ -19,6 +21,12 @@ struct RootView: View {
         }
         .task {
             appState.bootstrap(modelContext: modelContext)
+        }
+        .sheet(isPresented: $appState.isPaywallPresented) {
+            PaywallView()
+                .environment(appState)
+                .presentationDetents([.large])
+                .interactiveDismissDisabled(appState.subscriptionManager.isPurchasing)
         }
     }
 }

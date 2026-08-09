@@ -1,0 +1,84 @@
+{
+  "identifier" : "6175B792-964D-4D6C-BE25-08AC4F091650",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "79.99",
+      "familyShareable" : false,
+      "internalID" : "86F9474A-433C-40EC-8B85-3A34A9889A2B",
+      "localizations" : [
+        { "description" : "NudgeMate Pro lifetime access", "displayName" : "NudgeMate Pro Lifetime", "locale" : "en_US" },
+        { "description" : "NudgeMate Pro 평생 이용권", "displayName" : "NudgeMate Pro 평생", "locale" : "ko_KR" }
+      ],
+      "productID" : "com.nudgemate.pro.lifetime",
+      "referenceName" : "NudgeMate Pro Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "ko_KR",
+    "_storefront" : "KOR"
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "A1CD407A-FF88-4518-9277-8FEE0538EFF2",
+      "localizations" : [
+
+      ],
+      "name" : "NudgeMate Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "AC23108A-3620-4933-9ED1-EC4B193AC4C7",
+          "introductoryOffer" : null,
+          "localizations" : [
+            { "description" : "Unlimited NudgeMate Pro access for one month", "displayName" : "NudgeMate Pro Monthly", "locale" : "en_US" },
+            { "description" : "NudgeMate Pro 한 달 이용권", "displayName" : "NudgeMate Pro 월간", "locale" : "ko_KR" }
+          ],
+          "productID" : "com.nudgemate.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "NudgeMate Pro Monthly",
+          "subscriptionGroupID" : "A1CD407A-FF88-4518-9277-8FEE0538EFF2",
+          "type" : "RecurringSubscription",
+          "winBackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "814FEBCD-8B5D-46F8-9758-A845C13C634F",
+          "introductoryOffer" : null,
+          "localizations" : [
+            { "description" : "Unlimited NudgeMate Pro access for one year", "displayName" : "NudgeMate Pro Yearly", "locale" : "en_US" },
+            { "description" : "NudgeMate Pro 1년 이용권", "displayName" : "NudgeMate Pro 연간", "locale" : "ko_KR" }
+          ],
+          "productID" : "com.nudgemate.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "NudgeMate Pro Yearly",
+          "subscriptionGroupID" : "A1CD407A-FF88-4518-9277-8FEE0538EFF2",
+          "type" : "RecurringSubscription",
+          "winBackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

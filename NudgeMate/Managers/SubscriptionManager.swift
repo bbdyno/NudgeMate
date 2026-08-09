@@ -24,6 +24,14 @@ enum PurchaseOutcome: Equatable, Sendable {
     case cancelled
 }
 
+enum EntitlementState: Equatable, Sendable {
+    case free
+    case proSubscription
+    case proLifetime
+    case pending
+    case unknown
+}
+
 enum SubscriptionError: LocalizedError {
     case productsUnavailable
     case productNotSupported
@@ -57,6 +65,7 @@ final class SubscriptionManager {
     private(set) var products: [Product] = []
     private(set) var activeProductIDs: Set<String> = []
     private(set) var isPro = false
+    private(set) var entitlementState: EntitlementState = .unknown
     private(set) var isLoadingProducts = false
     private(set) var purchasingProductID: String?
     private(set) var lastErrorMessage: String?
@@ -148,6 +157,7 @@ final class SubscriptionManager {
                 return .purchased
 
             case .pending:
+                entitlementState = .pending
                 return .pending
 
             case .userCancelled:
@@ -206,6 +216,13 @@ final class SubscriptionManager {
 
         activeProductIDs = entitledProductIDs
         isPro = !entitledProductIDs.isEmpty
+        if entitledProductIDs.contains(SubscriptionProductID.lifetime.rawValue) {
+            entitlementState = .proLifetime
+        } else if !entitledProductIDs.isEmpty {
+            entitlementState = .proSubscription
+        } else {
+            entitlementState = .free
+        }
 
         if encounteredVerificationFailure {
             lastErrorMessage = SubscriptionError.failedVerification.localizedDescription
