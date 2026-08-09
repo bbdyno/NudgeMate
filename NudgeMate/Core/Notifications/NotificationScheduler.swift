@@ -41,14 +41,6 @@ actor LocalNotificationScheduler: NotificationScheduling {
     }
 
     func reconcile(_ descriptors: [LocalNotificationDescriptor]) async throws {
-        let desiredIDs = Set(descriptors.map(\.identifier))
-        let pending = await center.pendingNotificationRequests()
-        let obsolete = pending.map(\.identifier).filter { identifier in
-            (identifier.hasPrefix("rhythm.") || identifier.hasPrefix("prep.") || identifier.hasPrefix("recap."))
-                && !desiredIDs.contains(identifier)
-        }
-        center.removePendingNotificationRequests(withIdentifiers: obsolete)
-
         for descriptor in descriptors {
             center.removePendingNotificationRequests(withIdentifiers: [descriptor.identifier])
             let content = UNMutableNotificationContent()

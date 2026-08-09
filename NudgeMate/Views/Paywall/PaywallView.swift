@@ -93,8 +93,10 @@ struct PaywallView: View {
                             Button(L10n.Paywall.terms) {
                                 if let url = AppConfiguration.termsOfServiceURL { openURL(url) }
                             }
-                            Button(L10n.Paywall.privacy) {
-                                if let url = AppConfiguration.privacyPolicyURL { openURL(url) }
+                            if let url = AppConfiguration.privacyPolicyURL {
+                                Button(L10n.Paywall.privacy) {
+                                    openURL(url)
+                                }
                             }
                         }
                     }

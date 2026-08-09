@@ -196,6 +196,41 @@ final class NudgeManager {
         await scheduler.cancelAll()
     }
 
+    func reconcileDailyRecap(settings: UserSettings, now: Date = .now) async {
+        let identifiers = (0..<14).map { "recap.\($0)" }
+        await scheduler.cancel(identifiers: identifiers)
+        guard settings.dailyRecapEnabled,
+              settings.dailyRecapFrequency != .off,
+              await scheduler.permissionState() == .authorized else {
+            return
+        }
+
+        var descriptors: [LocalNotificationDescriptor] = []
+        for offset in 0..<14 {
+            guard let day = calendar.date(byAdding: .day, value: offset, to: now),
+                  isRecapDay(day, frequency: settings.dailyRecapFrequency) else {
+                continue
+            }
+            let fireDate = date(
+                day,
+                hour: settings.dailyRecapHour,
+                minute: settings.dailyRecapMinute
+            )
+            guard fireDate > now else { continue }
+            descriptors.append(
+                LocalNotificationDescriptor(
+                    identifier: "recap.\(offset)",
+                    title: NudgeMateStrings.Localizable.Notification.Recap.title,
+                    body: NudgeMateStrings.Localizable.Notification.Recap.body,
+                    categoryIdentifier: NotificationCategoryIdentifier.dailyRecap,
+                    payload: NotificationPayload(deepLink: "nudgemate://recap"),
+                    fireDate: fireDate
+                )
+            )
+        }
+        try? await scheduler.reconcile(descriptors)
+    }
+
     func handleNotificationAction(
         _ actionIdentifier: String,
         payload: NotificationPayload,
@@ -265,6 +300,18 @@ final class NudgeManager {
     private func addingDays(_ days: Int, to value: Date) -> Date {
         calendar.date(byAdding: .day, value: days, to: value)
             ?? value.addingTimeInterval(TimeInterval(days * 86_400))
+    }
+
+    private func isRecapDay(
+        _ date: Date,
+        frequency: DailyRecapFrequency
+    ) -> Bool {
+        switch frequency {
+        case .daily: true
+        case .threeTimesWeekly: [2, 4, 6].contains(calendar.component(.weekday, from: date))
+        case .weekly: calendar.component(.weekday, from: date) == 1
+        case .off: false
+        }
     }
 
     private func nudgeRequestIdentifier(for id: UUID) -> String {

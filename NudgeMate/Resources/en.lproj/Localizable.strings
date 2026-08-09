@@ -119,6 +119,8 @@
 "notification.prep.body" = "If you are not ready, we will remind you again halfway through the remaining time.";
 "notification.generic.title" = "You Have a Nudge to Review";
 "notification.generic.body" = "Open the app to see what needs your attention.";
+"notification.recap.title" = "Time for your daily recap";
+"notification.recap.body" = "Review what you completed or snoozed to improve your next nudges.";
 "notification.action.scheduleNow" = "Schedule Now";
 "notification.action.snoozeWeek" = "Snooze 1 Week";
 "notification.action.skip" = "Skip This Time";

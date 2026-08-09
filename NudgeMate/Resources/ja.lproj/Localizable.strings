@@ -119,6 +119,8 @@
 "notification.prep.body" = "まだ準備できていない場合は、残り期間の半分が過ぎた頃にもう一度お知らせします。";
 "notification.generic.title" = "確認するナッジがあります";
 "notification.generic.body" = "アプリを開いて、今確認する内容をご覧ください。";
+"notification.recap.title" = "今日の準備を振り返る時間です";
+"notification.recap.body" = "完了・延期した項目を確認すると、次の通知がより正確になります。";
 "notification.action.scheduleNow" = "今すぐ予定を入れる";
 "notification.action.snoozeWeek" = "1週間延期";
 "notification.action.skip" = "今回はスキップ";

@@ -15,6 +15,10 @@ final class AppState {
     private(set) var onboardingCompleted = false
     private(set) var selectedCalendarIdentifiers = Set<String>()
     private(set) var appearanceTheme: AppearanceTheme = .system
+    private(set) var dailyRecapEnabled = true
+    private(set) var dailyRecapHour = 22
+    private(set) var dailyRecapMinute = 0
+    private(set) var dailyRecapFrequency: DailyRecapFrequency = .daily
     var appErrorMessage: String?
 
     @ObservationIgnored
@@ -66,7 +70,9 @@ final class AppState {
             onboardingCompleted = settings.onboardingCompleted
             selectedCalendarIdentifiers = Set(settings.selectedCalendarIdentifiers)
             appearanceTheme = settings.appearanceTheme
+            applyRecapSettings(settings)
             isBootstrapped = true
+            Task { await nudgeManager.reconcileDailyRecap(settings: settings) }
         } catch {
             appErrorMessage = error.localizedDescription
             isBootstrapped = true
@@ -92,6 +98,8 @@ final class AppState {
     func updateSettings(_ settings: UserSettings) {
         selectedCalendarIdentifiers = Set(settings.selectedCalendarIdentifiers)
         appearanceTheme = settings.appearanceTheme
+        applyRecapSettings(settings)
+        Task { await nudgeManager.reconcileDailyRecap(settings: settings) }
     }
 
     func resetAfterDataDeletion() {
@@ -103,7 +111,10 @@ final class AppState {
     }
 
     func evaluateDailyRecapPresentation(at date: Date = .now) {
-        guard calendar.component(.hour, from: date) >= 22 else { return }
+        guard dailyRecapEnabled,
+              dailyRecapFrequency != .off,
+              isRecapDay(date),
+              isAtOrAfterRecapTime(date) else { return }
 
         if let lastDate = defaults.object(forKey: lastRecapDateKey) as? Date,
            calendar.isDate(lastDate, inSameDayAs: date) {
@@ -119,7 +130,7 @@ final class AppState {
 
         while !Task.isCancelled {
             let now = Date.now
-            let nextRecapDate = nextTenPM(after: now)
+            let nextRecapDate = nextRecapDate(after: now)
             let waitDuration = max(1, nextRecapDate.timeIntervalSince(now))
 
             do {
@@ -140,18 +151,40 @@ final class AppState {
         isPaywallPresented = true
     }
 
-    private func nextTenPM(after date: Date) -> Date {
-        var components = calendar.dateComponents([.year, .month, .day], from: date)
-        components.hour = 22
-        components.minute = 0
-        components.second = 0
-
-        let todayAtTen = calendar.date(from: components) ?? date.addingTimeInterval(60)
-        if todayAtTen > date {
-            return todayAtTen
+    private func nextRecapDate(after date: Date) -> Date {
+        for offset in 0...7 {
+            guard let day = calendar.date(byAdding: .day, value: offset, to: date) else { continue }
+            var components = calendar.dateComponents([.year, .month, .day], from: day)
+            components.hour = dailyRecapHour
+            components.minute = dailyRecapMinute
+            components.second = 0
+            guard let candidate = calendar.date(from: components),
+                  candidate > date,
+                  isRecapDay(candidate) else { continue }
+            return candidate
         }
+        return date.addingTimeInterval(86_400)
+    }
 
-        return calendar.date(byAdding: .day, value: 1, to: todayAtTen)
-            ?? date.addingTimeInterval(86_400)
+    private func applyRecapSettings(_ settings: UserSettings) {
+        dailyRecapEnabled = settings.dailyRecapEnabled
+        dailyRecapHour = settings.dailyRecapHour
+        dailyRecapMinute = settings.dailyRecapMinute
+        dailyRecapFrequency = settings.dailyRecapFrequency
+    }
+
+    private func isAtOrAfterRecapTime(_ date: Date) -> Bool {
+        let hour = calendar.component(.hour, from: date)
+        let minute = calendar.component(.minute, from: date)
+        return hour > dailyRecapHour || (hour == dailyRecapHour && minute >= dailyRecapMinute)
+    }
+
+    private func isRecapDay(_ date: Date) -> Bool {
+        switch dailyRecapFrequency {
+        case .daily: true
+        case .threeTimesWeekly: [2, 4, 6].contains(calendar.component(.weekday, from: date))
+        case .weekly: calendar.component(.weekday, from: date) == 1
+        case .off: false
+        }
     }
 }

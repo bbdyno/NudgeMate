@@ -119,6 +119,8 @@
 "notification.prep.body" = "如果尚未准备好，我们会在剩余时间过半时再次提醒你。";
 "notification.generic.title" = "有一条提醒需要确认";
 "notification.generic.body" = "请打开 App 查看需要关注的内容。";
+"notification.recap.title" = "该回顾今天的准备了";
+"notification.recap.body" = "确认已完成或推迟的事项，让下一次提醒更准确。";
 "notification.action.scheduleNow" = "立即安排";
 "notification.action.snoozeWeek" = "推迟一周";
 "notification.action.skip" = "本次跳过";
