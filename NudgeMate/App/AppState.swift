@@ -43,6 +43,10 @@ final class AppState {
 
     func configure(modelContainer: ModelContainer) {
         nudgeManager.configure(modelContainer: modelContainer)
+        NotificationActionRouter.shared.configure(
+            modelContainer: modelContainer,
+            nudgeManager: nudgeManager
+        )
     }
 
     func evaluateDailyRecapPresentation(at date: Date = .now) {

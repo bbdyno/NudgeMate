@@ -23,6 +23,8 @@
 "notification.nudge.body" = "根据过往记录，间隔约为 %d 天。";
 "notification.prep.title" = "请确认%@的准备状态";
 "notification.prep.body" = "如果尚未准备好，我们会在剩余时间过半时再次提醒你。";
+"notification.generic.title" = "有一条提醒需要确认";
+"notification.generic.body" = "请打开 App 查看需要关注的内容。";
 "notification.action.scheduleNow" = "立即安排";
 "notification.action.snoozeWeek" = "推迟一周";
 "notification.action.skip" = "本次跳过";

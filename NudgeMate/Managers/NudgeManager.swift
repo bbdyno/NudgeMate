@@ -1,155 +1,124 @@
 import Foundation
 import Observation
 import SwiftData
-import UserNotifications
-
-private typealias L10n = NudgeMateStrings.Localizable
 
 enum NudgeNotificationError: LocalizedError {
     case permissionDenied
-    case modelContainerUnavailable
     case invalidTargetDate
 
     var errorDescription: String? {
         switch self {
         case .permissionDenied:
-            return L10n.Notification.Error.permissionDenied
-        case .modelContainerUnavailable:
-            return L10n.Notification.Error.modelUnavailable
+            return NudgeMateStrings.Localizable.Notification.Error.permissionDenied
         case .invalidTargetDate:
-            return L10n.Notification.Error.invalidTargetDate
+            return NudgeMateStrings.Localizable.Notification.Error.invalidTargetDate
         }
     }
 }
 
 extension Notification.Name {
     static let scheduleNowRequested = Notification.Name("NudgeMate.scheduleNowRequested")
+    static let dailyRecapRequested = Notification.Name("NudgeMate.dailyRecapRequested")
 }
 
 @MainActor
 @Observable
-final class NudgeManager: NSObject, UNUserNotificationCenterDelegate {
-    enum Identifier {
-        static let nudgeCategory = "NUDGE_CATEGORY"
-        static let prepCategory = "PREP_CATEGORY"
-        static let scheduleNow = "SCHEDULE_NOW"
-        static let snoozeWeek = "SNOOZE_ONE_WEEK"
-        static let skip = "SKIP_NUDGE"
-        static let notReady = "PREP_NOT_READY"
-        static let ready = "PREP_READY"
-    }
-
+final class NudgeManager {
     private(set) var notificationsAuthorized = false
 
     @ObservationIgnored
-    private let center: UNUserNotificationCenter
+    private let scheduler: any NotificationScheduling
 
     @ObservationIgnored
     private let calendar: Calendar
 
-    @ObservationIgnored
-    private var modelContainer: ModelContainer?
-
     init(
-        center: UNUserNotificationCenter = .current(),
+        scheduler: any NotificationScheduling = LocalNotificationScheduler(),
         calendar: Calendar = .autoupdatingCurrent
     ) {
-        self.center = center
+        self.scheduler = scheduler
         self.calendar = calendar
-        super.init()
-        center.delegate = self
-        configureNotificationCategories()
     }
 
-    func configure(modelContainer: ModelContainer) {
-        self.modelContainer = modelContainer
-    }
+    func configure(modelContainer: ModelContainer) {}
 
     @discardableResult
     func requestAuthorization() async throws -> Bool {
-        let settings = await center.notificationSettings()
-
-        switch settings.authorizationStatus {
-        case .authorized, .provisional, .ephemeral:
-            notificationsAuthorized = true
-            return true
-        case .denied:
-            notificationsAuthorized = false
-            throw NudgeNotificationError.permissionDenied
-        case .notDetermined:
-            let granted = try await center.requestAuthorization(
-                options: [.alert, .badge, .sound]
-            )
-            notificationsAuthorized = granted
-            guard granted else { throw NudgeNotificationError.permissionDenied }
-            return true
-        @unknown default:
-            notificationsAuthorized = false
-            throw NudgeNotificationError.permissionDenied
-        }
+        let granted = try await scheduler.requestAuthorization()
+        notificationsAuthorized = granted
+        guard granted else { throw NudgeNotificationError.permissionDenied }
+        return true
     }
 
-    func scheduleNudge(for event: RecurringEvent) async throws {
+    func scheduleNudge(
+        for event: RecurringEvent,
+        privacyMode: PrivacyNotificationMode = .detailed
+    ) async throws {
         guard !event.isMuted else {
-            cancelNudge(for: event.id)
+            await scheduler.cancel(identifiers: [nudgeRequestIdentifier(for: event.id)])
             return
         }
-
         try await ensureAuthorization()
 
-        let content = UNMutableNotificationContent()
-        content.title = L10n.Notification.Nudge.title(event.title)
-        content.body = L10n.Notification.Nudge.body(event.baseInterval)
-        content.sound = .default
-        content.categoryIdentifier = Identifier.nudgeCategory
-        content.userInfo = [
-            "type": "nudge",
-            "id": event.id.uuidString
-        ]
-
-        let request = UNNotificationRequest(
+        let strings = NudgeMateStrings.Localizable.Notification.self
+        let title = privacyMode == .generic
+            ? strings.Generic.title
+            : strings.Nudge.title(event.title)
+        let body = privacyMode == .generic
+            ? strings.Generic.body
+            : strings.Nudge.body(event.baseIntervalDays)
+        let leadDate = calendar.date(
+            byAdding: .day,
+            value: -max(0, event.leadTimeDays),
+            to: event.nextExpectedStartDate
+        ) ?? event.nextExpectedStartDate
+        let fireDate = date(
+            leadDate,
+            hour: event.notificationHour,
+            minute: event.notificationMinute
+        )
+        let descriptor = LocalNotificationDescriptor(
             identifier: nudgeRequestIdentifier(for: event.id),
-            content: content,
-            trigger: calendarTrigger(for: event.nextPredictedDate)
+            title: title,
+            body: body,
+            categoryIdentifier: NotificationCategoryIdentifier.rhythmReview,
+            payload: NotificationPayload(
+                rhythmID: event.id,
+                deepLink: "nudgemate://rhythm/\(event.id.uuidString)"
+            ),
+            fireDate: fireDate
         )
-
-        center.removePendingNotificationRequests(
-            withIdentifiers: [nudgeRequestIdentifier(for: event.id)]
-        )
-        try await center.add(request)
+        try await scheduler.reconcile([descriptor])
     }
 
-    func schedulePrepReminder(for prep: EventPrep) async throws {
-        guard prep.status != .ready else {
-            cancelPrepReminder(for: prep.id)
+    func schedulePrepReminder(
+        for prep: EventPrep,
+        privacyMode: PrivacyNotificationMode = .detailed
+    ) async throws {
+        guard prep.status != .ready, prep.notificationsEnabled else {
+            await scheduler.cancel(identifiers: [prepRequestIdentifier(for: prep.id)])
             return
         }
-        guard prep.targetDate > .now else {
-            throw NudgeNotificationError.invalidTargetDate
-        }
-
+        guard prep.targetDate > .now else { throw NudgeNotificationError.invalidTargetDate }
         try await ensureAuthorization()
 
-        let content = UNMutableNotificationContent()
-        content.title = L10n.Notification.Prep.title(prep.title)
-        content.body = L10n.Notification.Prep.body
-        content.sound = .default
-        content.categoryIdentifier = Identifier.prepCategory
-        content.userInfo = [
-            "type": "prep",
-            "id": prep.id.uuidString
-        ]
-
-        let request = UNNotificationRequest(
+        let strings = NudgeMateStrings.Localizable.Notification.self
+        let descriptor = LocalNotificationDescriptor(
             identifier: prepRequestIdentifier(for: prep.id),
-            content: content,
-            trigger: calendarTrigger(for: prep.nextReminderDate)
+            title: privacyMode == .generic ? strings.Generic.title : strings.Prep.title(prep.title),
+            body: privacyMode == .generic ? strings.Generic.body : strings.Prep.body,
+            categoryIdentifier: NotificationCategoryIdentifier.prepCheckIn,
+            payload: NotificationPayload(
+                prepPlanID: prep.id,
+                deepLink: "nudgemate://prep/\(prep.id.uuidString)"
+            ),
+            fireDate: date(
+                prep.nextReminderDate,
+                hour: prep.preferredNotificationHour,
+                minute: prep.preferredNotificationMinute
+            )
         )
-
-        center.removePendingNotificationRequests(
-            withIdentifiers: [prepRequestIdentifier(for: prep.id)]
-        )
-        try await center.add(request)
+        try await scheduler.reconcile([descriptor])
     }
 
     func updatePrep(
@@ -159,215 +128,147 @@ final class NudgeManager: NSObject, UNUserNotificationCenterDelegate {
         now: Date = .now
     ) async throws {
         prep.status = status
+        prep.lastAnsweredAt = now
+        prep.updatedAt = now
 
-        switch status {
-        case .ready:
-            cancelPrepReminder(for: prep.id)
-        case .notReady, .inProgress:
-            prep.nextReminderDate = try nextSpacedReminderDate(
-                targetDate: prep.targetDate,
-                now: now
-            )
+        let result = PrepScheduleCalculator(calendar: calendar).nextCheckIn(
+            now: now,
+            targetDate: prep.targetDate,
+            status: status.readinessStatus,
+            intensity: prep.intensity
+        )
+        switch result {
+        case .stopped:
+            prep.planState = .ready
+            prep.completedAt = now
+            await scheduler.cancel(identifiers: [prepRequestIdentifier(for: prep.id)])
+        case let .scheduled(date), let .finalCheck(date):
+            prep.planState = .active
+            prep.nextReminderDate = date
             try await schedulePrepReminder(for: prep)
+        case .targetPassed:
+            prep.planState = .targetPassed
+            await scheduler.cancel(identifiers: [prepRequestIdentifier(for: prep.id)])
         }
-
         try modelContext.save()
     }
 
     func nextSpacedReminderDate(targetDate: Date, now: Date = .now) throws -> Date {
-        let daysLeft = targetDate.timeIntervalSince(now) / 86_400
-        guard daysLeft > 0 else { throw NudgeNotificationError.invalidTargetDate }
-        return now.addingTimeInterval((daysLeft / 2) * 86_400)
+        let result = PrepScheduleCalculator(calendar: calendar).nextCheckIn(
+            now: now,
+            targetDate: targetDate,
+            status: .notReady,
+            intensity: .normal
+        )
+        switch result {
+        case let .scheduled(date), let .finalCheck(date): return date
+        case .stopped, .targetPassed: throw NudgeNotificationError.invalidTargetDate
+        }
     }
 
     func snooze(_ event: RecurringEvent, modelContext: ModelContext) async throws {
-        event.nextPredictedDate = calendar.date(byAdding: .day, value: 7, to: .now)
-            ?? Date.now.addingTimeInterval(604_800)
+        event.nextExpectedStartDate = addingDays(7, to: event.nextExpectedStartDate)
+        event.nextExpectedCenterDate = addingDays(7, to: event.nextExpectedCenterDate)
+        event.nextExpectedEndDate = addingDays(7, to: event.nextExpectedEndDate)
+        event.updatedAt = .now
         try modelContext.save()
         try await scheduleNudge(for: event)
     }
 
     func skip(_ event: RecurringEvent, modelContext: ModelContext) async throws {
-        event.nextPredictedDate = recalculatedDate(
-            currentPrediction: event.nextPredictedDate,
-            intervalInDays: event.baseInterval,
-            now: .now
-        )
+        event.nextExpectedStartDate = addingDays(event.baseIntervalDays, to: event.nextExpectedStartDate)
+        event.nextExpectedCenterDate = addingDays(event.baseIntervalDays, to: event.nextExpectedCenterDate)
+        event.nextExpectedEndDate = addingDays(event.baseIntervalDays, to: event.nextExpectedEndDate)
+        event.updatedAt = .now
         try modelContext.save()
         try await scheduleNudge(for: event)
     }
 
     func cancelNudge(for id: UUID) {
-        center.removePendingNotificationRequests(
-            withIdentifiers: [nudgeRequestIdentifier(for: id)]
-        )
+        Task { await scheduler.cancel(identifiers: [nudgeRequestIdentifier(for: id)]) }
     }
 
     func cancelPrepReminder(for id: UUID) {
-        center.removePendingNotificationRequests(
-            withIdentifiers: [prepRequestIdentifier(for: id)]
-        )
+        Task { await scheduler.cancel(identifiers: [prepRequestIdentifier(for: id)]) }
     }
 
-    nonisolated func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification
-    ) async -> UNNotificationPresentationOptions {
-        [.banner, .list, .sound]
+    func cancelAll() async {
+        await scheduler.cancelAll()
     }
 
-    nonisolated func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse
-    ) async {
-        await processNotificationResponse(response)
-    }
-
-    private func processNotificationResponse(_ response: UNNotificationResponse) async {
-        guard
-            let idValue = response.notification.request.content.userInfo["id"] as? String,
-            let id = UUID(uuidString: idValue)
-        else { return }
-
-        if response.actionIdentifier == Identifier.scheduleNow {
-            NotificationCenter.default.post(
-                name: .scheduleNowRequested,
-                object: id
-            )
+    func handleNotificationAction(
+        _ actionIdentifier: String,
+        payload: NotificationPayload,
+        modelContext: ModelContext
+    ) async throws {
+        switch actionIdentifier {
+        case NotificationActionIdentifier.rhythmQuickAdd,
+             NotificationActionIdentifier.rhythmOpenScheduler:
+            guard let rhythmID = payload.rhythmID else { return }
+            NotificationCenter.default.post(name: .scheduleNowRequested, object: rhythmID)
+        case NotificationActionIdentifier.rhythmSnoozeOneWeek:
+            if let event = try fetchRhythm(payload.rhythmID, context: modelContext) {
+                try await snooze(event, modelContext: modelContext)
+            }
+        case NotificationActionIdentifier.rhythmSkipOnce:
+            if let event = try fetchRhythm(payload.rhythmID, context: modelContext) {
+                try await skip(event, modelContext: modelContext)
+            }
+        case NotificationActionIdentifier.prepNotReady:
+            if let prep = try fetchPrep(payload.prepPlanID, context: modelContext) {
+                try await updatePrep(prep, status: .notReady, modelContext: modelContext)
+            }
+        case NotificationActionIdentifier.prepInProgress:
+            if let prep = try fetchPrep(payload.prepPlanID, context: modelContext) {
+                try await updatePrep(prep, status: .inProgress, modelContext: modelContext)
+            }
+        case NotificationActionIdentifier.prepReady:
+            if let prep = try fetchPrep(payload.prepPlanID, context: modelContext) {
+                try await updatePrep(prep, status: .ready, modelContext: modelContext)
+            }
+        case NotificationActionIdentifier.recapOpen:
+            NotificationCenter.default.post(name: .dailyRecapRequested, object: nil)
+        default:
             return
         }
-
-        guard let modelContainer else { return }
-        let modelContext = ModelContext(modelContainer)
-
-        do {
-            switch response.actionIdentifier {
-            case Identifier.snoozeWeek:
-                if let event = try fetchRecurringEvent(id: id, context: modelContext) {
-                    try await snooze(event, modelContext: modelContext)
-                }
-            case Identifier.skip:
-                if let event = try fetchRecurringEvent(id: id, context: modelContext) {
-                    try await skip(event, modelContext: modelContext)
-                }
-            case Identifier.notReady:
-                if let prep = try fetchEventPrep(id: id, context: modelContext) {
-                    try await updatePrep(
-                        prep,
-                        status: .notReady,
-                        modelContext: modelContext
-                    )
-                }
-            case Identifier.ready:
-                if let prep = try fetchEventPrep(id: id, context: modelContext) {
-                    try await updatePrep(
-                        prep,
-                        status: .ready,
-                        modelContext: modelContext
-                    )
-                }
-            default:
-                break
-            }
-        } catch {
-            // Notification actions cannot present UI. The next foreground refresh retries scheduling.
-        }
-    }
-
-    private func configureNotificationCategories() {
-        let scheduleAction = UNNotificationAction(
-            identifier: Identifier.scheduleNow,
-            title: L10n.Notification.Action.scheduleNow,
-            options: [.foreground]
-        )
-        let snoozeAction = UNNotificationAction(
-            identifier: Identifier.snoozeWeek,
-            title: L10n.Notification.Action.snoozeWeek
-        )
-        let skipAction = UNNotificationAction(
-            identifier: Identifier.skip,
-            title: L10n.Notification.Action.skip,
-            options: [.destructive]
-        )
-        let nudgeCategory = UNNotificationCategory(
-            identifier: Identifier.nudgeCategory,
-            actions: [scheduleAction, snoozeAction, skipAction],
-            intentIdentifiers: [],
-            options: [.customDismissAction]
-        )
-
-        let notReadyAction = UNNotificationAction(
-            identifier: Identifier.notReady,
-            title: L10n.Notification.Action.notReady
-        )
-        let readyAction = UNNotificationAction(
-            identifier: Identifier.ready,
-            title: L10n.Notification.Action.ready
-        )
-        let prepCategory = UNNotificationCategory(
-            identifier: Identifier.prepCategory,
-            actions: [readyAction, notReadyAction],
-            intentIdentifiers: []
-        )
-
-        center.setNotificationCategories([nudgeCategory, prepCategory])
     }
 
     private func ensureAuthorization() async throws {
-        if !notificationsAuthorized {
-            try await requestAuthorization()
+        if await scheduler.permissionState() == .authorized {
+            notificationsAuthorized = true
+            return
         }
+        try await requestAuthorization()
     }
 
-    private func calendarTrigger(for requestedDate: Date) -> UNCalendarNotificationTrigger {
-        let deliveryDate = max(requestedDate, Date.now.addingTimeInterval(5))
-        let components = calendar.dateComponents(
-            [.year, .month, .day, .hour, .minute, .second],
-            from: deliveryDate
-        )
-        return UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+    private func fetchRhythm(_ id: UUID?, context: ModelContext) throws -> RecurringEvent? {
+        guard let id else { return nil }
+        let value = id
+        return try context.fetch(
+            FetchDescriptor<RecurringEvent>(predicate: #Predicate { $0.id == value })
+        ).first
     }
 
-    private func recalculatedDate(
-        currentPrediction: Date,
-        intervalInDays: Int,
-        now: Date
-    ) -> Date {
-        var prediction = currentPrediction
-        repeat {
-            prediction = calendar.date(
-                byAdding: .day,
-                value: max(1, intervalInDays),
-                to: prediction
-            ) ?? prediction.addingTimeInterval(TimeInterval(max(1, intervalInDays) * 86_400))
-        } while prediction <= now
-        return prediction
+    private func fetchPrep(_ id: UUID?, context: ModelContext) throws -> EventPrep? {
+        guard let id else { return nil }
+        let value = id
+        return try context.fetch(
+            FetchDescriptor<EventPrep>(predicate: #Predicate { $0.id == value })
+        ).first
     }
 
-    private func fetchRecurringEvent(
-        id: UUID,
-        context: ModelContext
-    ) throws -> RecurringEvent? {
-        let eventID = id
-        let descriptor = FetchDescriptor<RecurringEvent>(
-            predicate: #Predicate { $0.id == eventID }
-        )
-        return try context.fetch(descriptor).first
+    private func date(_ value: Date, hour: Int, minute: Int) -> Date {
+        calendar.date(bySettingHour: min(23, max(0, hour)), minute: min(59, max(0, minute)), second: 0, of: value)
+            ?? value
     }
 
-    private func fetchEventPrep(
-        id: UUID,
-        context: ModelContext
-    ) throws -> EventPrep? {
-        let prepID = id
-        let descriptor = FetchDescriptor<EventPrep>(
-            predicate: #Predicate { $0.id == prepID }
-        )
-        return try context.fetch(descriptor).first
+    private func addingDays(_ days: Int, to value: Date) -> Date {
+        calendar.date(byAdding: .day, value: days, to: value)
+            ?? value.addingTimeInterval(TimeInterval(days * 86_400))
     }
 
     private func nudgeRequestIdentifier(for id: UUID) -> String {
-        "nudge.\(id.uuidString)"
+        "rhythm.\(id.uuidString)"
     }
 
     private func prepRequestIdentifier(for id: UUID) -> String {

@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct NudgeMateApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     private let modelContainerResult: Result<ModelContainer, Error>
     @State private var appState: AppState
 

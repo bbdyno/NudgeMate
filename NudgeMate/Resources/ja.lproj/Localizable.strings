@@ -23,6 +23,8 @@
 "notification.nudge.body" = "過去の記録では、約%d日間隔で行っています。";
 "notification.prep.title" = "%@の準備状況を確認しましょう";
 "notification.prep.body" = "まだ準備できていない場合は、残り期間の半分が過ぎた頃にもう一度お知らせします。";
+"notification.generic.title" = "確認するナッジがあります";
+"notification.generic.body" = "アプリを開いて、今確認する内容をご覧ください。";
 "notification.action.scheduleNow" = "今すぐ予定を入れる";
 "notification.action.snoozeWeek" = "1週間延期";
 "notification.action.skip" = "今回はスキップ";
