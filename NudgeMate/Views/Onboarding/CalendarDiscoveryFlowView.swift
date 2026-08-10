@@ -213,6 +213,8 @@ private struct CandidateReviewView: View {
 
     @Query private var rhythms: [RecurringEvent]
 
+    @State private var errorMessage: String?
+
     let onFinished: () -> Void
 
     private var pending: [PatternCandidateRecord] {
@@ -224,7 +226,7 @@ private struct CandidateReviewView: View {
             LazyVStack(spacing: 14) {
                 if pending.isEmpty {
                     EmptyStateView(
-                        icon: .emptyState,
+                        icon: .empty,
                         title: L10n.Candidate.emptyTitle,
                         message: L10n.Candidate.emptyMessage
                     )
@@ -237,7 +239,9 @@ private struct CandidateReviewView: View {
 
                     ForEach(pending) { candidate in
                         CandidateCard(candidate: candidate) { name, category in
-                            accept(candidate, name: name, category: category)
+                            Task {
+                                await accept(candidate, name: name, category: category)
+                            }
                         } onReject: {
                             reject(candidate)
                         }
@@ -256,13 +260,21 @@ private struct CandidateReviewView: View {
             }
             .padding(20)
         }
+        .alert(L10n.Common.error, isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button(L10n.Common.confirm, role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "")
+        }
     }
 
     private func accept(
         _ record: PatternCandidateRecord,
         name: String,
         category: RhythmCategory
-    ) {
+    ) async {
         let activeAdaptiveCount = rhythms.filter {
             $0.mode == .adaptive && $0.lifecycleState == .active
         }.count
@@ -273,39 +285,54 @@ private struct CandidateReviewView: View {
             appState.presentPaywall()
             return
         }
-        guard var candidate = try? record.domainValue() else { return }
-        candidate.suggestedDisplayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        candidate.categorySuggestion = category
-        candidate.decision = .accepted
-        let event = RecurringEvent(
-            id: candidate.id,
-            title: candidate.suggestedDisplayName,
-            baseInterval: max(1, Int(candidate.medianIntervalDays.rounded())),
-            historyDates: candidate.eventReferences.filter(\.isIncluded).map(\.occurredAt),
-            nextPredictedDate: candidate.expectedWindow.center
-        )
-        event.category = category
-        event.normalizedName = candidate.normalizedKey
-        event.variationDays = candidate.variationDays
-        event.confidenceScore = candidate.confidenceScore
-        event.confidenceBand = candidate.confidenceBand
-        event.nextExpectedStartDate = candidate.expectedWindow.start
-        event.nextExpectedEndDate = candidate.expectedWindow.end
-        event.sourceCalendarIdentifiers = Array(
-            Set(candidate.eventReferences.map(\.calendarIdentifier))
-        ).sorted()
-        record.suggestedDisplayName = event.displayName
-        record.categorySuggestion = category
-        record.decision = .accepted
-        modelContext.insert(event)
-        try? modelContext.save()
+        do {
+            var candidate = try record.domainValue()
+            candidate.suggestedDisplayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            candidate.categorySuggestion = category
+            candidate.decision = .accepted
+            let event = RecurringEvent(
+                id: candidate.id,
+                title: candidate.suggestedDisplayName,
+                baseInterval: max(1, Int(candidate.medianIntervalDays.rounded())),
+                historyDates: candidate.eventReferences.filter(\.isIncluded).map(\.occurredAt),
+                nextPredictedDate: candidate.expectedWindow.center
+            )
+            event.category = category
+            event.normalizedName = candidate.normalizedKey
+            event.variationDays = candidate.variationDays
+            event.confidenceScore = candidate.confidenceScore
+            event.confidenceBand = candidate.confidenceBand
+            event.nextExpectedStartDate = candidate.expectedWindow.start
+            event.nextExpectedEndDate = candidate.expectedWindow.end
+            event.sourceCalendarIdentifiers = Array(
+                Set(candidate.eventReferences.map(\.calendarIdentifier))
+            ).sorted()
+            record.suggestedDisplayName = event.displayName
+            record.categorySuggestion = category
+            record.decision = .accepted
+            modelContext.insert(event)
+            do {
+                try modelContext.save()
+            } catch {
+                modelContext.delete(event)
+                record.decision = .pending
+                throw error
+            }
+
+            do {
+                try await appState.nudgeManager.scheduleNudge(for: event)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func reject(_ record: PatternCandidateRecord) {
-        record.decision = .rejected
-        let calendarIDs = (try? record.domainValue().eventReferences.map(\.calendarIdentifier)) ?? []
-        modelContext.insert(
-            SuppressedPatternRecord(
+        do {
+            let calendarIDs = try record.domainValue().eventReferences.map(\.calendarIdentifier)
+            let suppression = SuppressedPatternRecord(
                 value: SuppressedPattern(
                     id: UUID(),
                     normalizedSignature: record.normalizedKey,
@@ -319,8 +346,18 @@ private struct CandidateReviewView: View {
                     reason: .notInterested
                 )
             )
-        )
-        try? modelContext.save()
+            record.decision = .rejected
+            modelContext.insert(suppression)
+            do {
+                try modelContext.save()
+            } catch {
+                record.decision = .pending
+                modelContext.delete(suppression)
+                throw error
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }
 
@@ -354,8 +391,7 @@ private struct CandidateCard: View {
                 Label {
                     Text(L10n.Candidate.interval(Int(candidate.medianIntervalDays.rounded())))
                 } icon: {
-                    SVGAssetImage(asset: .calendarIcon)
-                        .frame(width: 24, height: 24)
+                    NudgeSymbolImage(symbol: .calendar, pointSize: 20)
                 }
                 Spacer()
                 Text(L10n.Candidate.samples(candidate.sampleCount))

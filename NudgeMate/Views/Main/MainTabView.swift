@@ -3,7 +3,7 @@ import SwiftUI
 private typealias L10n = NudgeMateStrings.Localizable
 
 struct MainTabView: View {
-    enum Tab: CaseIterable {
+    enum Tab: CaseIterable, Hashable {
         case today
         case rhythms
         case prep
@@ -16,62 +16,86 @@ struct MainTabView: View {
             }
         }
 
-        var asset: ImageAssetManager.Asset {
+        var systemImage: String {
             switch self {
-            case .today: .nudgeAlert
-            case .rhythms: .sync
-            case .prep: .calendarIcon
+            case .today: "sun.max.fill"
+            case .rhythms: "repeat"
+            case .prep: "checklist"
+            }
+        }
+
+        var identifier: String {
+            switch self {
+            case .today: "today"
+            case .rhythms: "rhythms"
+            case .prep: "prep"
             }
         }
     }
 
     @Environment(AppState.self) private var appState
-    @State private var selection: Tab = .today
+    @State private var selection: Tab
+
+    init() {
+        let arguments = ProcessInfo.processInfo.arguments
+        let initialTab: Tab
+        if arguments.contains("--open-rhythms") {
+            initialTab = .rhythms
+        } else if arguments.contains("--open-prep") {
+            initialTab = .prep
+        } else {
+            initialTab = .today
+        }
+        _selection = State(initialValue: initialTab)
+    }
 
     var body: some View {
-        ZStack {
-            switch selection {
-            case .today:
-                HomeView()
-            case .rhythms:
-                RhythmListView()
-            case .prep:
-                PrepListView()
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            HStack(spacing: 8) {
-                ForEach(Tab.allCases, id: \.self) { tab in
-                    Button {
-                        withAnimation(.spring(response: 0.36, dampingFraction: 0.84)) {
-                            selection = tab
-                        }
-                    } label: {
-                        VStack(spacing: 3) {
-                            SVGAssetImage(asset: tab.asset)
-                                .frame(width: 25, height: 25)
-                                .accessibilityHidden(true)
-                            Text(tab.title)
-                                .pretendard(.caption2, weight: selection == tab ? .bold : .medium)
-                        }
-                        .foregroundStyle(selection == tab ? ColorTheme.primaryNudge : ColorTheme.secondaryText)
-                        .frame(maxWidth: .infinity, minHeight: 52)
-                        .contentShape(Rectangle())
+        TabView(selection: $selection) {
+            ForEach(Tab.allCases, id: \.self) { tab in
+                tabContent(for: tab)
+                    .tag(tab)
+                    .tabItem {
+                        Label(tab.title, systemImage: tab.systemImage)
+                        .accessibilityIdentifier("main.tab.\(tab.identifier)")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(tab.title)
-                    .accessibilityAddTraits(selection == tab ? .isSelected : [])
-                }
             }
-            .padding(.horizontal, 12)
-            .background(.bar)
-            .overlay(alignment: .top) {
-                Divider()
-            }
-            .accessibilityIdentifier("main.tabbar")
         }
-        .onReceive(NotificationCenter.default.publisher(for: .dailyRecapRequested)) { _ in
+        .tint(ColorTheme.primaryNudge)
+        .toolbarBackground(.automatic, for: .tabBar)
+        .task { route(appState.pendingNavigation) }
+        .onChange(of: appState.pendingNavigation) { _, destination in
+            route(destination)
+        }
+    }
+
+    @ViewBuilder
+    private func tabContent(for tab: Tab) -> some View {
+        switch tab {
+        case .today:
+            HomeView()
+        case .rhythms:
+            RhythmListView()
+        case .prep:
+            PrepListView()
+        }
+    }
+
+    private func route(_ destination: AppNavigationDestination?) {
+        guard let destination else { return }
+        switch destination {
+        case .today:
+            selection = .today
+            appState.consumeNavigation(destination)
+        case .rhythm:
+            selection = .rhythms
+        case .scheduleRhythm:
+            selection = .today
+        case .prep:
+            selection = .prep
+        case .recap:
+            selection = .today
             appState.isDailyRecapPresented = true
+            appState.consumeNavigation(destination)
         }
     }
 }

@@ -16,11 +16,6 @@ enum NudgeNotificationError: LocalizedError {
     }
 }
 
-extension Notification.Name {
-    static let scheduleNowRequested = Notification.Name("NudgeMate.scheduleNowRequested")
-    static let dailyRecapRequested = Notification.Name("NudgeMate.dailyRecapRequested")
-}
-
 @MainActor
 @Observable
 final class NudgeManager {
@@ -32,6 +27,9 @@ final class NudgeManager {
     @ObservationIgnored
     private let calendar: Calendar
 
+    @ObservationIgnored
+    private var modelContainer: ModelContainer?
+
     init(
         scheduler: any NotificationScheduling = LocalNotificationScheduler(),
         calendar: Calendar = .autoupdatingCurrent
@@ -40,7 +38,16 @@ final class NudgeManager {
         self.calendar = calendar
     }
 
-    func configure(modelContainer: ModelContainer) {}
+    func configure(modelContainer: ModelContainer) {
+        self.modelContainer = modelContainer
+    }
+
+    @discardableResult
+    func refreshAuthorizationState() async -> NotificationPermissionState {
+        let state = await scheduler.permissionState()
+        notificationsAuthorized = state == .authorized
+        return state
+    }
 
     @discardableResult
     func requestAuthorization() async throws -> Bool {
@@ -52,7 +59,7 @@ final class NudgeManager {
 
     func scheduleNudge(
         for event: RecurringEvent,
-        privacyMode: PrivacyNotificationMode = .detailed
+        privacyMode: PrivacyNotificationMode? = nil
     ) async throws {
         guard !event.isMuted else {
             await scheduler.cancel(identifiers: [nudgeRequestIdentifier(for: event.id)])
@@ -60,11 +67,12 @@ final class NudgeManager {
         }
         try await ensureAuthorization()
 
+        let resolvedPrivacyMode = privacyMode ?? configuredPrivacyMode()
         let strings = NudgeMateStrings.Localizable.Notification.self
-        let title = privacyMode == .generic
+        let title = resolvedPrivacyMode == .generic
             ? strings.Generic.title
             : strings.Nudge.title(event.title)
-        let body = privacyMode == .generic
+        let body = resolvedPrivacyMode == .generic
             ? strings.Generic.body
             : strings.Nudge.body(event.baseIntervalDays)
         let leadDate = calendar.date(
@@ -93,7 +101,7 @@ final class NudgeManager {
 
     func schedulePrepReminder(
         for prep: EventPrep,
-        privacyMode: PrivacyNotificationMode = .detailed
+        privacyMode: PrivacyNotificationMode? = nil
     ) async throws {
         guard prep.status != .ready, prep.notificationsEnabled else {
             await scheduler.cancel(identifiers: [prepRequestIdentifier(for: prep.id)])
@@ -102,11 +110,12 @@ final class NudgeManager {
         guard prep.targetDate > .now else { throw NudgeNotificationError.invalidTargetDate }
         try await ensureAuthorization()
 
+        let resolvedPrivacyMode = privacyMode ?? configuredPrivacyMode()
         let strings = NudgeMateStrings.Localizable.Notification.self
         let descriptor = LocalNotificationDescriptor(
             identifier: prepRequestIdentifier(for: prep.id),
-            title: privacyMode == .generic ? strings.Generic.title : strings.Prep.title(prep.title),
-            body: privacyMode == .generic ? strings.Generic.body : strings.Prep.body,
+            title: resolvedPrivacyMode == .generic ? strings.Generic.title : strings.Prep.title(prep.title),
+            body: resolvedPrivacyMode == .generic ? strings.Generic.body : strings.Prep.body,
             categoryIdentifier: NotificationCategoryIdentifier.prepCheckIn,
             payload: NotificationPayload(
                 prepPlanID: prep.id,
@@ -220,8 +229,12 @@ final class NudgeManager {
             descriptors.append(
                 LocalNotificationDescriptor(
                     identifier: "recap.\(offset)",
-                    title: NudgeMateStrings.Localizable.Notification.Recap.title,
-                    body: NudgeMateStrings.Localizable.Notification.Recap.body,
+                    title: settings.privacyNotificationMode == .generic
+                        ? NudgeMateStrings.Localizable.Notification.Generic.title
+                        : NudgeMateStrings.Localizable.Notification.Recap.title,
+                    body: settings.privacyNotificationMode == .generic
+                        ? NudgeMateStrings.Localizable.Notification.Generic.body
+                        : NudgeMateStrings.Localizable.Notification.Recap.body,
                     categoryIdentifier: NotificationCategoryIdentifier.dailyRecap,
                     payload: NotificationPayload(deepLink: "nudgemate://recap"),
                     fireDate: fireDate
@@ -231,16 +244,39 @@ final class NudgeManager {
         try? await scheduler.reconcile(descriptors)
     }
 
+    func reconcileAll(settings: UserSettings) async {
+        guard await scheduler.permissionState() == .authorized else {
+            await reconcileDailyRecap(settings: settings)
+            return
+        }
+        guard let modelContainer else {
+            await reconcileDailyRecap(settings: settings)
+            return
+        }
+        let context = ModelContext(modelContainer)
+        let rhythms = (try? context.fetch(FetchDescriptor<RecurringEvent>())) ?? []
+        for rhythm in rhythms {
+            try? await scheduleNudge(
+                for: rhythm,
+                privacyMode: settings.privacyNotificationMode
+            )
+        }
+        let preps = (try? context.fetch(FetchDescriptor<EventPrep>())) ?? []
+        for prep in preps where prep.targetDate > .now {
+            try? await schedulePrepReminder(
+                for: prep,
+                privacyMode: settings.privacyNotificationMode
+            )
+        }
+        await reconcileDailyRecap(settings: settings)
+    }
+
     func handleNotificationAction(
         _ actionIdentifier: String,
         payload: NotificationPayload,
         modelContext: ModelContext
     ) async throws {
         switch actionIdentifier {
-        case NotificationActionIdentifier.rhythmQuickAdd,
-             NotificationActionIdentifier.rhythmOpenScheduler:
-            guard let rhythmID = payload.rhythmID else { return }
-            NotificationCenter.default.post(name: .scheduleNowRequested, object: rhythmID)
         case NotificationActionIdentifier.rhythmSnoozeOneWeek:
             if let event = try fetchRhythm(payload.rhythmID, context: modelContext) {
                 try await snooze(event, modelContext: modelContext)
@@ -261,8 +297,6 @@ final class NudgeManager {
             if let prep = try fetchPrep(payload.prepPlanID, context: modelContext) {
                 try await updatePrep(prep, status: .ready, modelContext: modelContext)
             }
-        case NotificationActionIdentifier.recapOpen:
-            NotificationCenter.default.post(name: .dailyRecapRequested, object: nil)
         default:
             return
         }
@@ -274,6 +308,13 @@ final class NudgeManager {
             return
         }
         try await requestAuthorization()
+    }
+
+    private func configuredPrivacyMode() -> PrivacyNotificationMode {
+        guard let modelContainer else { return .detailed }
+        let context = ModelContext(modelContainer)
+        return (try? SwiftDataSettingsRepository(context: context).load().privacyNotificationMode)
+            ?? .detailed
     }
 
     private func fetchRhythm(_ id: UUID?, context: ModelContext) throws -> RecurringEvent? {

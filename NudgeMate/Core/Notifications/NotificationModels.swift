@@ -76,7 +76,7 @@ struct LocalNotificationDescriptor: Hashable, Sendable {
     var fireDate: Date
 }
 
-enum NotificationPermissionState: Sendable {
+enum NotificationPermissionState: Equatable, Sendable {
     case notDetermined
     case authorized
     case denied

@@ -11,10 +11,10 @@ struct OnboardingView: View {
     @State private var isCalendarFlowPresented = false
     @State private var errorMessage: String?
 
-    private let pages: [(ImageAssetManager.Asset, String, String)] = [
-        (.nudgeAlert, L10n.Onboarding.Welcome.title, L10n.Onboarding.Welcome.message),
-        (.calendarIcon, L10n.Onboarding.Rhythm.title, L10n.Onboarding.Rhythm.message),
-        (.sync, L10n.Onboarding.Permission.title, L10n.Onboarding.Permission.message)
+    private let pages: [(NudgeSymbol, String, String)] = [
+        (.reminder, L10n.Onboarding.Welcome.title, L10n.Onboarding.Welcome.message),
+        (.calendar, L10n.Onboarding.Rhythm.title, L10n.Onboarding.Rhythm.message),
+        (.refresh, L10n.Onboarding.Permission.title, L10n.Onboarding.Permission.message)
     ]
 
     var body: some View {
@@ -23,9 +23,7 @@ struct OnboardingView: View {
                 ForEach(Array(pages.enumerated()), id: \.offset) { index, value in
                     VStack(spacing: 28) {
                         Spacer()
-                        SVGAssetImage(asset: value.0)
-                            .frame(width: 152, height: 152)
-                            .accessibilityHidden(true)
+                        NudgeSymbolBadge(symbol: value.0, size: 152)
                         Text(value.1)
                             .pretendard(.largeTitle, weight: .bold)
                             .foregroundStyle(ColorTheme.primaryText)
@@ -65,6 +63,7 @@ struct OnboardingView: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 24)
         .background(ColorTheme.background.ignoresSafeArea())
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("onboarding.screen")
         .fullScreenCover(isPresented: $isCalendarFlowPresented) {
             CalendarDiscoveryFlowView {

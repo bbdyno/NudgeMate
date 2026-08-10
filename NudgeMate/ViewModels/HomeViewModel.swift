@@ -74,35 +74,6 @@ final class HomeViewModel {
         )
     }
 
-    func scheduleNow(
-        event: RecurringEvent,
-        modelContext: ModelContext,
-        eventKitManager: EventKitManager,
-        nudgeManager: NudgeManager
-    ) async {
-        do {
-            let startDate = max(event.nextPredictedDate, nextAvailableHour())
-            _ = try await eventKitManager.createCalendarEvent(
-                title: event.title,
-                startDate: startDate
-            )
-
-            event.nextPredictedDate = Calendar.autoupdatingCurrent.date(
-                byAdding: .day,
-                value: event.baseInterval,
-                to: startDate
-            ) ?? startDate.addingTimeInterval(TimeInterval(event.baseInterval * 86_400))
-            try modelContext.save()
-            try? await nudgeManager.scheduleNudge(for: event)
-
-            confirmationMessage = L10n.Home.calendarAdded(event.title)
-        } catch CalendarError.accessDenied, CalendarError.writeOnlyAccess {
-            calendarAccessDenied = true
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
-
     func clearMessages() {
         errorMessage = nil
         confirmationMessage = nil
@@ -112,10 +83,7 @@ final class HomeViewModel {
         modelContext: ModelContext,
         nudgeManager: NudgeManager
     ) async {
-        do {
-            try await nudgeManager.requestAuthorization()
-        } catch {
-            // Calendar-based nudges remain usable in-app when notification permission is off.
+        guard await nudgeManager.refreshAuthorizationState() == .authorized else {
             return
         }
 
@@ -128,12 +96,5 @@ final class HomeViewModel {
         for prep in preps where prep.status != .ready && prep.targetDate > .now {
             try? await nudgeManager.schedulePrepReminder(for: prep)
         }
-    }
-
-    private func nextAvailableHour(from date: Date = .now) -> Date {
-        let calendar = Calendar.autoupdatingCurrent
-        let startOfHour = calendar.dateInterval(of: .hour, for: date)?.start ?? date
-        return calendar.date(byAdding: .hour, value: 1, to: startOfHour)
-            ?? date.addingTimeInterval(3_600)
     }
 }

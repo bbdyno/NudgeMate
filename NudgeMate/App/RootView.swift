@@ -28,6 +28,9 @@ struct RootView: View {
                 .presentationDetents([.large])
                 .interactiveDismissDisabled(appState.subscriptionManager.isPurchasing)
         }
+        .onOpenURL { url in
+            appState.handleDeepLink(url)
+        }
         .preferredColorScheme(preferredColorScheme)
     }
 

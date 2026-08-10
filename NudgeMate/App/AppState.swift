@@ -2,6 +2,14 @@ import Foundation
 import Observation
 import SwiftData
 
+enum AppNavigationDestination: Equatable {
+    case today
+    case rhythm(UUID?)
+    case scheduleRhythm(UUID?)
+    case prep(UUID?)
+    case recap
+}
+
 @MainActor
 @Observable
 final class AppState {
@@ -11,6 +19,7 @@ final class AppState {
 
     var isDailyRecapPresented = false
     var isPaywallPresented = false
+    var pendingNavigation: AppNavigationDestination?
     private(set) var isBootstrapped = false
     private(set) var onboardingCompleted = false
     private(set) var selectedCalendarIdentifiers = Set<String>()
@@ -59,7 +68,10 @@ final class AppState {
         nudgeManager.configure(modelContainer: modelContainer)
         NotificationActionRouter.shared.configure(
             modelContainer: modelContainer,
-            nudgeManager: nudgeManager
+            nudgeManager: nudgeManager,
+            navigationHandler: { [weak self] destination in
+                self?.navigate(to: destination)
+            }
         )
     }
 
@@ -72,7 +84,7 @@ final class AppState {
             appearanceTheme = settings.appearanceTheme
             applyRecapSettings(settings)
             isBootstrapped = true
-            Task { await nudgeManager.reconcileDailyRecap(settings: settings) }
+            Task { await nudgeManager.reconcileAll(settings: settings) }
         } catch {
             appErrorMessage = error.localizedDescription
             isBootstrapped = true
@@ -99,7 +111,7 @@ final class AppState {
         selectedCalendarIdentifiers = Set(settings.selectedCalendarIdentifiers)
         appearanceTheme = settings.appearanceTheme
         applyRecapSettings(settings)
-        Task { await nudgeManager.reconcileDailyRecap(settings: settings) }
+        Task { await nudgeManager.reconcileAll(settings: settings) }
     }
 
     func resetAfterDataDeletion() {
@@ -108,6 +120,7 @@ final class AppState {
         onboardingCompleted = false
         isBootstrapped = false
         isDailyRecapPresented = false
+        pendingNavigation = nil
     }
 
     func evaluateDailyRecapPresentation(at date: Date = .now) {
@@ -149,6 +162,30 @@ final class AppState {
 
     func presentPaywall() {
         isPaywallPresented = true
+    }
+
+    func navigate(to destination: AppNavigationDestination) {
+        pendingNavigation = destination
+    }
+
+    func consumeNavigation(_ destination: AppNavigationDestination) {
+        guard pendingNavigation == destination else { return }
+        pendingNavigation = nil
+    }
+
+    func handleDeepLink(_ url: URL) {
+        guard url.scheme?.lowercased() == "nudgemate" else { return }
+        let id = url.pathComponents
+            .dropFirst()
+            .first
+            .flatMap(UUID.init(uuidString:))
+        switch url.host?.lowercased() {
+        case "rhythm": navigate(to: .rhythm(id))
+        case "prep": navigate(to: .prep(id))
+        case "recap": navigate(to: .recap)
+        case "today": navigate(to: .today)
+        default: break
+        }
     }
 
     private func nextRecapDate(after date: Date) -> Date {

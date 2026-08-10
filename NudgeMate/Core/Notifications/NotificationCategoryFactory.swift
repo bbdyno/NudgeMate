@@ -5,7 +5,8 @@ enum NotificationCategoryFactory {
         let strings = NudgeMateStrings.Localizable.Notification.Action.self
         let quickAdd = UNNotificationAction(
             identifier: NotificationActionIdentifier.rhythmQuickAdd,
-            title: strings.scheduleNow
+            title: strings.scheduleNow,
+            options: [.foreground]
         )
         let openScheduler = UNNotificationAction(
             identifier: NotificationActionIdentifier.rhythmOpenScheduler,

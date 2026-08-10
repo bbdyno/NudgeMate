@@ -30,6 +30,12 @@ let project = Project(
                     "ja"
                 ],
                 "NSCalendarsFullAccessUsageDescription": "NudgeMate는 반복 일정의 주기를 분석하기 위해 캘린더 전체 접근 권한이 필요합니다.",
+                "CFBundleURLTypes": [
+                    [
+                        "CFBundleTypeRole": "Editor",
+                        "CFBundleURLSchemes": ["nudgemate"]
+                    ]
+                ],
                 "UILaunchScreen": [:],
                 "UIAppFonts": [
                     "Pretendard-Regular.otf",

@@ -13,6 +13,25 @@
 "common.delete" = "删除";
 "common.cancel" = "取消";
 "common.save" = "保存";
+"common.add" = "添加";
+"common.select" = "选择";
+"common.moreActions" = "更多操作";
+"common.itemCount" = "%d项";
+
+"quickCapture.title" = "快速添加日程";
+"quickCapture.subtitle" = "确认时间和冲突后一次完成添加";
+
+"selection.selectAll" = "全选";
+"selection.deselectAll" = "取消全选";
+"selection.count" = "已选择%d项";
+"selection.dragHint" = "用双指滑动可选择多项";
+"selection.deleteAction" = "删除%d项";
+"selection.deleteTitle" = "删除%d项？";
+"selection.deleteMessage" = "与这些项目关联的预定通知也会一并删除。";
+"selection.selected" = "已选择";
+"selection.select" = "选择项目";
+"selection.deselect" = "取消选择项目";
+"selection.past" = "已逾期";
 
 "tab.today" = "今天";
 "tab.rhythms" = "节奏";
@@ -109,6 +128,22 @@
 "calendar.error.saveFailed" = "无法保存日程。%@";
 "calendar.event.predictedNote" = "由 NudgeMate 预测的重复日程";
 "calendar.event.fallbackTitle" = "重复日程";
+"calendar.composer.newTitle" = "添加日程";
+"calendar.composer.rhythmTitle" = "确认日程";
+"calendar.composer.details" = "日程信息";
+"calendar.composer.title" = "日程或约会名称";
+"calendar.composer.startDate" = "开始";
+"calendar.composer.duration" = "时长";
+"calendar.composer.minutes" = "%d分钟";
+"calendar.composer.calendar" = "保存到日历";
+"calendar.composer.conflicts" = "冲突检查";
+"calendar.composer.checking" = "正在检查冲突…";
+"calendar.composer.noConflicts" = "没有冲突的日程";
+"calendar.composer.conflictCount" = "同一时间有%d个日程";
+"calendar.composer.duplicateWarning" = "已有名称和开始时间相同的日程。";
+"calendar.composer.allowDuplicate" = "仍然添加重复日程";
+"calendar.composer.add" = "确认并添加";
+"calendar.composer.postSaveWarning" = "日程已添加到日历，但NudgeMate无法更新状态或提醒。%@";
 
 "notification.error.permissionDenied" = "通知已关闭。请在“设置”中允许通知。";
 "notification.error.modelUnavailable" = "存储空间尚未就绪，无法处理通知操作。";
@@ -121,7 +156,7 @@
 "notification.generic.body" = "请打开 App 查看需要关注的内容。";
 "notification.recap.title" = "该回顾今天的准备了";
 "notification.recap.body" = "确认已完成或推迟的事项，让下一次提醒更准确。";
-"notification.action.scheduleNow" = "立即安排";
+"notification.action.scheduleNow" = "确认日程";
 "notification.action.snoozeWeek" = "推迟一周";
 "notification.action.skip" = "本次跳过";
 "notification.action.notReady" = "尚未准备";
@@ -144,12 +179,13 @@
 "nudge.card.interval" = "约每 %d 天 · %@";
 "nudge.action.enable" = "开启提醒";
 "nudge.action.disable" = "关闭提醒";
-"nudge.action.schedule" = "安排日程";
+"nudge.action.schedule" = "确认日程";
 "nudge.action.snooze" = "推迟一周";
 "nudge.action.skip" = "跳过";
 
 "prep.card.dayCount" = "D-%d";
 "prep.card.accessibility" = "%@，还剩 %d 天，%@";
+"prep.card.openHint" = "轻点两下来查看和编辑准备内容。";
 
 "recap.empty.title" = "今天没有需要确认的准备";
 "recap.empty.message" = "祝你今晚轻松愉快，明天我们会继续提醒你。";
@@ -199,6 +235,11 @@
 "settings.notification.privacyMode" = "锁屏内容";
 "settings.notification.detailed" = "显示日程名称";
 "settings.notification.generic" = "仅显示通用文字";
+"settings.notification.status" = "权限状态";
+"settings.notification.authorized" = "已允许";
+"settings.notification.denied" = "已关闭";
+"settings.notification.notDetermined" = "未检查";
+"settings.notification.authorizedMessage" = "通知已允许，并已重新检查计划中的提醒。";
 "settings.recap.title" = "每日回顾";
 "settings.recap.enabled" = "晚间回顾";
 "settings.recap.time" = "显示时间";

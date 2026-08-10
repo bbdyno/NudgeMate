@@ -13,57 +13,62 @@ struct PrepListView: View {
     @State private var editingPrep: EventPrep?
     @State private var isCreating = false
     @State private var errorMessage: String?
+    @State private var selectedIDs: Set<UUID> = []
+    @State private var selectionFrames: [UUID: CGRect] = [:]
+    @State private var isSelecting = false
+    @State private var isDeleteConfirmationPresented = false
+
+    private var allSelected: Bool {
+        !preps.isEmpty && selectedIDs.count == preps.count
+    }
 
     var body: some View {
         NavigationStack {
-            Group {
-                if preps.isEmpty {
-                    EmptyStateView(
-                        icon: .calendarIcon,
-                        title: L10n.Prep.Empty.title,
-                        message: L10n.Prep.Empty.message,
-                        actionTitle: L10n.Prep.add
-                    ) {
-                        isCreating = true
-                    }
-                } else {
-                    List {
-                        ForEach(preps) { prep in
-                            VStack(alignment: .leading, spacing: 12) {
-                                Button {
-                                    editingPrep = prep
-                                } label: {
-                                    PrepRow(prep: prep)
-                                }
-                                .buttonStyle(.plain)
+            ZStack {
+                NudgeScreenBackground()
 
-                                if prep.status != .ready && prep.targetDate >= .now {
-                                    Picker(L10n.Prep.readiness, selection: statusBinding(for: prep)) {
-                                        ForEach(PrepStatus.allCases, id: \.self) { status in
-                                            Text(status.localizedTitle).tag(status)
-                                        }
-                                    }
-                                    .pickerStyle(.segmented)
-                                }
-                            }
-                            .padding(.vertical, 5)
-                            .swipeActions {
-                                Button(L10n.Common.delete, role: .destructive) {
-                                    delete(prep)
-                                }
-                            }
-                        }
-                    }
-                    .listStyle(.insetGrouped)
+                VStack(spacing: 0) {
+                    NudgeScreenHeader(
+                        title: L10n.Prep.title,
+                        subtitle: L10n.Home.Prep.subtitle,
+                        itemCount: preps.count,
+                        isSelecting: isSelecting,
+                        allSelected: allSelected,
+                        onToggleSelectionMode: toggleSelectionMode,
+                        onToggleAll: toggleAll,
+                        onAdd: { isCreating = true }
+                    )
+
+                    PrepListContent(
+                        preps: preps,
+                        isSelecting: isSelecting,
+                        selectedIDs: selectedIDs,
+                        onAdd: { isCreating = true },
+                        onOpen: openOrSelect,
+                        onStatusChange: updateStatus,
+                        onDelete: delete
+                    )
                 }
             }
-            .background(ColorTheme.background)
-            .navigationTitle(L10n.Prep.title)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button(L10n.Prep.add) { isCreating = true }
-                        .pretendard(.headline, weight: .semibold)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if isSelecting {
+                    NudgeSelectionActionBar(
+                        selectedCount: selectedIDs.count,
+                        onDelete: { isDeleteConfirmationPresented = true }
+                    )
                 }
+            }
+            .background {
+                TwoFingerSelectionInstaller(
+                    itemFrames: selectionFrames,
+                    selectedIDs: selectedIDs,
+                    onSelectionStarted: { isSelecting = true },
+                    onSelectionChanged: updateSelection
+                )
+                .frame(width: 0, height: 0)
+            }
+            .onPreferenceChange(NudgeSelectionFrameKey.self) { frames in
+                selectionFrames = frames
             }
         }
         .sheet(isPresented: $isCreating) {
@@ -73,6 +78,23 @@ struct PrepListView: View {
         .sheet(item: $editingPrep) { prep in
             PrepEditorView(prep: prep)
                 .environment(appState)
+        }
+        .task { handleNavigation(appState.pendingNavigation) }
+        .onChange(of: appState.pendingNavigation) { _, destination in
+            handleNavigation(destination)
+        }
+        .confirmationDialog(
+            L10n.Selection.deleteTitle(selectedIDs.count),
+            isPresented: $isDeleteConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.Selection.deleteAction(selectedIDs.count), role: .destructive) {
+                deleteSelected()
+            }
+            .accessibilityIdentifier("selection.confirmDelete")
+            Button(L10n.Common.cancel, role: .cancel) {}
+        } message: {
+            Text(L10n.Selection.deleteMessage)
         }
         .alert(L10n.Common.error, isPresented: Binding(
             get: { errorMessage != nil },
@@ -84,23 +106,70 @@ struct PrepListView: View {
         }
     }
 
-    private func statusBinding(for prep: EventPrep) -> Binding<PrepStatus> {
-        Binding(
-            get: { prep.status },
-            set: { status in
-                Task {
-                    do {
-                        try await appState.nudgeManager.updatePrep(
-                            prep,
-                            status: status,
-                            modelContext: modelContext
-                        )
-                    } catch {
-                        errorMessage = error.localizedDescription
-                    }
-                }
+    private func toggleSelectionMode() {
+        withAnimation(.snappy(duration: 0.24)) {
+            isSelecting.toggle()
+            if !isSelecting {
+                selectedIDs.removeAll()
             }
-        )
+        }
+    }
+
+    private func toggleAll() {
+        withAnimation(.snappy(duration: 0.22)) {
+            if allSelected {
+                selectedIDs.removeAll()
+            } else {
+                selectedIDs = Set(preps.map(\.id))
+            }
+        }
+    }
+
+    private func openOrSelect(_ prep: EventPrep) {
+        if isSelecting {
+            updateSelection(prep.id, !selectedIDs.contains(prep.id))
+        } else {
+            editingPrep = prep
+        }
+    }
+
+    private func updateSelection(_ id: UUID, _ shouldSelect: Bool) {
+        withAnimation(.snappy(duration: 0.18)) {
+            if shouldSelect {
+                selectedIDs.insert(id)
+            } else {
+                selectedIDs.remove(id)
+            }
+        }
+    }
+
+    private func updateStatus(_ prep: EventPrep, _ status: PrepStatus) {
+        Task {
+            do {
+                try await appState.nudgeManager.updatePrep(
+                    prep,
+                    status: status,
+                    modelContext: modelContext
+                )
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    private func deleteSelected() {
+        let targets = preps.filter { selectedIDs.contains($0.id) }
+        targets.forEach { prep in
+            appState.nudgeManager.cancelPrepReminder(for: prep.id)
+            modelContext.delete(prep)
+        }
+        do {
+            try modelContext.save()
+            selectedIDs.removeAll()
+            isSelecting = false
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func delete(_ prep: EventPrep) {
@@ -108,10 +177,69 @@ struct PrepListView: View {
         modelContext.delete(prep)
         do { try modelContext.save() } catch { errorMessage = error.localizedDescription }
     }
+
+    private func handleNavigation(_ destination: AppNavigationDestination?) {
+        guard let destination, case let .prep(id) = destination else { return }
+        if let id, let prep = preps.first(where: { $0.id == id }) {
+            editingPrep = prep
+        } else if id == nil {
+            isCreating = true
+        }
+        appState.consumeNavigation(.prep(id))
+    }
 }
 
-private struct PrepRow: View {
+private struct PrepListContent: View {
+    let preps: [EventPrep]
+    let isSelecting: Bool
+    let selectedIDs: Set<UUID>
+    let onAdd: () -> Void
+    let onOpen: (EventPrep) -> Void
+    let onStatusChange: (EventPrep, PrepStatus) -> Void
+    let onDelete: (EventPrep) -> Void
+
+    var body: some View {
+        if preps.isEmpty {
+            EmptyStateView(
+                icon: .calendar,
+                title: L10n.Prep.Empty.title,
+                message: L10n.Prep.Empty.message,
+                actionTitle: L10n.Prep.add,
+                action: onAdd
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.horizontal, 20)
+        } else {
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(preps) { prep in
+                        PrepCard(
+                            prep: prep,
+                            isSelecting: isSelecting,
+                            isSelected: selectedIDs.contains(prep.id),
+                            onOpen: { onOpen(prep) },
+                            onStatusChange: { onStatusChange(prep, $0) },
+                            onDelete: { onDelete(prep) }
+                        )
+                        .nudgeSelectionFrame(id: prep.id)
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.bottom, NudgeLayoutMetrics.listBottomClearance)
+            }
+            .scrollIndicators(.hidden)
+            .accessibilityIdentifier("prep.list")
+        }
+    }
+}
+
+private struct PrepCard: View {
     let prep: EventPrep
+    let isSelecting: Bool
+    let isSelected: Bool
+    let onOpen: () -> Void
+    let onStatusChange: (PrepStatus) -> Void
+    let onDelete: () -> Void
 
     private var daysRemaining: Int {
         Calendar.autoupdatingCurrent.dateComponents(
@@ -122,34 +250,125 @@ private struct PrepRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 14) {
-            SVGAssetImage(asset: .calendarIcon)
-                .frame(width: 44, height: 44)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 5) {
-                Text(prep.title)
-                    .pretendard(.headline, weight: .semibold)
-                    .foregroundStyle(ColorTheme.primaryText)
-                Text(L10n.Prep.Row.detail(
-                    daysRemaining,
-                    prep.targetDate.formatted(date: .abbreviated, time: .omitted)
-                ))
-                .pretendard(.subheadline)
-                .foregroundStyle(ColorTheme.secondaryText)
-                if !prep.nextActionNote.isEmpty {
-                    Text(prep.nextActionNote)
-                        .pretendard(.caption)
-                        .foregroundStyle(ColorTheme.secondarySnooze)
-                        .lineLimit(2)
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Button(action: onOpen) {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(ColorTheme.brandSoft)
+                            NudgeSymbolImage(symbol: .calendar, pointSize: 24)
+                        }
+                        .frame(width: 54, height: 54)
+                        .accessibilityHidden(true)
+
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(dayLabel)
+                                .pretendard(.caption2, weight: .bold)
+                                .foregroundStyle(dayLabelColor)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(dayLabelColor.opacity(0.13), in: Capsule())
+                            Text(prep.title)
+                                .pretendard(.headline, weight: .semibold)
+                                .foregroundStyle(ColorTheme.primaryText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Text(prep.targetDate, format: .dateTime.month(.abbreviated).day().weekday(.abbreviated))
+                                .pretendard(.subheadline)
+                                .foregroundStyle(ColorTheme.secondaryText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                if isSelecting {
+                    Button(action: onOpen) {
+                        NudgeSelectionIndicator(isSelected: isSelected)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(isSelected ? L10n.Selection.deselect : L10n.Selection.select)
+                } else {
+                    Menu {
+                        Button(L10n.Common.delete, role: .destructive, action: onDelete)
+                    } label: {
+                        VStack(spacing: 2) {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text(L10n.Common.moreActions)
+                                .pretendard(.caption2, weight: .medium)
+                        }
+                        .foregroundStyle(ColorTheme.secondaryText)
+                        .frame(minWidth: 54, minHeight: 48)
+                        .background(ColorTheme.backgroundDeep.opacity(0.75), in: Capsule())
+                    }
+                    .accessibilityLabel(L10n.Common.moreActions)
                 }
             }
-            Spacer()
+
+            if !prep.nextActionNote.isEmpty {
+                Text(prep.nextActionNote)
+                    .pretendard(.caption)
+                    .foregroundStyle(ColorTheme.secondarySnooze)
+                    .lineLimit(2)
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(ColorTheme.backgroundDeep.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+            }
+
+            if !isSelecting && prep.status != .ready && prep.targetDate >= .now {
+                PrepReadinessControl(
+                    selection: prep.status,
+                    onSelectionChanged: onStatusChange
+                )
+            }
         }
-        .accessibilityElement(children: .combine)
+        .nudgeCardSurface(isSelected: isSelected)
+        .accessibilityValue(isSelected ? L10n.Selection.selected : "")
+    }
+
+    private var dayLabel: String {
+        daysRemaining >= 0 ? "D-\(daysRemaining)" : L10n.Selection.past
+    }
+
+    private var dayLabelColor: Color {
+        daysRemaining <= 3 ? ColorTheme.warning : ColorTheme.primaryNudge
     }
 }
 
-private struct PrepEditorView: View {
+private struct PrepReadinessControl: View {
+    let selection: PrepStatus
+    let onSelectionChanged: (PrepStatus) -> Void
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(PrepStatus.allCases) { status in
+                Button {
+                    onSelectionChanged(status)
+                } label: {
+                    Text(status.localizedTitle)
+                        .pretendard(.caption2, weight: selection == status ? .bold : .medium)
+                        .foregroundStyle(
+                            selection == status ? ColorTheme.cardBackground : ColorTheme.secondaryText
+                        )
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background(
+                            selection == status ? ColorTheme.primaryNudge : ColorTheme.backgroundDeep,
+                            in: Capsule()
+                        )
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selection == status ? .isSelected : [])
+            }
+        }
+    }
+}
+
+struct PrepEditorView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
@@ -162,6 +381,7 @@ private struct PrepEditorView: View {
     @State private var nextAction: String
     @State private var notificationsEnabled: Bool
     @State private var errorMessage: String?
+    @State private var isSaving = false
 
     @Query private var allPreps: [EventPrep]
 
@@ -205,10 +425,22 @@ private struct PrepEditorView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(L10n.Common.cancel) { dismiss() }
+                        .disabled(isSaving)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(L10n.Common.save, action: save)
-                        .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button {
+                        Task { await save() }
+                    } label: {
+                        if isSaving {
+                            ProgressView()
+                        } else {
+                            Text(L10n.Common.save)
+                        }
+                    }
+                    .disabled(
+                        isSaving
+                            || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    )
                 }
             }
         }
@@ -220,9 +452,10 @@ private struct PrepEditorView: View {
         } message: {
             Text(errorMessage ?? "")
         }
+        .accessibilityIdentifier("prep.editor.screen")
     }
 
-    private func save() {
+    private func save() async {
         let activePrepCount = allPreps.filter {
             $0.planState == .active && $0.id != prep?.id
         }.count
@@ -233,6 +466,8 @@ private struct PrepEditorView: View {
             appState.presentPaywall()
             return
         }
+        isSaving = true
+        defer { isSaving = false }
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let schedule = PrepScheduleCalculator(calendar: .autoupdatingCurrent).nextCheckIn(
             now: .now,
@@ -257,16 +492,19 @@ private struct PrepEditorView: View {
         value.notificationsEnabled = notificationsEnabled
         value.updatedAt = .now
 
-        if prep == nil { modelContext.insert(value) }
         do {
-            try modelContext.save()
             if notificationsEnabled && value.status != .ready {
-                Task { try? await appState.nudgeManager.schedulePrepReminder(for: value) }
+                try await appState.nudgeManager.schedulePrepReminder(for: value)
             } else {
                 appState.nudgeManager.cancelPrepReminder(for: value.id)
             }
+            if prep == nil { modelContext.insert(value) }
+            try modelContext.save()
             dismiss()
         } catch {
+            if prep == nil {
+                appState.nudgeManager.cancelPrepReminder(for: value.id)
+            }
             errorMessage = error.localizedDescription
         }
     }

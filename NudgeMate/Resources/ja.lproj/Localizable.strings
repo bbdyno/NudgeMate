@@ -13,6 +13,25 @@
 "common.delete" = "削除";
 "common.cancel" = "キャンセル";
 "common.save" = "保存";
+"common.add" = "追加";
+"common.select" = "選択";
+"common.moreActions" = "その他の操作";
+"common.itemCount" = "%d件";
+
+"quickCapture.title" = "予定をすばやく追加";
+"quickCapture.subtitle" = "時間と重複を確認してから一度で追加します";
+
+"selection.selectAll" = "すべて選択";
+"selection.deselectAll" = "すべて解除";
+"selection.count" = "%d件選択中";
+"selection.dragHint" = "2本指でなぞって複数選択";
+"selection.deleteAction" = "%d件を削除";
+"selection.deleteTitle" = "%d件を削除しますか？";
+"selection.deleteMessage" = "項目に関連する予約通知も削除されます。";
+"selection.selected" = "選択済み";
+"selection.select" = "項目を選択";
+"selection.deselect" = "項目の選択を解除";
+"selection.past" = "期限切れ";
 
 "tab.today" = "今日";
 "tab.rhythms" = "リズム";
@@ -109,6 +128,22 @@
 "calendar.error.saveFailed" = "予定を保存できませんでした。%@";
 "calendar.event.predictedNote" = "NudgeMateが予測した繰り返し予定";
 "calendar.event.fallbackTitle" = "繰り返し予定";
+"calendar.composer.newTitle" = "新しい予定";
+"calendar.composer.rhythmTitle" = "予定を確認";
+"calendar.composer.details" = "予定の詳細";
+"calendar.composer.title" = "予定または約束の名前";
+"calendar.composer.startDate" = "開始";
+"calendar.composer.duration" = "所要時間";
+"calendar.composer.minutes" = "%d分";
+"calendar.composer.calendar" = "保存先カレンダー";
+"calendar.composer.conflicts" = "重複の確認";
+"calendar.composer.checking" = "重複する予定を確認中…";
+"calendar.composer.noConflicts" = "重複する予定はありません";
+"calendar.composer.conflictCount" = "同じ時間に%d件の予定があります";
+"calendar.composer.duplicateWarning" = "同じ名前と開始時刻の予定がすでにあります。";
+"calendar.composer.allowDuplicate" = "それでも重複して追加";
+"calendar.composer.add" = "確認して追加";
+"calendar.composer.postSaveWarning" = "予定はカレンダーに追加されましたが、NudgeMateの状態または通知を更新できませんでした。%@";
 
 "notification.error.permissionDenied" = "通知がオフになっています。「設定」で通知を許可してください。";
 "notification.error.modelUnavailable" = "ストレージの準備ができていないため、通知操作を処理できません。";
@@ -121,7 +156,7 @@
 "notification.generic.body" = "アプリを開いて、今確認する内容をご覧ください。";
 "notification.recap.title" = "今日の準備を振り返る時間です";
 "notification.recap.body" = "完了・延期した項目を確認すると、次の通知がより正確になります。";
-"notification.action.scheduleNow" = "今すぐ予定を入れる";
+"notification.action.scheduleNow" = "予定を確認";
 "notification.action.snoozeWeek" = "1週間延期";
 "notification.action.skip" = "今回はスキップ";
 "notification.action.notReady" = "未準備";
@@ -144,12 +179,13 @@
 "nudge.card.interval" = "約%d日ごと · %@";
 "nudge.action.enable" = "通知をオン";
 "nudge.action.disable" = "通知をオフ";
-"nudge.action.schedule" = "予定を入れる";
+"nudge.action.schedule" = "予定を確認";
 "nudge.action.snooze" = "1週間延期";
 "nudge.action.skip" = "スキップ";
 
 "prep.card.dayCount" = "D-%d";
 "prep.card.accessibility" = "%@、残り%d日、%@";
+"prep.card.openHint" = "ダブルタップして準備内容を確認・編集します。";
 
 "recap.empty.title" = "今日は確認する準備がありません";
 "recap.empty.message" = "ゆっくりお過ごしください。明日またサポートします。";
@@ -199,6 +235,11 @@
 "settings.notification.privacyMode" = "ロック画面の内容";
 "settings.notification.detailed" = "予定名を表示";
 "settings.notification.generic" = "一般的な文言のみ";
+"settings.notification.status" = "権限の状態";
+"settings.notification.authorized" = "許可済み";
+"settings.notification.denied" = "オフ";
+"settings.notification.notDetermined" = "未確認";
+"settings.notification.authorizedMessage" = "通知が許可されました。予約済みの通知を再確認しました。";
 "settings.recap.title" = "Daily Recap";
 "settings.recap.enabled" = "夜の振り返り";
 "settings.recap.time" = "表示時刻";

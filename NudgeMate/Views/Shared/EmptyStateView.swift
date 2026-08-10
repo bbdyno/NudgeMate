@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct EmptyStateView: View {
-    let icon: ImageAssetManager.Asset
+    let icon: NudgeSymbol
     let title: String
     let message: String
     let actionTitle: String?
     let action: (() -> Void)?
 
     init(
-        icon: ImageAssetManager.Asset,
+        icon: NudgeSymbol,
         title: String,
         message: String,
         actionTitle: String? = nil,
@@ -23,9 +23,7 @@ struct EmptyStateView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SVGAssetImage(asset: icon)
-                .frame(width: 112, height: 112)
-                .accessibilityHidden(true)
+            NudgeSymbolBadge(symbol: icon, size: 112)
 
             Text(title)
                 .pretendard(.title2, weight: .semibold)

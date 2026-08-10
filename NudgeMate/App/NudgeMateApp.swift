@@ -12,6 +12,9 @@ struct NudgeMateApp: App {
         modelContainerResult = Result {
             let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
             let container = try PersistenceController.makeContainer(inMemory: isRunningTests)
+#if DEBUG
+            try UITestScenarioConfigurator.configureIfNeeded(modelContainer: container)
+#endif
             state.configure(modelContainer: container)
             return container
         }
@@ -27,7 +30,7 @@ struct NudgeMateApp: App {
                         .modelContainer(modelContainer)
                 case .failure:
                     EmptyStateView(
-                        icon: .emptyState,
+                        icon: .empty,
                         title: NudgeMateStrings.Localizable.App.Storage.title,
                         message: NudgeMateStrings.Localizable.App.Storage.message
                     )

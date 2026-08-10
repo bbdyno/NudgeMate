@@ -16,9 +16,7 @@ struct NudgeCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 12) {
-                SVGAssetImage(asset: .nudgeAlert)
-                    .frame(width: 48, height: 48)
-                    .accessibilityHidden(true)
+                NudgeSymbolBadge(symbol: .category(event.category), size: 48)
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(event.title)
@@ -32,14 +30,6 @@ struct NudgeCardView: View {
                 }
 
                 Spacer(minLength: 8)
-
-                Button(
-                    event.isMuted ? L10n.Nudge.Action.enable : L10n.Nudge.Action.disable,
-                    action: onToggleMute
-                )
-                    .pretendard(.caption, weight: .medium)
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(ColorTheme.secondaryText)
             }
 
             ViewThatFits(in: .horizontal) {
@@ -52,6 +42,7 @@ struct NudgeCardView: View {
         .overlay {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(ColorTheme.separator.opacity(0.35), lineWidth: 0.5)
+                .allowsHitTesting(false)
         }
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: event.nextPredictedDate)
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: event.isMuted)
@@ -70,9 +61,20 @@ struct NudgeCardView: View {
             Button(L10n.Nudge.Action.snooze, action: onSnooze)
                 .buttonStyle(.bordered)
                 .tint(ColorTheme.secondarySnooze)
-            Button(L10n.Nudge.Action.skip, action: onSkip)
-                .buttonStyle(.borderless)
-                .foregroundStyle(ColorTheme.secondaryText)
+            Menu {
+                Button(L10n.Nudge.Action.skip, action: onSkip)
+                    .accessibilityIdentifier("nudge.skip")
+                Button(
+                    event.isMuted ? L10n.Nudge.Action.enable : L10n.Nudge.Action.disable,
+                    action: onToggleMute
+                )
+                .accessibilityIdentifier("nudge.toggleMute")
+            } label: {
+                Label(L10n.Common.moreActions, systemImage: "ellipsis")
+            }
+            .buttonStyle(.bordered)
+            .tint(ColorTheme.secondaryText)
+            .accessibilityIdentifier("nudge.moreActions")
         }
         .pretendard(.subheadline, weight: .semibold)
         .controlSize(.regular)

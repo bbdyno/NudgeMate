@@ -53,7 +53,10 @@ final class RecurringEvent {
 
     var isMuted: Bool {
         get { !notificationsEnabled || lifecycleState != .active }
-        set { notificationsEnabled = !newValue }
+        set {
+            notificationsEnabled = !newValue
+            lifecycleState = newValue ? .paused : .active
+        }
     }
 
     init(
@@ -99,7 +102,7 @@ final class RecurringEvent {
         defaultEventStartHour = nil
         defaultEventStartMinute = nil
         notificationsEnabled = !isMuted
-        lifecycleState = .active
+        lifecycleState = isMuted ? .paused : .active
         createdAt = .now
         updatedAt = .now
     }

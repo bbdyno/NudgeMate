@@ -36,7 +36,7 @@ struct DailyRecapSheet: View {
             Group {
                 if pendingPreps.isEmpty && dueRhythms.isEmpty {
                     EmptyStateView(
-                        icon: .emptyState,
+                        icon: .empty,
                         title: L10n.Recap.Empty.title,
                         message: L10n.Recap.Empty.message
                     )
@@ -85,9 +85,7 @@ struct DailyRecapSheet: View {
     private func recapRow(for prep: EventPrep) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                SVGAssetImage(asset: .calendarIcon)
-                    .frame(width: 46, height: 46)
-                    .accessibilityHidden(true)
+                NudgeSymbolBadge(symbol: .calendar, size: 46)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(prep.title)
@@ -122,9 +120,7 @@ struct DailyRecapSheet: View {
     private func rhythmRecapRow(for rhythm: RecurringEvent) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 12) {
-                SVGAssetImage(asset: .nudgeAlert)
-                    .frame(width: 46, height: 46)
-                    .accessibilityHidden(true)
+                NudgeSymbolBadge(symbol: .reminder, size: 46)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(rhythm.displayName)
                         .pretendard(.headline, weight: .semibold)
@@ -181,6 +177,10 @@ struct DailyRecapSheet: View {
     }
 
     private func complete(_ rhythm: RecurringEvent) {
+        let previousHistoryDates = rhythm.historyDates
+        let previousLastOccurrenceDate = rhythm.lastOccurrenceDate
+        let previousNextPredictedDate = rhythm.nextPredictedDate
+        let previousUpdatedAt = rhythm.updatedAt
         let now = Date.now
         rhythm.historyDates.append(now)
         rhythm.lastOccurrenceDate = now
@@ -191,11 +191,23 @@ struct DailyRecapSheet: View {
         ) ?? now.addingTimeInterval(TimeInterval(rhythm.baseIntervalDays * 86_400))
         rhythm.nextPredictedDate = center
         rhythm.updatedAt = now
-        do {
-            try modelContext.save()
-            Task { try? await appState.nudgeManager.scheduleNudge(for: rhythm) }
-        } catch {
-            errorMessage = error.localizedDescription
+        Task {
+            do {
+                try modelContext.save()
+            } catch {
+                rhythm.historyDates = previousHistoryDates
+                rhythm.lastOccurrenceDate = previousLastOccurrenceDate
+                rhythm.nextPredictedDate = previousNextPredictedDate
+                rhythm.updatedAt = previousUpdatedAt
+                errorMessage = error.localizedDescription
+                return
+            }
+
+            do {
+                try await appState.nudgeManager.scheduleNudge(for: rhythm)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 }

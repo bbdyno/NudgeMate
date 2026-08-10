@@ -13,6 +13,25 @@
 "common.delete" = "Delete";
 "common.cancel" = "Cancel";
 "common.save" = "Save";
+"common.add" = "Add";
+"common.select" = "Select";
+"common.moreActions" = "More actions";
+"common.itemCount" = "%d items";
+
+"quickCapture.title" = "Quick add schedule";
+"quickCapture.subtitle" = "Review the time and conflicts, then add it in one step";
+
+"selection.selectAll" = "Select All";
+"selection.deselectAll" = "Deselect All";
+"selection.count" = "%d selected";
+"selection.dragHint" = "Swipe with two fingers to select multiple items";
+"selection.deleteAction" = "Delete %d";
+"selection.deleteTitle" = "Delete %d items?";
+"selection.deleteMessage" = "Scheduled notifications linked to these items will also be removed.";
+"selection.selected" = "Selected";
+"selection.select" = "Select item";
+"selection.deselect" = "Deselect item";
+"selection.past" = "Past due";
 
 "tab.today" = "Today";
 "tab.rhythms" = "Rhythms";
@@ -109,6 +128,22 @@
 "calendar.error.saveFailed" = "The event could not be saved. %@";
 "calendar.event.predictedNote" = "Recurring event predicted by NudgeMate";
 "calendar.event.fallbackTitle" = "Recurring Event";
+"calendar.composer.newTitle" = "Add Schedule";
+"calendar.composer.rhythmTitle" = "Review Schedule";
+"calendar.composer.details" = "Schedule Details";
+"calendar.composer.title" = "Schedule or appointment name";
+"calendar.composer.startDate" = "Starts";
+"calendar.composer.duration" = "Duration";
+"calendar.composer.minutes" = "%d min";
+"calendar.composer.calendar" = "Save to Calendar";
+"calendar.composer.conflicts" = "Conflict Check";
+"calendar.composer.checking" = "Checking for conflicts…";
+"calendar.composer.noConflicts" = "No conflicting events";
+"calendar.composer.conflictCount" = "%d events overlap this time";
+"calendar.composer.duplicateWarning" = "An event with the same name and start time already exists.";
+"calendar.composer.allowDuplicate" = "Add the duplicate anyway";
+"calendar.composer.add" = "Review and Add";
+"calendar.composer.postSaveWarning" = "The event was added to Calendar, but NudgeMate could not update its status or reminder. %@";
 
 "notification.error.permissionDenied" = "Notifications are turned off. Allow notifications in Settings.";
 "notification.error.modelUnavailable" = "The notification action could not be completed because storage is unavailable.";
@@ -121,7 +156,7 @@
 "notification.generic.body" = "Open the app to see what needs your attention.";
 "notification.recap.title" = "Time for your daily recap";
 "notification.recap.body" = "Review what you completed or snoozed to improve your next nudges.";
-"notification.action.scheduleNow" = "Schedule Now";
+"notification.action.scheduleNow" = "Review Schedule";
 "notification.action.snoozeWeek" = "Snooze 1 Week";
 "notification.action.skip" = "Skip This Time";
 "notification.action.notReady" = "Not Ready";
@@ -144,12 +179,13 @@
 "nudge.card.interval" = "About every %d days · %@";
 "nudge.action.enable" = "Enable";
 "nudge.action.disable" = "Mute";
-"nudge.action.schedule" = "Schedule";
+"nudge.action.schedule" = "Review Schedule";
 "nudge.action.snooze" = "Snooze 1 Week";
 "nudge.action.skip" = "Skip";
 
 "prep.card.dayCount" = "D-%d";
 "prep.card.accessibility" = "%@, %d days remaining, %@";
+"prep.card.openHint" = "Double tap to review and edit this preparation.";
 
 "recap.empty.title" = "Nothing to Review Today";
 "recap.empty.message" = "Enjoy your evening. We’ll help you stay on track tomorrow.";
@@ -199,6 +235,11 @@
 "settings.notification.privacyMode" = "Lock Screen Content";
 "settings.notification.detailed" = "Show Event Names";
 "settings.notification.generic" = "Show Generic Text";
+"settings.notification.status" = "Permission Status";
+"settings.notification.authorized" = "Allowed";
+"settings.notification.denied" = "Off";
+"settings.notification.notDetermined" = "Not Checked";
+"settings.notification.authorizedMessage" = "Notifications are allowed. Scheduled nudges were checked again.";
 "settings.recap.title" = "Daily Recap";
 "settings.recap.enabled" = "Evening Recap";
 "settings.recap.time" = "Time";

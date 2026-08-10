@@ -13,6 +13,25 @@
 "common.delete" = "刪除";
 "common.cancel" = "取消";
 "common.save" = "儲存";
+"common.add" = "新增";
+"common.select" = "選取";
+"common.moreActions" = "更多操作";
+"common.itemCount" = "%d項";
+
+"quickCapture.title" = "快速加入行程";
+"quickCapture.subtitle" = "確認時間和衝突後一次完成加入";
+
+"selection.selectAll" = "全部選取";
+"selection.deselectAll" = "取消全選";
+"selection.count" = "已選取%d項";
+"selection.dragHint" = "用雙指滑動可選取多個項目";
+"selection.deleteAction" = "刪除%d項";
+"selection.deleteTitle" = "刪除%d個項目？";
+"selection.deleteMessage" = "與這些項目關聯的排程通知也會一併移除。";
+"selection.selected" = "已選取";
+"selection.select" = "選取項目";
+"selection.deselect" = "取消選取項目";
+"selection.past" = "已逾期";
 
 "tab.today" = "今天";
 "tab.rhythms" = "節奏";
@@ -109,6 +128,22 @@
 "calendar.error.saveFailed" = "無法儲存行程。%@";
 "calendar.event.predictedNote" = "由 NudgeMate 預測的重複行程";
 "calendar.event.fallbackTitle" = "重複行程";
+"calendar.composer.newTitle" = "加入行程";
+"calendar.composer.rhythmTitle" = "確認行程";
+"calendar.composer.details" = "行程資訊";
+"calendar.composer.title" = "行程或約會名稱";
+"calendar.composer.startDate" = "開始";
+"calendar.composer.duration" = "時長";
+"calendar.composer.minutes" = "%d分鐘";
+"calendar.composer.calendar" = "儲存至行事曆";
+"calendar.composer.conflicts" = "衝突檢查";
+"calendar.composer.checking" = "正在檢查衝突…";
+"calendar.composer.noConflicts" = "沒有衝突的行程";
+"calendar.composer.conflictCount" = "同一時間有%d個行程";
+"calendar.composer.duplicateWarning" = "已有名稱和開始時間相同的行程。";
+"calendar.composer.allowDuplicate" = "仍然加入重複行程";
+"calendar.composer.add" = "確認並加入";
+"calendar.composer.postSaveWarning" = "行程已加入行事曆，但NudgeMate無法更新狀態或提醒。%@";
 
 "notification.error.permissionDenied" = "通知已關閉。請在「設定」中允許通知。";
 "notification.error.modelUnavailable" = "儲存空間尚未就緒，無法處理通知動作。";
@@ -121,7 +156,7 @@
 "notification.generic.body" = "請開啟 App 查看需要留意的內容。";
 "notification.recap.title" = "該回顧今天的準備了";
 "notification.recap.body" = "確認已完成或延後的事項，讓下一次提醒更準確。";
-"notification.action.scheduleNow" = "立即安排";
+"notification.action.scheduleNow" = "確認行程";
 "notification.action.snoozeWeek" = "延後一週";
 "notification.action.skip" = "本次略過";
 "notification.action.notReady" = "尚未準備";
@@ -144,12 +179,13 @@
 "nudge.card.interval" = "約每 %d 天 · %@";
 "nudge.action.enable" = "開啟提醒";
 "nudge.action.disable" = "關閉提醒";
-"nudge.action.schedule" = "安排行程";
+"nudge.action.schedule" = "確認行程";
 "nudge.action.snooze" = "延後一週";
 "nudge.action.skip" = "略過";
 
 "prep.card.dayCount" = "D-%d";
 "prep.card.accessibility" = "%@，還剩 %d 天，%@";
+"prep.card.openHint" = "點兩下以查看和編輯準備內容。";
 
 "recap.empty.title" = "今天沒有需要確認的準備";
 "recap.empty.message" = "祝你今晚輕鬆愉快，明天我們會繼續提醒你。";
@@ -199,6 +235,11 @@
 "settings.notification.privacyMode" = "鎖定畫面內容";
 "settings.notification.detailed" = "顯示行程名稱";
 "settings.notification.generic" = "僅顯示一般文字";
+"settings.notification.status" = "權限狀態";
+"settings.notification.authorized" = "已允許";
+"settings.notification.denied" = "已關閉";
+"settings.notification.notDetermined" = "未檢查";
+"settings.notification.authorizedMessage" = "通知已允許，並已重新檢查排程中的提醒。";
 "settings.recap.title" = "每日回顧";
 "settings.recap.enabled" = "晚間回顧";
 "settings.recap.time" = "顯示時間";

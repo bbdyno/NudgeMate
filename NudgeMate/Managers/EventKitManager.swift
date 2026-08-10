@@ -155,6 +155,23 @@ final class EventKitManager {
         )
     }
 
+    func conflictingEvents(
+        startDate: Date,
+        endDate: Date,
+        calendarIdentifier: String? = nil
+    ) async throws -> [CalendarEventSnapshot] {
+        guard endDate > startDate else { return [] }
+        let identifiers = calendarIdentifier.map { Set([$0]) } ?? []
+        let values = try await store.events(
+            from: startDate,
+            to: endDate,
+            calendarIdentifiers: identifiers
+        )
+        return values
+            .filter { $0.startDate < endDate && $0.endDate > startDate }
+            .sorted { $0.startDate < $1.startDate }
+    }
+
     private func mostFrequentTitle(_ events: [CalendarEventSnapshot]) -> String {
         Dictionary(grouping: events, by: \.title)
             .max { $0.value.count < $1.value.count }?.key

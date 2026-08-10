@@ -36,6 +36,7 @@ final class NudgeViewModel {
         modelContext: ModelContext,
         nudgeManager: NudgeManager
     ) async {
+        let wasMuted = event.isMuted
         event.isMuted.toggle()
 
         do {
@@ -46,7 +47,7 @@ final class NudgeViewModel {
                 try await nudgeManager.scheduleNudge(for: event)
             }
         } catch {
-            event.isMuted.toggle()
+            event.isMuted = wasMuted
             errorMessage = error.localizedDescription
         }
     }

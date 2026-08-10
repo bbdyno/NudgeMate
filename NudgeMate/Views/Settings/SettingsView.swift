@@ -12,11 +12,13 @@ struct SettingsView: View {
 
     @State private var settings: UserSettings?
     @State private var calendarState: CalendarAuthorizationState = .notDetermined
+    @State private var notificationState: NotificationPermissionState = .notDetermined
     @State private var exportURL: URL?
     @State private var isCalendarFlowPresented = false
     @State private var isPrivacyInfoPresented = false
     @State private var isDeleteConfirmationPresented = false
     @State private var errorMessage: String?
+    @State private var statusMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -56,8 +58,7 @@ struct SettingsView: View {
         )) {
             NavigationStack {
                 VStack(spacing: 22) {
-                    SVGAssetImage(asset: .featureCheck)
-                        .frame(width: 96, height: 96)
+                    NudgeSymbolBadge(symbol: .success, size: 96)
                     Text(L10n.Settings.Export.ready)
                         .pretendard(.title2, weight: .bold)
                     if let exportURL {
@@ -100,6 +101,14 @@ struct SettingsView: View {
         } message: {
             Text(errorMessage ?? "")
         }
+        .alert(L10n.App.name, isPresented: Binding(
+            get: { statusMessage != nil },
+            set: { if !$0 { statusMessage = nil } }
+        )) {
+            Button(L10n.Common.confirm, role: .cancel) {}
+        } message: {
+            Text(statusMessage ?? "")
+        }
     }
 
     private var accountSection: some View {
@@ -108,8 +117,7 @@ struct SettingsView: View {
                 Label {
                     Text(L10n.Settings.Sync.appleCalendar)
                 } icon: {
-                    SVGAssetImage(asset: .calendarIcon)
-                        .frame(width: 28, height: 28)
+                    NudgeSymbolBadge(symbol: .calendar, size: 28)
                 }
                 Spacer()
                 Text(calendarStatusText)
@@ -130,11 +138,21 @@ struct SettingsView: View {
 
     private var notificationSection: some View {
         Section(L10n.Settings.Notification.title) {
+            LabeledContent(
+                L10n.Settings.Notification.status,
+                value: notificationStatusText
+            )
             Button(L10n.Settings.Notification.request) {
                 Task {
                     do {
                         try await appState.nudgeManager.requestAuthorization()
+                        notificationState = .authorized
+                        if let settings {
+                            await appState.nudgeManager.reconcileAll(settings: settings)
+                        }
+                        statusMessage = L10n.Settings.Notification.authorizedMessage
                     } catch {
+                        notificationState = await appState.nudgeManager.refreshAuthorizationState()
                         errorMessage = error.localizedDescription
                     }
                 }
@@ -197,8 +215,7 @@ struct SettingsView: View {
                 appState.presentPaywall()
             } label: {
                 HStack(spacing: 14) {
-                    SVGAssetImage(asset: .proBadge)
-                        .frame(width: 52, height: 52)
+                    NudgeSymbolBadge(symbol: .pro, size: 52)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(appState.subscriptionManager.isPro ? L10n.Settings.Pro.active : L10n.Settings.Pro.title)
                             .pretendard(.headline, weight: .bold)
@@ -254,6 +271,14 @@ struct SettingsView: View {
         case .denied, .restricted: L10n.Settings.Sync.denied
         case .writeOnly: L10n.Settings.Sync.writeOnly
         case .notDetermined: L10n.Settings.Sync.notConnected
+        }
+    }
+
+    private var notificationStatusText: String {
+        switch notificationState {
+        case .authorized: L10n.Settings.Notification.authorized
+        case .denied: L10n.Settings.Notification.denied
+        case .notDetermined: L10n.Settings.Notification.notDetermined
         }
     }
 
@@ -322,6 +347,7 @@ struct SettingsView: View {
         Task {
             await appState.eventKitManager.refreshAuthorizationState()
             calendarState = appState.eventKitManager.authorizationState
+            notificationState = await appState.nudgeManager.refreshAuthorizationState()
         }
     }
 
@@ -373,8 +399,7 @@ private struct PrivacyInformationView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    SVGAssetImage(asset: .emptyState)
-                        .frame(width: 120, height: 120)
+                    NudgeSymbolBadge(symbol: .privacy, size: 120)
                         .frame(maxWidth: .infinity)
                     Text(L10n.Settings.Privacy.Info.title)
                         .pretendard(.title2, weight: .bold)

@@ -229,6 +229,7 @@ final class SuppressedPatternRecord {
 
 enum PendingIntentKind: String, Codable, Sendable {
     case openScheduler
+    case openPrep
     case quickAdd
     case rhythmAction
     case prepAction

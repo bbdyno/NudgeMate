@@ -19,7 +19,7 @@ struct PaywallView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 22) {
-                    SVGAssetImage(asset: .paywallHero)
+                    ArtworkAssetImage(asset: .paywallHero)
                         .frame(width: 180, height: 144)
                         .accessibilityHidden(true)
 
@@ -143,9 +143,8 @@ struct PaywallView: View {
 
     private func feature(_ title: String) -> some View {
         HStack(spacing: 12) {
-            SVGAssetImage(asset: .featureCheck)
+            NudgeSymbolImage(symbol: .success, pointSize: 24)
                 .frame(width: 28, height: 28)
-                .accessibilityHidden(true)
             Text(title)
                 .pretendard(.body, weight: .medium)
         }

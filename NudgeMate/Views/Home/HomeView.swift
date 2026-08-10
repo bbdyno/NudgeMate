@@ -18,6 +18,8 @@ struct HomeView: View {
     @State private var viewModel = HomeViewModel()
     @State private var nudgeViewModel = NudgeViewModel()
     @State private var isSettingsPresented = false
+    @State private var composerDraft: CalendarEventComposerDraft?
+    @State private var editingPrep: EventPrep?
 
     private var activeNudges: [RecurringEvent] {
         recurringEvents.filter { !$0.isMuted }
@@ -27,42 +29,46 @@ struct HomeView: View {
         @Bindable var appState = appState
 
         NavigationStack {
-            Group {
-                if viewModel.isLoading {
-                    ProgressView(L10n.Home.loading)
-                        .pretendard(.body)
-                        .tint(ColorTheme.primaryNudge)
-                } else if viewModel.calendarAccessDenied {
-                    calendarPermissionView
-                } else if let errorMessage = viewModel.errorMessage {
-                    EmptyStateView(
-                        icon: .nudgeAlert,
-                        title: L10n.Home.Error.loadTitle,
-                        message: errorMessage,
-                        actionTitle: L10n.Common.retry
-                    ) {
-                        Task { await retry() }
+            ZStack {
+                NudgeScreenBackground()
+
+                VStack(spacing: 0) {
+                    Group {
+                        if viewModel.isLoading {
+                            ProgressView(L10n.Home.loading)
+                                .pretendard(.body)
+                                .tint(ColorTheme.primaryNudge)
+                        } else if viewModel.calendarAccessDenied {
+                            calendarPermissionView
+                        } else if let errorMessage = viewModel.errorMessage {
+                            EmptyStateView(
+                                icon: .reminder,
+                                title: L10n.Home.Error.loadTitle,
+                                message: errorMessage,
+                                actionTitle: L10n.Common.retry
+                            ) {
+                                Task { await retry() }
+                            }
+                        } else {
+                            dashboard
+                        }
                     }
-                } else {
-                    dashboard
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(ColorTheme.background.ignoresSafeArea())
+            .navigationTitle(L10n.Tab.today)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isSettingsPresented = true
                     } label: {
-                        SVGAssetImage(asset: .sync)
-                            .frame(width: 30, height: 30)
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 17, weight: .semibold))
+                            .frame(width: 44, height: 44)
                     }
                     .accessibilityLabel(L10n.Settings.title)
-                }
-                ToolbarItem(placement: .principal) {
-                    Text(L10n.App.name)
-                        .pretendard(.headline, weight: .bold)
-                        .foregroundStyle(ColorTheme.primaryText)
+                    .accessibilityIdentifier("home.settings")
                 }
             }
         }
@@ -76,6 +82,21 @@ struct HomeView: View {
             SettingsView()
                 .environment(appState)
         }
+        .sheet(item: $composerDraft) { draft in
+            CalendarEventComposerView(
+                draft: draft,
+                rhythm: draft.rhythmID.flatMap { rhythmID in
+                    recurringEvents.first { $0.id == rhythmID }
+                }
+            ) { title in
+                viewModel.confirmationMessage = L10n.Home.calendarAdded(title)
+            }
+            .environment(appState)
+        }
+        .sheet(item: $editingPrep) { prep in
+            PrepEditorView(prep: prep)
+                .environment(appState)
+        }
         .task {
             await viewModel.load(
                 modelContext: modelContext,
@@ -86,19 +107,15 @@ struct HomeView: View {
         .task {
             await appState.runDailyRecapClock()
         }
+        .task {
+            handleNavigation(appState.pendingNavigation)
+        }
+        .onChange(of: appState.pendingNavigation) { _, destination in
+            handleNavigation(destination)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 appState.evaluateDailyRecapPresentation()
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .scheduleNowRequested)) { notification in
-            guard
-                let id = notification.object as? UUID,
-                let event = recurringEvents.first(where: { $0.id == id })
-            else { return }
-
-            Task {
-                await scheduleNow(event)
             }
         }
         .alert(L10n.App.name, isPresented: messageBinding) {
@@ -114,7 +131,7 @@ struct HomeView: View {
 
     private var calendarPermissionView: some View {
         EmptyStateView(
-            icon: .emptyState,
+            icon: .empty,
             title: L10n.Home.Permission.title,
             message: L10n.Home.Permission.message,
             actionTitle: L10n.Home.Permission.openSettings
@@ -127,11 +144,17 @@ struct HomeView: View {
     private var dashboard: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 28) {
+                HomeQuickCaptureCard {
+                    composerDraft = CalendarEventComposerDraft(
+                        startDate: nextAvailableHour()
+                    )
+                }
                 prepSection
                 nudgeSection
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 20)
+            .padding(.top, 4)
+            .padding(.bottom, NudgeLayoutMetrics.listBottomClearance)
         }
         .scrollIndicators(.hidden)
         .refreshable {
@@ -152,7 +175,9 @@ struct HomeView: View {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 12) {
                         ForEach(eventPreps) { prep in
-                            PrepTrackerCard(prep: prep)
+                            PrepTrackerCard(prep: prep) {
+                                editingPrep = prep
+                            }
                         }
                     }
                     .scrollTargetLayout()
@@ -172,7 +197,7 @@ struct HomeView: View {
 
             if activeNudges.isEmpty {
                 EmptyStateView(
-                    icon: .emptyState,
+                    icon: .empty,
                     title: L10n.Home.Nudge.emptyTitle,
                     message: L10n.Home.Nudge.emptyMessage
                 )
@@ -184,7 +209,7 @@ struct HomeView: View {
                         NudgeCardView(
                             event: event,
                             onSchedule: {
-                                Task { await scheduleNow(event) }
+                                composerDraft = draft(for: event)
                             },
                             onSnooze: {
                                 Task {
@@ -235,9 +260,7 @@ struct HomeView: View {
 
     private func compactEmptyMessage(_ message: String) -> some View {
         HStack(spacing: 12) {
-            SVGAssetImage(asset: .calendarIcon)
-                .frame(width: 44, height: 44)
-                .accessibilityHidden(true)
+            NudgeSymbolBadge(symbol: .calendar, size: 44)
             Text(message)
                 .pretendard(.subheadline)
                 .foregroundStyle(ColorTheme.secondaryText)
@@ -269,18 +292,50 @@ struct HomeView: View {
         )
     }
 
-    private func scheduleNow(_ event: RecurringEvent) async {
-        await viewModel.scheduleNow(
-            event: event,
-            modelContext: modelContext,
-            eventKitManager: appState.eventKitManager,
-            nudgeManager: appState.nudgeManager
+    private func handleNavigation(_ destination: AppNavigationDestination?) {
+        guard case let .scheduleRhythm(rhythmID) = destination else { return }
+        if let rhythmID,
+           let event = recurringEvents.first(where: { $0.id == rhythmID }) {
+            composerDraft = draft(for: event)
+        } else {
+            composerDraft = CalendarEventComposerDraft(startDate: nextAvailableHour())
+        }
+        appState.consumeNavigation(.scheduleRhythm(rhythmID))
+    }
+
+    private func draft(for event: RecurringEvent) -> CalendarEventComposerDraft {
+        let nextHour = nextAvailableHour()
+        var startDate = max(event.nextPredictedDate, nextHour)
+        if let hour = event.defaultEventStartHour {
+            let minute = event.defaultEventStartMinute ?? 0
+            startDate = Calendar.autoupdatingCurrent.date(
+                bySettingHour: hour,
+                minute: minute,
+                second: 0,
+                of: event.nextPredictedDate
+            ) ?? startDate
+            startDate = max(startDate, nextHour)
+        }
+        return CalendarEventComposerDraft(
+            title: event.displayName,
+            startDate: startDate,
+            durationMinutes: event.defaultEventDurationMinutes,
+            calendarIdentifier: event.preferredCalendarIdentifier,
+            rhythmID: event.id
         )
+    }
+
+    private func nextAvailableHour(from date: Date = .now) -> Date {
+        let calendar = Calendar.autoupdatingCurrent
+        let startOfHour = calendar.dateInterval(of: .hour, for: date)?.start ?? date
+        return calendar.date(byAdding: .hour, value: 1, to: startOfHour)
+            ?? date.addingTimeInterval(3_600)
     }
 }
 
 private struct PrepTrackerCard: View {
     let prep: EventPrep
+    let action: () -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -296,39 +351,51 @@ private struct PrepTrackerCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                SVGAssetImage(asset: .calendarIcon)
-                    .frame(width: 42, height: 42)
-                    .accessibilityHidden(true)
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    NudgeSymbolBadge(symbol: .calendar, size: 42)
 
-                Text(L10n.Prep.Card.dayCount(daysRemaining))
-                    .pretendard(.headline, weight: .bold)
-                    .foregroundStyle(ColorTheme.primaryNudge)
+                    Text(L10n.Prep.Card.dayCount(daysRemaining))
+                        .pretendard(.headline, weight: .bold)
+                        .foregroundStyle(ColorTheme.primaryNudge)
+                }
+
+                Spacer(minLength: 0)
+
+                Text(prep.title)
+                    .pretendard(.headline, weight: .semibold)
+                    .foregroundStyle(ColorTheme.primaryText)
+                    .lineLimit(2)
+
+                HStack {
+                    Text(prep.status.localizedTitle)
+                        .pretendard(.caption, weight: .medium)
+                        .foregroundStyle(ColorTheme.secondarySnooze)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(ColorTheme.secondaryText)
+                }
             }
-
-            Spacer(minLength: 0)
-
-            Text(prep.title)
-                .pretendard(.headline, weight: .semibold)
-                .foregroundStyle(ColorTheme.primaryText)
-                .lineLimit(2)
-
-            Text(prep.status.localizedTitle)
-                .pretendard(.caption, weight: .medium)
-                .foregroundStyle(ColorTheme.secondarySnooze)
+            .padding(16)
+            .frame(width: dynamicTypeSize.isAccessibilitySize ? 250 : 190)
+            .frame(
+                minHeight: dynamicTypeSize.isAccessibilitySize ? 220 : 150,
+                alignment: .leading
+            )
+            .background(
+                ColorTheme.cardBackground,
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(ColorTheme.separator.opacity(0.35), lineWidth: 0.5)
+                    .allowsHitTesting(false)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         }
-        .padding(16)
-        .frame(width: dynamicTypeSize.isAccessibilitySize ? 250 : 190)
-        .frame(
-            minHeight: dynamicTypeSize.isAccessibilitySize ? 220 : 150,
-            alignment: .leading
-        )
-        .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(ColorTheme.separator.opacity(0.35), lineWidth: 0.5)
-        }
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
             L10n.Prep.Card.accessibility(
@@ -337,5 +404,40 @@ private struct PrepTrackerCard: View {
                 prep.status.localizedTitle
             )
         )
+        .accessibilityHint(L10n.Prep.Card.openHint)
+        .accessibilityIdentifier("home.prep.card")
+    }
+}
+
+private struct HomeQuickCaptureCard: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                NudgeSymbolBadge(symbol: .calendar, size: 52)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(L10n.QuickCapture.title)
+                        .pretendard(.headline, weight: .bold)
+                        .foregroundStyle(ColorTheme.primaryText)
+                    Text(L10n.QuickCapture.subtitle)
+                        .pretendard(.subheadline)
+                        .foregroundStyle(ColorTheme.secondaryText)
+                        .multilineTextAlignment(.leading)
+                }
+                Spacer(minLength: 8)
+                Image(systemName: "plus.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(ColorTheme.primaryNudge)
+            }
+            .padding(16)
+            .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(ColorTheme.primaryNudge.opacity(0.22), lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("home.quickCapture")
     }
 }

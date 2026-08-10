@@ -1,6 +1,7 @@
 import XCTest
 @testable import NudgeMate
 
+@MainActor
 final class StoreKitConfigurationTests: XCTestCase {
     func testProductIdentifiersAreStable() {
         XCTAssertEqual(

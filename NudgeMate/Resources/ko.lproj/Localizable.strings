@@ -13,6 +13,25 @@
 "common.delete" = "삭제";
 "common.cancel" = "취소";
 "common.save" = "저장";
+"common.add" = "추가";
+"common.select" = "선택";
+"common.moreActions" = "더보기";
+"common.itemCount" = "%d개 항목";
+
+"quickCapture.title" = "일정·약속 빠르게 추가";
+"quickCapture.subtitle" = "시간과 겹치는 일정을 확인한 뒤 한 번에 추가해요";
+
+"selection.selectAll" = "전체 선택";
+"selection.deselectAll" = "전체 해제";
+"selection.count" = "%d개 선택됨";
+"selection.dragHint" = "두 손가락으로 쓸어 여러 항목 선택";
+"selection.deleteAction" = "%d개 삭제";
+"selection.deleteTitle" = "%d개 항목을 삭제할까요?";
+"selection.deleteMessage" = "삭제한 항목과 연결된 예약 알림도 함께 제거됩니다.";
+"selection.selected" = "선택됨";
+"selection.select" = "항목 선택";
+"selection.deselect" = "항목 선택 해제";
+"selection.past" = "기한 지남";
 
 "tab.today" = "오늘";
 "tab.rhythms" = "리듬";
@@ -109,6 +128,22 @@
 "calendar.error.saveFailed" = "일정을 저장하지 못했습니다. %@";
 "calendar.event.predictedNote" = "NudgeMate가 예측한 반복 일정";
 "calendar.event.fallbackTitle" = "반복 일정";
+"calendar.composer.newTitle" = "새 일정 추가";
+"calendar.composer.rhythmTitle" = "일정 확인";
+"calendar.composer.details" = "일정 정보";
+"calendar.composer.title" = "일정 또는 약속 이름";
+"calendar.composer.startDate" = "시작";
+"calendar.composer.duration" = "소요 시간";
+"calendar.composer.minutes" = "%d분";
+"calendar.composer.calendar" = "저장할 캘린더";
+"calendar.composer.conflicts" = "겹치는 일정 확인";
+"calendar.composer.checking" = "겹치는 일정을 확인하는 중…";
+"calendar.composer.noConflicts" = "겹치는 일정이 없습니다";
+"calendar.composer.conflictCount" = "같은 시간에 %d개 일정이 있습니다";
+"calendar.composer.duplicateWarning" = "같은 이름과 시작 시간의 일정이 이미 있습니다.";
+"calendar.composer.allowDuplicate" = "그래도 중복 일정 추가";
+"calendar.composer.add" = "확인 후 추가";
+"calendar.composer.postSaveWarning" = "일정은 캘린더에 추가했지만 NudgeMate 상태나 알림을 갱신하지 못했습니다. %@";
 
 "notification.error.permissionDenied" = "알림 권한이 꺼져 있습니다. 설정에서 알림을 허용해 주세요.";
 "notification.error.modelUnavailable" = "저장소가 준비되지 않아 알림 동작을 처리할 수 없습니다.";
@@ -121,7 +156,7 @@
 "notification.generic.body" = "앱을 열어 지금 챙길 내용을 확인해 주세요.";
 "notification.recap.title" = "오늘의 준비를 돌아볼 시간이에요";
 "notification.recap.body" = "완료한 일과 미룬 일을 확인하면 다음 넛지가 더 정확해집니다.";
-"notification.action.scheduleNow" = "지금 일정 잡기";
+"notification.action.scheduleNow" = "일정 확인하기";
 "notification.action.snoozeWeek" = "1주일 미루기";
 "notification.action.skip" = "이번에는 건너뛰기";
 "notification.action.notReady" = "아직 준비 전";
@@ -144,12 +179,13 @@
 "nudge.card.interval" = "약 %d일 주기 · %@";
 "nudge.action.enable" = "알림 켜기";
 "nudge.action.disable" = "알림 끄기";
-"nudge.action.schedule" = "일정 잡기";
+"nudge.action.schedule" = "일정 확인";
 "nudge.action.snooze" = "1주 미루기";
 "nudge.action.skip" = "건너뛰기";
 
 "prep.card.dayCount" = "D-%d";
 "prep.card.accessibility" = "%@, %d일 남음, %@";
+"prep.card.openHint" = "두 번 탭하여 준비 내용을 확인하고 수정합니다.";
 
 "recap.empty.title" = "오늘 확인할 준비가 없어요";
 "recap.empty.message" = "편안한 저녁 보내세요. 내일 다시 챙겨드릴게요.";
@@ -199,6 +235,11 @@
 "settings.notification.privacyMode" = "잠금 화면 내용";
 "settings.notification.detailed" = "일정 이름 표시";
 "settings.notification.generic" = "일반 문구만 표시";
+"settings.notification.status" = "권한 상태";
+"settings.notification.authorized" = "허용됨";
+"settings.notification.denied" = "꺼짐";
+"settings.notification.notDetermined" = "확인 전";
+"settings.notification.authorizedMessage" = "알림이 허용되었습니다. 예약된 넛지를 다시 확인했습니다.";
 "settings.recap.title" = "Daily Recap";
 "settings.recap.enabled" = "저녁 돌아보기";
 "settings.recap.time" = "표시 시간";
