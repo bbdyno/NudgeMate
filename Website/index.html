@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071426">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="NudgeMate는 반복 일정의 다음 시점과 중요한 준비를 기기에서 미리 챙겨주는 iOS 일정 도우미입니다.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="NudgeMate">
+  <meta property="og:title" content="NudgeMate — 반복되는 일, 늦기 전에">
+  <meta property="og:description" content="캘린더의 리듬을 발견하고, 다음 시점과 준비를 미리 챙기세요.">
+  <meta property="og:url" content="https://bbdyno.github.io/NudgeMate/">
+  <meta property="og:image" content="https://bbdyno.github.io/NudgeMate/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NudgeMate — Stay ahead of what repeats">
+  <meta name="twitter:description" content="Discover calendar rhythms and prepare before the next moment arrives.">
+  <meta name="twitter:image" content="https://bbdyno.github.io/NudgeMate/assets/og.png">
+  <link rel="canonical" href="https://bbdyno.github.io/NudgeMate/">
+  <link rel="alternate" hreflang="ko" href="https://bbdyno.github.io/NudgeMate/?lang=ko">
+  <link rel="alternate" hreflang="en" href="https://bbdyno.github.io/NudgeMate/?lang=en">
+  <link rel="alternate" hreflang="zh-Hans" href="https://bbdyno.github.io/NudgeMate/?lang=zh-Hans">
+  <link rel="alternate" hreflang="zh-Hant" href="https://bbdyno.github.io/NudgeMate/?lang=zh-Hant">
+  <link rel="alternate" hreflang="ja" href="https://bbdyno.github.io/NudgeMate/?lang=ja">
+  <link rel="alternate" hreflang="x-default" href="https://bbdyno.github.io/NudgeMate/">
+  <link rel="icon" type="image/png" href="assets/app-icon.png">
+  <link rel="apple-touch-icon" href="assets/app-icon.png">
+  <link rel="preload" as="image" href="assets/nudgemate-journey.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>NudgeMate — 반복되는 일, 늦기 전에</title>
+  <script>document.documentElement.classList.remove('no-js');</script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skipLink">본문으로 건너뛰기</a>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+
+  <header class="site-header" data-header>
+    <nav class="nav-shell" aria-label="Primary">
+      <a class="brand" href="#top" aria-label="NudgeMate home">
+        <img src="assets/app-icon.png" width="38" height="38" alt="">
+        <span>NudgeMate</span>
+      </a>
+      <div class="nav-links" aria-label="Page sections">
+        <a href="#rhythm" data-i18n="navRhythm">리듬</a>
+        <a href="#how" data-i18n="navHow">작동 방식</a>
+        <a href="#privacy" data-i18n="navPrivacy">개인정보 보호</a>
+        <a href="#pro">Pro</a>
+      </div>
+      <div class="nav-actions">
+        <label class="visually-hidden" for="language" data-i18n="languageLabel">언어 선택</label>
+        <select id="language" class="language-select" aria-label="언어 선택">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+          <option value="zh-Hans">简体中文</option>
+          <option value="zh-Hant">繁體中文</option>
+          <option value="ja">日本語</option>
+        </select>
+        <a class="nav-cta" href="https://github.com/bbdyno/NudgeMate" data-i18n="navGithub">GitHub</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <p class="eyebrow reveal" data-i18n="heroEyebrow">나보다 먼저 기억하는 일정 도우미</p>
+        <h1 id="hero-title" class="reveal reveal-delay-1">
+          <span data-i18n="heroLine1">반복되는 일,</span>
+          <em data-i18n="heroLine2">늦기 전에.</em>
+        </h1>
+        <p class="hero-description reveal reveal-delay-2" data-i18n="heroDescription">
+          캘린더에서 반복되는 흐름을 발견하고, 다음 시점과 중요한 준비를 조용히 미리 챙겨드립니다.
+        </p>
+        <div class="hero-actions reveal reveal-delay-3">
+          <a class="button button-primary" href="#how" data-i18n="heroPrimary">어떻게 작동하나요?</a>
+          <a class="button button-ghost" href="https://github.com/bbdyno/NudgeMate" data-i18n="heroSecondary">GitHub에서 보기</a>
+        </div>
+        <p class="availability reveal reveal-delay-3">
+          <span class="availability-dot" aria-hidden="true"></span>
+          <span data-i18n="availability">iOS 17+ · App Store 출시 준비 중</span>
+        </p>
+      </div>
+
+      <div class="hero-art reveal reveal-delay-2" data-hero-art>
+        <img src="assets/nudgemate-journey.png" alt="일정 리듬이 빛을 향해 이어지는 종이 공예 풍경" data-i18n-alt="heroArtAlt">
+        <div class="hero-sheen" aria-hidden="true"></div>
+        <div class="floating-note note-one" aria-hidden="true">
+          <span class="note-icon">✦</span>
+          <span data-i18n="floatDiscover">새 리듬 발견</span>
+        </div>
+        <div class="floating-note note-two" aria-hidden="true">
+          <span class="note-pulse"></span>
+          <span data-i18n="floatAhead">3일 전에 미리</span>
+        </div>
+      </div>
+      <div class="hero-fade" aria-hidden="true"></div>
+    </section>
+
+    <section class="statement section" id="rhythm">
+      <div class="statement-inner reveal">
+        <p class="section-kicker" data-i18n="statementKicker">기억보다 믿을 수 있는 흐름</p>
+        <h2>
+          <span data-i18n="statementLine1">일정은 반복되지만,</span>
+          <span class="muted" data-i18n="statementLine2">기억은 늘 한발 늦습니다.</span>
+        </h2>
+        <p data-i18n="statementBody">
+          NudgeMate는 사용자가 선택한 캘린더의 과거 간격을 기기에서 분석해 다음 시점을 예상합니다. 제안은 직접 확인한 뒤에만 리듬이 됩니다.
+        </p>
+      </div>
+    </section>
+
+    <section class="journey section" id="how" aria-labelledby="journey-title">
+      <div class="journey-heading reveal">
+        <p class="section-kicker" data-i18n="howKicker">세 단계, 더 여유로운 다음 일정</p>
+        <h2 id="journey-title" data-i18n="howTitle">흐름을 발견하고, 미리 준비하세요.</h2>
+      </div>
+
+      <div class="journey-grid">
+        <div class="device-column" aria-hidden="true">
+          <div class="device-sticky" data-device>
+            <div class="device-halo"></div>
+            <div class="device-frame">
+              <div class="device-island"></div>
+              <div class="device-screen">
+                <div class="demo-header">
+                  <span class="demo-time">9:41</span>
+                  <span class="demo-brand">NudgeMate</span>
+                  <span class="demo-avatar"></span>
+                </div>
+
+                <div class="demo-scene demo-scene-discover">
+                  <p class="demo-kicker" data-i18n="demoDiscoverKicker">캘린더에서 찾았어요</p>
+                  <h3 data-i18n="demoDiscoverTitle">새로운 리듬 3개</h3>
+                  <div class="scan-orbit">
+                    <span class="orbit-ring ring-one"></span>
+                    <span class="orbit-ring ring-two"></span>
+                    <span class="orbit-core"></span>
+                    <span class="orbit-dot dot-one"></span>
+                    <span class="orbit-dot dot-two"></span>
+                    <span class="orbit-dot dot-three"></span>
+                  </div>
+                  <div class="demo-card compact-card">
+                    <span class="card-symbol coral">✦</span>
+                    <span><strong data-i18n="demoHaircut">미용실 예약</strong><small data-i18n="demoEveryFiveWeeks">약 5주마다</small></span>
+                  </div>
+                </div>
+
+                <div class="demo-scene demo-scene-predict">
+                  <p class="demo-kicker" data-i18n="demoPredictKicker">다음 예상 시점</p>
+                  <div class="date-orb">
+                    <span data-i18n="demoMonth">9월</span>
+                    <strong>18</strong>
+                    <small data-i18n="demoDay">목요일</small>
+                  </div>
+                  <div class="window-track">
+                    <span></span><span class="active"></span><span></span>
+                  </div>
+                  <p class="demo-caption" data-i18n="demoWindow">9월 16일–20일 사이로 예상해요</p>
+                </div>
+
+                <div class="demo-scene demo-scene-prepare">
+                  <p class="demo-kicker" data-i18n="demoPrepareKicker">중요한 일정 준비</p>
+                  <h3 data-i18n="demoPrepareTitle">여름 휴가까지 18일</h3>
+                  <img class="prep-art" src="assets/prep-journey.png" alt="">
+                  <div class="readiness-row">
+                    <span data-i18n="demoNotReady">준비 전</span>
+                    <span class="selected" data-i18n="demoInProgress">준비 중</span>
+                    <span data-i18n="demoReady">완료</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapters">
+          <article class="chapter reveal" data-scene="0">
+            <span class="chapter-number">01</span>
+            <p class="chapter-label" data-i18n="chapterDiscoverLabel">발견</p>
+            <h3 data-i18n="chapterDiscoverTitle">반복되는 일정을 알아봅니다.</h3>
+            <p data-i18n="chapterDiscoverBody">선택한 Apple 캘린더의 최근 기록에서 비슷한 일정과 간격을 찾습니다. 생일·공휴일·구독 캘린더는 기본적으로 제외됩니다.</p>
+          </article>
+          <article class="chapter reveal" data-scene="1">
+            <span class="chapter-number">02</span>
+            <p class="chapter-label" data-i18n="chapterPredictLabel">예측</p>
+            <h3 data-i18n="chapterPredictTitle">딱 하루가 아닌, 현실적인 기간으로.</h3>
+            <p data-i18n="chapterPredictBody">일정 간격의 변화와 예외를 반영해 다음 시점을 하나의 날짜가 아닌 예상 기간으로 보여줍니다.</p>
+          </article>
+          <article class="chapter reveal" data-scene="2">
+            <span class="chapter-number">03</span>
+            <p class="chapter-label" data-i18n="chapterPrepareLabel">준비</p>
+            <h3 data-i18n="chapterPrepareTitle">상태에 맞춰 다시 챙겨드립니다.</h3>
+            <p data-i18n="chapterPrepareBody">중요한 일정은 준비 전·준비 중·완료 상태에 따라 다음 체크인 시점을 조절합니다. 한 번의 알림으로 끝내지 않습니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-section section" aria-labelledby="features-title">
+      <div class="feature-heading reveal">
+        <p class="section-kicker" data-i18n="featuresKicker">필요한 순간에만, 조용하고 정확하게</p>
+        <h2 id="features-title" data-i18n="featuresTitle">일정을 쫓는 대신, 앞서 가세요.</h2>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card feature-card-wide reveal tilt-card">
+          <div class="feature-copy">
+            <span class="feature-icon">↗</span>
+            <h3 data-i18n="featureAdaptiveTitle">변화에 적응하는 리듬</h3>
+            <p data-i18n="featureAdaptiveBody">최근 일정이 계속 늦어졌다면 새 주기를 제안합니다. 변경은 언제나 사용자가 결정합니다.</p>
+          </div>
+          <div class="rhythm-graph" aria-hidden="true">
+            <span class="graph-line"></span>
+            <i style="--x: 8%; --y: 68%"></i>
+            <i style="--x: 28%; --y: 58%"></i>
+            <i style="--x: 50%; --y: 46%"></i>
+            <i style="--x: 72%; --y: 30%"></i>
+            <i class="future" style="--x: 92%; --y: 18%"></i>
+          </div>
+        </article>
+        <article class="feature-card reveal reveal-delay-1 tilt-card">
+          <span class="feature-icon lavender">◌</span>
+          <h3 data-i18n="featureActionsTitle">알림에서 바로 처리</h3>
+          <p data-i18n="featureActionsBody">일정 확인, 1주 미루기, 이번만 건너뛰기를 앱을 열지 않고 선택할 수 있습니다.</p>
+          <div class="action-pills" aria-hidden="true">
+            <span data-i18n="actionSchedule">일정 확인</span>
+            <span data-i18n="actionSnooze">1주 미루기</span>
+          </div>
+        </article>
+        <article class="feature-card reveal reveal-delay-2 tilt-card">
+          <span class="feature-icon gold">✓</span>
+          <h3 data-i18n="featureRecapTitle">하루를 가볍게 정리</h3>
+          <p data-i18n="featureRecapBody">Daily Recap에서 오늘 준비한 일과 미룬 리듬을 한 번에 확인합니다.</p>
+          <div class="recap-stack" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="privacy-section section" id="privacy" aria-labelledby="privacy-title">
+      <div class="privacy-orb" aria-hidden="true">
+        <span class="privacy-core"></span>
+        <span class="privacy-ring privacy-ring-one"></span>
+        <span class="privacy-ring privacy-ring-two"></span>
+      </div>
+      <div class="privacy-copy reveal">
+        <p class="section-kicker" data-i18n="privacyKicker">처음부터 기기 안에서</p>
+        <h2 id="privacy-title" data-i18n="privacyTitle">당신의 일정은 당신에게만.</h2>
+        <p data-i18n="privacyBody">캘린더 분석과 리듬 학습은 외부 서버가 아닌 기기에서 처리됩니다. 원하는 캘린더만 선택하고, 앱 데이터는 언제든 내보내거나 삭제할 수 있습니다.</p>
+        <ul class="privacy-list">
+          <li><span>✓</span><span data-i18n="privacyPoint1">계정 가입 불필요</span></li>
+          <li><span>✓</span><span data-i18n="privacyPoint2">외부 분석 서버 없음</span></li>
+          <li><span>✓</span><span data-i18n="privacyPoint3">선택한 캘린더만 분석</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="pro-section section" id="pro" aria-labelledby="pro-title">
+      <div class="pro-heading reveal">
+        <p class="section-kicker" data-i18n="proKicker">무료로 시작하고, 필요할 때 더 넓게</p>
+        <h2 id="pro-title" data-i18n="proTitle">당신의 리듬만큼 유연한 선택.</h2>
+        <p data-i18n="proBody">핵심 기능은 무료로 충분히 경험할 수 있습니다. Pro는 적응형 리듬과 준비 트래커의 한도를 해제합니다.</p>
+      </div>
+      <div class="plan-grid">
+        <article class="plan-card reveal">
+          <p class="plan-name" data-i18n="freeName">무료</p>
+          <h3 data-i18n="freeTitle">차분하게 시작하세요.</h3>
+          <ul>
+            <li data-i18n="freePoint1">수동 고정 리듬 무제한</li>
+            <li data-i18n="freePoint2">활성 적응형 리듬 3개</li>
+            <li data-i18n="freePoint3">활성 준비 트래커 1개</li>
+          </ul>
+        </article>
+        <article class="plan-card plan-pro reveal reveal-delay-1">
+          <div class="pro-aura" aria-hidden="true"></div>
+          <p class="plan-name">NudgeMate Pro</p>
+          <h3 data-i18n="paidTitle">제한 없이 앞서 가세요.</h3>
+          <ul>
+            <li data-i18n="paidPoint1">적응형 리듬 무제한</li>
+            <li data-i18n="paidPoint2">준비 트래커 무제한</li>
+            <li data-i18n="paidPoint3">Pro 미드나이트 테마</li>
+          </ul>
+          <p class="plan-options" data-i18n="paidOptions">월간 · 연간 · 평생 이용권</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="final-cta section">
+      <div class="final-art" aria-hidden="true"></div>
+      <div class="final-copy reveal">
+        <img src="assets/app-icon.png" width="88" height="88" alt="">
+        <p class="section-kicker">NudgeMate</p>
+        <h2>
+          <span data-i18n="finalLine1">다음 일정을,</span>
+          <span class="accent" data-i18n="finalLine2">조금 더 여유롭게.</span>
+        </h2>
+        <p data-i18n="finalBody">현재 App Store 출시를 준비하고 있습니다. 개발 과정과 최신 소식은 GitHub에서 확인하세요.</p>
+        <a class="button button-light" href="https://github.com/bbdyno/NudgeMate" data-i18n="finalCta">GitHub에서 NudgeMate 보기</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="footer-brand" href="#top">
+      <img src="assets/app-icon.png" width="28" height="28" alt="">
+      <span>NudgeMate</span>
+    </a>
+    <p data-i18n="footerNote">기기 안에서 당신의 다음을 미리 챙깁니다.</p>
+    <div class="footer-links">
+      <a href="#privacy" data-i18n="navPrivacy">개인정보 보호</a>
+      <a href="https://github.com/bbdyno/NudgeMate">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
