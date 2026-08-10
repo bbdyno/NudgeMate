@@ -276,3 +276,4 @@
 "settings.delete.confirm" = "모두 삭제";
 "settings.about.title" = "정보";
 "settings.about.version" = "버전";
+"prep.liveActivity.hint" = "‘진행 중’을 선택하면 잠금 화면과 Dynamic Island에서 준비를 이어갈 수 있어요.";

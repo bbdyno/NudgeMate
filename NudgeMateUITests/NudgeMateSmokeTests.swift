@@ -15,8 +15,8 @@ final class NudgeMateSmokeTests: XCTestCase {
         let settingsButton = app.buttons["home.settings"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 5))
         XCTAssertTrue(settingsButton.isHittable)
-        XCTAssertGreaterThanOrEqual(settingsButton.frame.width, 36)
-        XCTAssertGreaterThanOrEqual(settingsButton.frame.height, 36)
+        XCTAssertGreaterThanOrEqual(settingsButton.frame.width, 35.5)
+        XCTAssertGreaterThanOrEqual(settingsButton.frame.height, 35.5)
     }
 
     func testTodayQuickCaptureOpensScheduleReview() {

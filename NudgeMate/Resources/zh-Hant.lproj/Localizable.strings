@@ -276,3 +276,4 @@
 "settings.delete.confirm" = "全部刪除";
 "settings.about.title" = "關於";
 "settings.about.version" = "版本";
+"prep.liveActivity.hint" = "選擇「進行中」後，可在鎖定畫面和動態島上繼續查看準備進度。";

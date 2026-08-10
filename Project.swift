@@ -1,5 +1,9 @@
 import ProjectDescription
 
+let marketingVersion = "1.0.0"
+let releaseBuildNumber = "2026081001"
+let developmentTeam = "M79H9K226Y"
+
 let project = Project(
     name: "NudgeMate",
     organizationName: "NudgeMate",
@@ -18,10 +22,12 @@ let project = Project(
             name: "NudgeMate",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.nudgemate.app",
+            bundleId: "com.bbdyno.app.nudgemate",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "NudgeMate",
+                "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+                "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
                 "CFBundleLocalizations": [
                     "ko",
                     "en",
@@ -36,6 +42,9 @@ let project = Project(
                         "CFBundleURLSchemes": ["nudgemate"]
                     ]
                 ],
+                "ITSAppUsesNonExemptEncryption": false,
+                "NudgeMatePrivacyPolicyURL": "https://bbdyno.github.io/NudgeMate/privacy.html",
+                "NSSupportsLiveActivities": true,
                 "UILaunchScreen": [:],
                 "UIAppFonts": [
                     "Pretendard-Regular.otf",
@@ -44,15 +53,57 @@ let project = Project(
                     "Pretendard-Bold.otf"
                 ]
             ]),
-            sources: ["NudgeMate/**"],
+            sources: ["NudgeMate/**", "NudgeMateShared/**"],
             resources: ["NudgeMate/Resources/**"],
+            entitlements: .file(path: "NudgeMate/NudgeMate.entitlements"),
+            dependencies: [
+                .target(name: "NudgeMateWidgets")
+            ],
             settings: .settings(
                 base: [
                     "CODE_SIGN_STYLE": "Automatic",
+                    "DEVELOPMENT_TEAM": .string(developmentTeam),
                     "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
-                    "CURRENT_PROJECT_VERSION": "1",
-                    "MARKETING_VERSION": "1.0.0",
+                    "CURRENT_PROJECT_VERSION": .string(releaseBuildNumber),
+                    "MARKETING_VERSION": .string(marketingVersion),
                     "PRODUCT_NAME": "NudgeMate",
+                    "SWIFT_EMIT_LOC_STRINGS": "NO",
+                    "TARGETED_DEVICE_FAMILY": "1,2"
+                ]
+            )
+        ),
+        .target(
+            name: "NudgeMateWidgets",
+            destinations: .iOS,
+            product: .appExtension,
+            bundleId: "com.bbdyno.app.nudgemate.widget",
+            deploymentTargets: .iOS("17.0"),
+            infoPlist: .extendingDefault(with: [
+                "CFBundleDisplayName": "NudgeMate",
+                "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+                "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+                "CFBundleLocalizations": [
+                    "ko",
+                    "en",
+                    "zh-Hans",
+                    "zh-Hant",
+                    "ja"
+                ],
+                "NSExtension": [
+                    "NSExtensionPointIdentifier": "com.apple.widgetkit-extension"
+                ]
+            ]),
+            sources: ["NudgeMateWidgets/**", "NudgeMateShared/**"],
+            resources: ["NudgeMateWidgets/Resources/**"],
+            entitlements: .file(path: "NudgeMateWidgets/NudgeMateWidgets.entitlements"),
+            settings: .settings(
+                base: [
+                    "APPLICATION_EXTENSION_API_ONLY": "YES",
+                    "CODE_SIGN_STYLE": "Automatic",
+                    "CURRENT_PROJECT_VERSION": .string(releaseBuildNumber),
+                    "DEVELOPMENT_TEAM": .string(developmentTeam),
+                    "MARKETING_VERSION": .string(marketingVersion),
+                    "SKIP_INSTALL": "YES",
                     "SWIFT_EMIT_LOC_STRINGS": "NO",
                     "TARGETED_DEVICE_FAMILY": "1,2"
                 ]
@@ -62,7 +113,7 @@ let project = Project(
             name: "NudgeMateTests",
             destinations: .iOS,
             product: .unitTests,
-            bundleId: "com.nudgemate.app.tests",
+            bundleId: "com.bbdyno.app.nudgemate.tests",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["NudgeMateTests/**"],
@@ -79,7 +130,7 @@ let project = Project(
             name: "NudgeMateUITests",
             destinations: .iOS,
             product: .uiTests,
-            bundleId: "com.nudgemate.app.uitests",
+            bundleId: "com.bbdyno.app.nudgemate.uitests",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .default,
             sources: ["NudgeMateUITests/**"],

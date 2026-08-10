@@ -1,0 +1,15 @@
+"widget.title" = "即将开始的准备";
+"widget.upNext" = "下一项准备";
+"widget.empty.title" = "轻松开始准备";
+"widget.empty.message" = "在 NudgeMate 中添加准备事项后，它会显示在这里。";
+"widget.openApp" = "打开 NudgeMate";
+"widget.nextAction" = "下一步";
+"widget.privatePrep" = "准备事项";
+"widget.more" = "还有 %d 项准备";
+"status.notReady" = "尚未准备";
+"status.inProgress" = "进行中";
+"status.ready" = "已准备好";
+"liveActivity.live" = "准备中";
+"liveActivity.target" = "距离目标";
+"liveActivity.noNextAction" = "在 NudgeMate 中设置下一步";
+"liveActivity.privateAction" = "在 NudgeMate 中查看详情";

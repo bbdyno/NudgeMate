@@ -30,16 +30,22 @@ final class NudgeManager {
     @ObservationIgnored
     private var modelContainer: ModelContainer?
 
+    @ObservationIgnored
+    private let widgetActivityCoordinator: WidgetActivityCoordinator
+
     init(
         scheduler: any NotificationScheduling = LocalNotificationScheduler(),
-        calendar: Calendar = .autoupdatingCurrent
+        calendar: Calendar = .autoupdatingCurrent,
+        widgetActivityCoordinator: WidgetActivityCoordinator? = nil
     ) {
         self.scheduler = scheduler
         self.calendar = calendar
+        self.widgetActivityCoordinator = widgetActivityCoordinator ?? .shared
     }
 
     func configure(modelContainer: ModelContainer) {
         self.modelContainer = modelContainer
+        widgetActivityCoordinator.configure(modelContainer: modelContainer)
     }
 
     @discardableResult
@@ -160,6 +166,11 @@ final class NudgeManager {
             await scheduler.cancel(identifiers: [prepRequestIdentifier(for: prep.id)])
         }
         try modelContext.save()
+        try? await widgetActivityCoordinator.synchronize(
+            modelContext: modelContext,
+            startLiveActivityFor: status == .inProgress ? prep.id : nil,
+            now: now
+        )
     }
 
     func nextSpacedReminderDate(targetDate: Date, now: Date = .now) throws -> Date {
@@ -205,6 +216,16 @@ final class NudgeManager {
         await scheduler.cancelAll()
     }
 
+    func synchronizeWidgetsAndActivities(
+        modelContext: ModelContext? = nil
+    ) async throws {
+        try await widgetActivityCoordinator.synchronize(modelContext: modelContext)
+    }
+
+    func clearWidgetsAndActivities() async {
+        await widgetActivityCoordinator.clear()
+    }
+
     func reconcileDailyRecap(settings: UserSettings, now: Date = .now) async {
         let identifiers = (0..<14).map { "recap.\($0)" }
         await scheduler.cancel(identifiers: identifiers)
@@ -245,6 +266,7 @@ final class NudgeManager {
     }
 
     func reconcileAll(settings: UserSettings) async {
+        try? await synchronizeWidgetsAndActivities()
         guard await scheduler.permissionState() == .authorized else {
             await reconcileDailyRecap(settings: settings)
             return

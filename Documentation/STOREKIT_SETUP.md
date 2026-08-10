@@ -10,7 +10,7 @@
 
 ## App Store Connect
 
-1. Bundle ID `com.nudgemate.app`에 In-App Purchase capability를 활성화한다.
+1. Bundle ID `com.bbdyno.app.nudgemate`에 In-App Purchase capability를 활성화한다.
 2. 위 상품을 생성하고 가격, 판매 지역, 심사 스크린샷, 현지화 설명을 입력한다.
 3. Paid Applications 계약과 세금·은행 정보를 완료한다.
 4. Sandbox 계정으로 구매, 갱신, 만료, 취소, Ask to Buy, 복원을 확인한다.

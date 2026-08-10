@@ -41,7 +41,13 @@ struct PaywallView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    if manager.isLoadingProducts && manager.products.isEmpty {
+                    if isScreenshotMode {
+                        VStack(spacing: 10) {
+                            screenshotPricingCard(.monthly, price: "$4.99")
+                            screenshotPricingCard(.yearly, price: "$39.99")
+                            screenshotPricingCard(.lifetime, price: "$79.99")
+                        }
+                    } else if manager.isLoadingProducts && manager.products.isEmpty {
                         ProgressView(L10n.Paywall.loading)
                             .tint(ColorTheme.primaryNudge)
                             .frame(minHeight: 160)
@@ -70,8 +76,8 @@ struct PaywallView: View {
                     .buttonStyle(.plain)
                     .foregroundStyle(.white)
                     .background(ColorTheme.primaryNudge, in: Capsule())
-                    .disabled(manager.isPurchasing || selectedProduct == nil)
-                    .opacity(selectedProduct == nil ? 0.5 : 1)
+                    .disabled(manager.isPurchasing || (!isScreenshotMode && selectedProduct == nil))
+                    .opacity(!isScreenshotMode && selectedProduct == nil ? 0.5 : 1)
 
                     VStack(spacing: 12) {
                         Button(L10n.Paywall.restore) {
@@ -114,7 +120,7 @@ struct PaywallView: View {
             }
         }
         .task {
-            if manager.products.isEmpty {
+            if !isScreenshotMode && manager.products.isEmpty {
                 await manager.prepare()
             }
             chooseAvailableDefault()
@@ -123,7 +129,7 @@ struct PaywallView: View {
             if isPro { dismiss() }
         }
         .alert(L10n.App.name, isPresented: Binding(
-            get: { message != nil || manager.lastErrorMessage != nil },
+            get: { !isScreenshotMode && (message != nil || manager.lastErrorMessage != nil) },
             set: { isPresented in
                 if !isPresented {
                     message = nil
@@ -139,6 +145,14 @@ struct PaywallView: View {
 
     private var selectedProduct: Product? {
         manager.product(for: selectedProductID)
+    }
+
+    private var isScreenshotMode: Bool {
+#if DEBUG
+        ProcessInfo.processInfo.arguments.contains("--screenshot-paywall")
+#else
+        false
+#endif
     }
 
     private func feature(_ title: String) -> some View {
@@ -181,6 +195,40 @@ struct PaywallView: View {
                 }
                 Spacer()
                 Text(product.displayPrice)
+                    .pretendard(.headline, weight: .bold)
+                    .foregroundStyle(isSelected ? ColorTheme.primaryNudge : ColorTheme.primaryText)
+            }
+            .padding(16)
+            .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(isSelected ? ColorTheme.primaryNudge : ColorTheme.separator.opacity(0.5), lineWidth: isSelected ? 2 : 0.5)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func screenshotPricingCard(_ id: SubscriptionProductID, price: String) -> some View {
+        let isSelected = id == selectedProductID
+        return Button {
+            selectedProductID = id
+        } label: {
+            HStack(spacing: 12) {
+                HStack(spacing: 8) {
+                    Text(productTitle(for: id))
+                        .pretendard(.headline, weight: .semibold)
+                    if id == .yearly {
+                        Text(L10n.Paywall.bestValue)
+                            .pretendard(.caption2, weight: .bold)
+                            .foregroundStyle(ColorTheme.proAccent)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(ColorTheme.proAccent.opacity(0.14), in: Capsule())
+                    }
+                }
+                Spacer()
+                Text(price)
                     .pretendard(.headline, weight: .bold)
                     .foregroundStyle(isSelected ? ColorTheme.primaryNudge : ColorTheme.primaryText)
             }

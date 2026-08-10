@@ -1,0 +1,9 @@
+NudgeMate does not require an account or sign-in.
+
+Core review flow:
+1. Complete onboarding and optionally grant Calendar and Notification permissions.
+2. The Today tab shows seeded or user-created preparation items and recurring rhythms.
+3. Open Settings using the gear button, then select NudgeMate Pro to review the monthly, yearly, and lifetime purchase options.
+4. Widgets can be added from the iOS widget gallery. A Live Activity starts when a preparation item is moved to In Progress and Live Activities are allowed in system settings.
+
+Calendar titles and dates are processed on device. No user data is sent to an external server, no account is created, and no tracking or third-party analytics SDK is used. StoreKit handles all purchases. The app provides Restore Purchases and Manage Subscription controls in the paywall.

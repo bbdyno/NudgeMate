@@ -116,6 +116,9 @@ struct HomeView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 appState.evaluateDailyRecapPresentation()
+                Task {
+                    try? await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext)
+                }
             }
         }
         .alert(L10n.App.name, isPresented: messageBinding) {

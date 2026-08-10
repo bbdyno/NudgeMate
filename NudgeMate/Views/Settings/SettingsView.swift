@@ -383,6 +383,7 @@ struct SettingsView: View {
             await appState.nudgeManager.cancelAll()
             do {
                 try DataPrivacyManager().deleteAllData(modelContext: modelContext)
+                await appState.nudgeManager.clearWidgetsAndActivities()
                 appState.resetAfterDataDeletion()
                 dismiss()
             } catch {

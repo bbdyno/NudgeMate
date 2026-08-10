@@ -167,6 +167,7 @@ struct PrepListView: View {
             try modelContext.save()
             selectedIDs.removeAll()
             isSelecting = false
+            Task { try? await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext) }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -175,7 +176,12 @@ struct PrepListView: View {
     private func delete(_ prep: EventPrep) {
         appState.nudgeManager.cancelPrepReminder(for: prep.id)
         modelContext.delete(prep)
-        do { try modelContext.save() } catch { errorMessage = error.localizedDescription }
+        do {
+            try modelContext.save()
+            Task { try? await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext) }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func handleNavigation(_ destination: AppNavigationDestination?) {
@@ -325,6 +331,13 @@ private struct PrepCard: View {
                     selection: prep.status,
                     onSelectionChanged: onStatusChange
                 )
+
+                Label(
+                    String(localized: "prep.liveActivity.hint"),
+                    systemImage: "dot.radiowaves.left.and.right"
+                )
+                .pretendard(.caption2)
+                .foregroundStyle(ColorTheme.secondaryText)
             }
         }
         .nudgeCardSurface(isSelected: isSelected)
@@ -500,6 +513,7 @@ struct PrepEditorView: View {
             }
             if prep == nil { modelContext.insert(value) }
             try modelContext.save()
+            try await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext)
             dismiss()
         } catch {
             if prep == nil {

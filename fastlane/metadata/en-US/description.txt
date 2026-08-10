@@ -1,0 +1,16 @@
+NudgeMate helps you anticipate recurring tasks and prepare for important dates before they become urgent.
+
+It finds recurring candidates in the Apple calendars you choose, then saves only the rhythms you confirm. For important dates, adaptive check-ins respond to Not Ready, In Progress, and Ready so your next action stays clear.
+
+Highlights
+• Suggestions for when recurring tasks may be due
+• Preparation trackers with a clear next action
+• Timely notifications, widgets, and Live Activities
+• Daily Recap for a calm end-of-day review
+• JSON data export and complete local deletion
+
+Privacy comes first. Calendar and preparation information is processed on your device and is not sent to an external server. NudgeMate uses no advertising, external analytics SDK, or cross-app tracking.
+
+The free version includes unlimited manual rhythms, up to three adaptive rhythms, and one active preparation tracker. NudgeMate Pro removes the adaptive rhythm and preparation limits. Choose a monthly or yearly auto-renewing subscription, or a lifetime purchase. Subscriptions can be managed or cancelled at any time in your App Store account settings.
+
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

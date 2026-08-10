@@ -1,0 +1,1 @@
+Welcome to the first release of NudgeMate, with recurring schedule suggestions, preparation trackers, widgets, Live Activities, and Daily Recap.

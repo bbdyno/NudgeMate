@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5ff">
+  <title>NudgeMate Privacy Policy</title>
+  <meta name="description" content="NudgeMate Privacy Policy">
+  <link rel="icon" href="assets/app-icon.png">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17152d;
+      --muted: #5f5a78;
+      --line: rgba(63, 48, 119, .14);
+      --lavender: #7667d9;
+      --paper: rgba(255,255,255,.82);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 3%, rgba(159, 139, 255, .24), transparent 31rem),
+        radial-gradient(circle at 92% 22%, rgba(88, 190, 255, .17), transparent 30rem),
+        #f7f7fb;
+      line-height: 1.72;
+    }
+    a { color: #5748bd; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .85rem max(1.25rem, calc((100vw - 960px) / 2));
+      border-bottom: 1px solid var(--line);
+      background: rgba(247,247,251,.82);
+      backdrop-filter: blur(20px);
+    }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; color: var(--ink); font-weight: 750; text-decoration: none; }
+    .brand img { width: 34px; height: 34px; border-radius: 9px; box-shadow: 0 8px 24px rgba(73,55,145,.2); }
+    .locale { min-width: 9rem; padding: .55rem .75rem; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--ink); }
+    main { width: min(960px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(3rem, 8vw, 6rem) 0 5rem; }
+    .hero { max-width: 760px; margin-bottom: 2.5rem; }
+    .eyebrow { margin: 0 0 .6rem; color: var(--lavender); font-weight: 760; letter-spacing: .09em; text-transform: uppercase; font-size: .78rem; }
+    h1 { margin: 0; font-size: clamp(2.45rem, 7vw, 5rem); line-height: 1.02; letter-spacing: -.055em; }
+    .lead { margin: 1.25rem 0 .5rem; color: var(--muted); font-size: clamp(1.05rem, 2.2vw, 1.25rem); }
+    .effective { color: var(--muted); font-size: .92rem; }
+    .policy { display: grid; gap: 1rem; }
+    section {
+      padding: clamp(1.35rem, 4vw, 2.15rem);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--paper);
+      box-shadow: 0 22px 65px rgba(44,35,94,.07);
+      backdrop-filter: blur(16px);
+    }
+    h2 { margin: 0 0 .7rem; font-size: 1.18rem; letter-spacing: -.02em; }
+    p { margin: .55rem 0; }
+    ul { margin: .55rem 0 0; padding-left: 1.25rem; }
+    .contact { margin-top: 1rem; text-align: center; color: var(--muted); }
+    @media (prefers-reduced-motion: no-preference) {
+      section { animation: rise .6s both; animation-delay: calc(var(--i, 0) * 55ms); }
+      @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><img src="assets/app-icon.png" alt=""><span>NudgeMate</span></a>
+    <select class="locale" id="locale" aria-label="Language">
+      <option value="ko">한국어</option>
+      <option value="en">English</option>
+      <option value="zh-Hans">简体中文</option>
+      <option value="zh-Hant">繁體中文</option>
+      <option value="ja">日本語</option>
+    </select>
+  </header>
+  <main>
+    <div class="hero">
+      <p class="eyebrow" data-copy="eyebrow">Privacy by design</p>
+      <h1 data-copy="title">개인정보처리방침</h1>
+      <p class="lead" data-copy="lead"></p>
+      <p class="effective" data-copy="effective"></p>
+    </div>
+    <div class="policy" id="policy"></div>
+    <p class="contact"><span data-copy="contact"></span> <a href="https://github.com/bbdyno/NudgeMate/issues">GitHub Issues</a></p>
+  </main>
+  <script src="privacy.js" defer></script>
+</body>
+</html>

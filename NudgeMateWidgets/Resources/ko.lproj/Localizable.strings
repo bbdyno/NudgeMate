@@ -1,0 +1,15 @@
+"widget.title" = "다가오는 준비";
+"widget.upNext" = "다음 준비";
+"widget.empty.title" = "준비를 가볍게 시작해요";
+"widget.empty.message" = "NudgeMate에서 준비 일정을 추가하면 여기에 표시돼요.";
+"widget.openApp" = "NudgeMate 열기";
+"widget.nextAction" = "다음 행동";
+"widget.privatePrep" = "준비 일정";
+"widget.more" = "준비 %d개 더";
+"status.notReady" = "준비 전";
+"status.inProgress" = "진행 중";
+"status.ready" = "준비 완료";
+"liveActivity.live" = "준비 중";
+"liveActivity.target" = "목표까지";
+"liveActivity.noNextAction" = "NudgeMate에서 다음 행동을 정해보세요";
+"liveActivity.privateAction" = "NudgeMate에서 자세히 확인하세요";

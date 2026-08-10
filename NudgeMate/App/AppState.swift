@@ -84,10 +84,12 @@ final class AppState {
             appearanceTheme = settings.appearanceTheme
             applyRecapSettings(settings)
             isBootstrapped = true
+            configureUITestPresentation()
             Task { await nudgeManager.reconcileAll(settings: settings) }
         } catch {
             appErrorMessage = error.localizedDescription
             isBootstrapped = true
+            configureUITestPresentation()
         }
     }
 
@@ -223,5 +225,16 @@ final class AppState {
         case .weekly: calendar.component(.weekday, from: date) == 1
         case .off: false
         }
+    }
+
+    private func configureUITestPresentation() {
+#if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("--open-paywall") {
+            isPaywallPresented = true
+        } else if arguments.contains("--open-recap") {
+            pendingNavigation = .recap
+        }
+#endif
     }
 }

@@ -1,0 +1,15 @@
+"widget.title" = "次の準備";
+"widget.upNext" = "次の準備";
+"widget.empty.title" = "準備を気軽に始めよう";
+"widget.empty.message" = "NudgeMateで準備予定を追加すると、ここに表示されます。";
+"widget.openApp" = "NudgeMateを開く";
+"widget.nextAction" = "次のアクション";
+"widget.privatePrep" = "準備予定";
+"widget.more" = "ほかに%d件の準備";
+"status.notReady" = "準備前";
+"status.inProgress" = "進行中";
+"status.ready" = "準備完了";
+"liveActivity.live" = "準備中";
+"liveActivity.target" = "目標まで";
+"liveActivity.noNextAction" = "NudgeMateで次のアクションを決めましょう";
+"liveActivity.privateAction" = "詳細はNudgeMateで確認してください";

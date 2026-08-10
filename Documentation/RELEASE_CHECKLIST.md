@@ -7,6 +7,7 @@
 - [ ] 단위·UI 테스트 실제 실행 및 결과 기록
 - [ ] 주요 경로의 warning, 강제 종료, 미완성 placeholder 없음
 - [ ] iOS 17 최소 지원과 iPhone/iPad 레이아웃 확인
+- [ ] 앱 `com.bbdyno.app.nudgemate`, 확장 `com.bbdyno.app.nudgemate.widget` 서명 확인
 
 ## 계정과 상품
 
@@ -14,6 +15,7 @@
 - [ ] App Store Connect 월간·연간·평생 상품 생성 및 심사 정보 입력
 - [ ] 구독 그룹, 가격, 판매 지역, 현지화 확인
 - [ ] Sandbox 실기기 구매·복원·만료 확인
+- [ ] App Group `group.com.bbdyno.app.nudgemate` 등록 및 앱·확장 양쪽 연결
 
 ## 개인정보와 법무
 
@@ -31,6 +33,8 @@
 - [ ] 준비 3상태와 목표일 경과
 - [ ] 알림 액션, 중복 방지, Daily Recap 시간·빈도
 - [ ] JSON 내보내기와 전체 삭제
+- [ ] 작은·중간·잠금 화면 위젯의 빈 상태, 정렬, 딥 링크
+- [ ] Live Activity 시작·갱신·종료와 Dynamic Island 3개 표시 모드
 - [ ] 한국어·영어·중국어 간체·번체·일본어
 - [ ] 다크 모드, VoiceOver, 최대 Dynamic Type, Reduce Motion
 

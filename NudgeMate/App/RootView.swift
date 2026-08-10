@@ -21,6 +21,7 @@ struct RootView: View {
         }
         .task {
             appState.bootstrap(modelContext: modelContext)
+            try? await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext)
         }
         .sheet(isPresented: $appState.isPaywallPresented) {
             PaywallView()

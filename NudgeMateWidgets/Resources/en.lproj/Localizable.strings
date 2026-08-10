@@ -1,0 +1,15 @@
+"widget.title" = "Upcoming Prep";
+"widget.upNext" = "Up Next";
+"widget.empty.title" = "Start a Gentle Prep";
+"widget.empty.message" = "Add a prep in NudgeMate and it will appear here.";
+"widget.openApp" = "Open NudgeMate";
+"widget.nextAction" = "Next Action";
+"widget.privatePrep" = "Upcoming Prep";
+"widget.more" = "%d more preps";
+"status.notReady" = "Not Ready";
+"status.inProgress" = "In Progress";
+"status.ready" = "Ready";
+"liveActivity.live" = "PREPPING";
+"liveActivity.target" = "UNTIL TARGET";
+"liveActivity.noNextAction" = "Choose your next action in NudgeMate";
+"liveActivity.privateAction" = "Open NudgeMate for details";

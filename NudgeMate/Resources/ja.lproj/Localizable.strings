@@ -276,3 +276,4 @@
 "settings.delete.confirm" = "すべて削除";
 "settings.about.title" = "情報";
 "settings.about.version" = "バージョン";
+"prep.liveActivity.hint" = "「進行中」を選ぶと、ロック画面とDynamic Islandで準備を確認できます。";

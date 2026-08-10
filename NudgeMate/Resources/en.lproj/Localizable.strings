@@ -276,3 +276,4 @@
 "settings.delete.confirm" = "Delete Everything";
 "settings.about.title" = "About";
 "settings.about.version" = "Version";
+"prep.liveActivity.hint" = "Choose In Progress to keep this prep visible on the Lock Screen and Dynamic Island.";
