@@ -237,6 +237,7 @@ input {
 .language-select:focus-visible,
 .nav-cta:focus-visible,
 .button:focus-visible,
+.app-store-badge-link:focus-visible,
 .brand:focus-visible,
 .footer-links a:focus-visible {
   outline: 2px solid var(--gold);
@@ -1418,14 +1419,16 @@ input {
   font-size: 18px;
 }
 
-.button-light {
-  margin-top: 32px;
-  background: var(--cream);
-  color: var(--navy-950);
+.app-store-badge-link {
+  display: inline-flex;
+  margin-top: 24px;
+  padding: 14px;
+  border-radius: 12px;
 }
 
-.button-light:hover {
-  background: white;
+.app-store-badge {
+  width: 181px;
+  height: auto;
 }
 
 .site-footer {
@@ -1455,6 +1458,18 @@ input {
   display: flex;
   justify-self: end;
   gap: 20px;
+}
+
+.apple-trademark {
+  grid-column: 1 / -1;
+  width: min(100%, 920px);
+  margin-right: auto !important;
+  margin-left: auto !important;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 10px;
+  line-height: 1.55;
 }
 
 .reveal {
@@ -1762,7 +1777,7 @@ input {
     grid-template-columns: 1fr auto;
   }
 
-  .site-footer p {
+  .site-footer .footer-note {
     display: none;
   }
 }

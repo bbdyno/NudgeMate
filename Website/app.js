@@ -7,14 +7,15 @@ const copy = {
     navHow: "작동 방식",
     navPrivacy: "개인정보 보호",
     navGithub: "GitHub",
+    navStore: "App Store",
     languageLabel: "언어 선택",
     heroEyebrow: "나보다 먼저 기억하는 일정 도우미",
     heroLine1: "반복되는 일,",
     heroLine2: "늦기 전에.",
     heroDescription: "캘린더에서 반복되는 흐름을 발견하고, 다음 시점과 중요한 준비를 조용히 미리 챙겨드립니다.",
     heroPrimary: "어떻게 작동하나요?",
-    heroSecondary: "GitHub에서 보기",
-    availability: "iOS 17+ · App Store 출시 준비 중",
+    heroSecondary: "App Store에서 보기",
+    availability: "iPhone용 NudgeMate · App Store에서 이용 가능",
     heroArtAlt: "일정 리듬이 빛을 향해 이어지는 종이 공예 풍경",
     floatDiscover: "새 리듬 발견",
     floatAhead: "3일 전에 미리",
@@ -77,9 +78,11 @@ const copy = {
     paidOptions: "월간 · 연간 · 평생 이용권",
     finalLine1: "다음 일정을,",
     finalLine2: "조금 더 여유롭게.",
-    finalBody: "현재 App Store 출시를 준비하고 있습니다. 개발 과정과 최신 소식은 GitHub에서 확인하세요.",
+    finalBody: "반복되는 일정과 중요한 준비를 놓치기 전에, iPhone용 NudgeMate를 지금 만나보세요.",
     finalCta: "GitHub에서 NudgeMate 보기",
-    footerNote: "기기 안에서 당신의 다음을 미리 챙깁니다."
+    footerNote: "기기 안에서 당신의 다음을 미리 챙깁니다.",
+    storeBadgeAlt: "App Store에서 다운로드",
+    appleTrademark: "Apple 및 Apple 로고는 미국 및 기타 국가에 등록된 Apple Inc.의 상표입니다. App Store는 Apple Inc.의 서비스 마크입니다."
   },
   en: {
     metaTitle: "NudgeMate — Stay ahead of what repeats",
@@ -89,14 +92,15 @@ const copy = {
     navHow: "How it works",
     navPrivacy: "Privacy",
     navGithub: "GitHub",
+    navStore: "App Store",
     languageLabel: "Choose language",
     heroEyebrow: "A calendar companion that remembers first",
     heroLine1: "For everything that repeats,",
     heroLine2: "stay one step ahead.",
     heroDescription: "Discover patterns in your calendar, anticipate the next moment, and prepare for what matters without the last-minute rush.",
     heroPrimary: "See how it works",
-    heroSecondary: "View on GitHub",
-    availability: "iOS 17+ · Preparing for the App Store",
+    heroSecondary: "View on the App Store",
+    availability: "NudgeMate for iPhone · Available on the App Store",
     heroArtAlt: "A handcrafted paper path carrying schedule rhythms toward a warm light",
     floatDiscover: "New rhythm found",
     floatAhead: "A nudge 3 days early",
@@ -159,9 +163,11 @@ const copy = {
     paidOptions: "Monthly · Yearly · Lifetime",
     finalLine1: "Make the next date",
     finalLine2: "feel a little lighter.",
-    finalBody: "NudgeMate is preparing for its App Store release. Follow development and the latest updates on GitHub.",
+    finalBody: "Stay ahead of recurring schedules and important preparations with NudgeMate for iPhone.",
     finalCta: "Explore NudgeMate on GitHub",
-    footerNote: "Helping you stay ahead, privately on your device."
+    footerNote: "Helping you stay ahead, privately on your device.",
+    storeBadgeAlt: "Download on the App Store",
+    appleTrademark: "Apple and the Apple logo are trademarks of Apple Inc., registered in the U.S. and other countries. App Store is a service mark of Apple Inc."
   },
   "zh-Hans": {
     metaTitle: "NudgeMate — 在重复发生前，提前一步",
@@ -171,14 +177,15 @@ const copy = {
     navHow: "工作方式",
     navPrivacy: "隐私",
     navGithub: "GitHub",
+    navStore: "App Store",
     languageLabel: "选择语言",
     heroEyebrow: "比你更早想起的日程助手",
     heroLine1: "重复发生的事，",
     heroLine2: "提前一步准备。",
     heroDescription: "发现日历中不断重复的规律，预测下一次时间，并从容准备真正重要的事情。",
     heroPrimary: "了解工作方式",
-    heroSecondary: "在 GitHub 查看",
-    availability: "iOS 17+ · 正在准备 App Store 上线",
+    heroSecondary: "在 App Store 查看",
+    availability: "适用于 iPhone 的 NudgeMate · 已在 App Store 提供",
     heroArtAlt: "日程节奏沿着手工纸艺路径走向温暖光线",
     floatDiscover: "发现新节奏",
     floatAhead: "提前 3 天提醒",
@@ -241,9 +248,11 @@ const copy = {
     paidOptions: "月度 · 年度 · 终身",
     finalLine1: "让下一次日程，",
     finalLine2: "多一点从容。",
-    finalBody: "NudgeMate 正在准备 App Store 上线。你可以在 GitHub 查看开发进展和最新消息。",
+    finalBody: "使用适用于 iPhone 的 NudgeMate，提前掌握重复日程与重要准备。",
     finalCta: "在 GitHub 查看 NudgeMate",
-    footerNote: "在设备上，帮你提前准备下一次。"
+    footerNote: "在设备上，帮你提前准备下一次。",
+    storeBadgeAlt: "从 App Store 下载",
+    appleTrademark: "Apple 和 Apple 标志是 Apple Inc. 在美国及其他国家和地区注册的商标。App Store 是 Apple Inc. 的服务标志。"
   },
   "zh-Hant": {
     metaTitle: "NudgeMate — 在重複發生前，提早一步",
@@ -253,14 +262,15 @@ const copy = {
     navHow: "運作方式",
     navPrivacy: "隱私",
     navGithub: "GitHub",
+    navStore: "App Store",
     languageLabel: "選擇語言",
     heroEyebrow: "比你更早想起的行程助手",
     heroLine1: "重複發生的事，",
     heroLine2: "提早一步準備。",
     heroDescription: "發現行事曆中不斷重複的規律，預測下一次時間，從容準備真正重要的事情。",
     heroPrimary: "了解運作方式",
-    heroSecondary: "在 GitHub 查看",
-    availability: "iOS 17+ · 正在準備 App Store 上線",
+    heroSecondary: "在 App Store 查看",
+    availability: "適用於 iPhone 的 NudgeMate · 已在 App Store 提供",
     heroArtAlt: "行程節奏沿著手工紙藝路徑走向溫暖光線",
     floatDiscover: "發現新節奏",
     floatAhead: "提前 3 天提醒",
@@ -323,9 +333,11 @@ const copy = {
     paidOptions: "月繳 · 年繳 · 終身",
     finalLine1: "讓下一次行程，",
     finalLine2: "多一點從容。",
-    finalBody: "NudgeMate 正在準備 App Store 上線。你可以在 GitHub 查看開發進度和最新消息。",
+    finalBody: "使用適用於 iPhone 的 NudgeMate，提早掌握重複行程與重要準備。",
     finalCta: "在 GitHub 查看 NudgeMate",
-    footerNote: "在裝置上，幫你提早準備下一次。"
+    footerNote: "在裝置上，幫你提早準備下一次。",
+    storeBadgeAlt: "從 App Store 下載",
+    appleTrademark: "Apple 和 Apple 標誌是 Apple Inc. 在美國及其他國家與地區註冊的商標。App Store 是 Apple Inc. 的服務標誌。"
   },
   ja: {
     metaTitle: "NudgeMate — 繰り返す予定を、ひと足先に",
@@ -335,14 +347,15 @@ const copy = {
     navHow: "使い方",
     navPrivacy: "プライバシー",
     navGithub: "GitHub",
+    navStore: "App Store",
     languageLabel: "言語を選択",
     heroEyebrow: "あなたより先に思い出す予定アシスタント",
     heroLine1: "繰り返す予定を、",
     heroLine2: "ひと足先に。",
     heroDescription: "カレンダーに繰り返される流れを見つけ、次のタイミングと大切な準備をそっと先回りします。",
     heroPrimary: "使い方を見る",
-    heroSecondary: "GitHubで見る",
-    availability: "iOS 17+ · App Store公開準備中",
+    heroSecondary: "App Storeで見る",
+    availability: "iPhone用NudgeMate · App Storeで配信中",
     heroArtAlt: "予定のリズムが光へ続く手作りのペーパークラフト風景",
     floatDiscover: "新しいリズムを発見",
     floatAhead: "3日前にお知らせ",
@@ -405,9 +418,11 @@ const copy = {
     paidOptions: "月間 · 年間 · 買い切り",
     finalLine1: "次の予定を、",
     finalLine2: "もう少し軽やかに。",
-    finalBody: "現在、App Storeでの公開を準備しています。開発の進捗と最新情報はGitHubでご覧ください。",
+    finalBody: "繰り返す予定と大切な準備を、iPhone用NudgeMateでひと足先に整えましょう。",
     finalCta: "GitHubでNudgeMateを見る",
-    footerNote: "デバイスの中で、あなたの次を先回りします。"
+    footerNote: "デバイスの中で、あなたの次を先回りします。",
+    storeBadgeAlt: "App Storeからダウンロード",
+    appleTrademark: "AppleおよびAppleのロゴは、米国およびその他の国で登録されたApple Inc.の商標です。App StoreはApple Inc.のサービスマークです。"
   }
 };
 
@@ -421,6 +436,13 @@ const localeAliases = {
   "zh-hk": "zh-Hant",
   "zh-mo": "zh-Hant",
   "zh-hant": "zh-Hant"
+};
+const storeBadgeLocales = {
+  ko: "ko-kr",
+  en: "en-us",
+  "zh-Hans": "zh-cn",
+  "zh-Hant": "zh-tw",
+  ja: "ja-jp"
 };
 
 function normalizeLocale(value) {
@@ -460,6 +482,12 @@ function applyLocale(locale, updateURL = false) {
     const key = element.dataset.i18nAlt;
     if (strings[key]) element.alt = strings[key];
   });
+
+  const storeBadge = document.querySelector("[data-store-badge]");
+  if (storeBadge) {
+    const badgeLocale = storeBadgeLocales[locale] || storeBadgeLocales.en;
+    storeBadge.src = `https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/${badgeLocale}?size=250x83`;
+  }
 
   document.querySelector('meta[name="description"]')?.setAttribute("content", strings.metaDescription);
   document.querySelector('meta[property="og:title"]')?.setAttribute("content", strings.metaTitle);
