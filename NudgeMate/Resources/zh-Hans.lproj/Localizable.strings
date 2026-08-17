@@ -186,6 +186,7 @@
 "home.prep.title" = "准备追踪";
 "home.prep.subtitle" = "为重要的日子做好准备";
 "home.prep.empty" = "目前没有正在准备的重要日程。";
+"home.priority.empty" = "目前没有需要优先处理的事项。";
 "home.nudge.title" = "即将到来的提醒";
 "home.nudge.subtitle" = "根据过往日程规律提供建议";
 "home.nudge.emptyTitle" = "暂时没有可预测的日程";
@@ -195,6 +196,7 @@
 "home.today.itemCount" = "今天 %d 项";
 "home.today.summaryLabel" = "今日提醒";
 "home.today.summaryTitle" = "今天只需准备 %d 件事就足够了。";
+"home.today.summaryEmpty" = "今天没有需要关注的事项。";
 "home.today.summaryDuration" = "预计准备 20 分钟";
 "home.today.prepSection" = "优先准备";
 "home.today.rhythmSection" = "你的节奏又到了";
@@ -208,6 +210,7 @@
 "nudge.card.interval" = "约每 %d 天 · %@";
 "nudge.action.enable" = "开启提醒";
 "nudge.action.disable" = "关闭提醒";
+"nudge.action.delete" = "删除节奏";
 "nudge.action.schedule" = "确认日程";
 "nudge.action.snooze" = "推迟一周";
 "nudge.action.skip" = "跳过";

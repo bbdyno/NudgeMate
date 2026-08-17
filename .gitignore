@@ -5,3 +5,11 @@ Derived/
 xcuserdata/
 Tuist/.build/
 Tuist/Dependencies/
+
+# Local App Store distribution outputs and signing material
+*.xcarchive/
+*.ipa
+*.mobileprovision
+AppStoreAssets/**/export/
+AppStoreAssets/**/raw/
+AppStoreAssets/**/framed_raw/

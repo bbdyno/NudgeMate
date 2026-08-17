@@ -1,6 +1,5 @@
 import SwiftData
 import SwiftUI
-import UIKit
 
 private typealias L10n = NudgeMateStrings.Localizable
 
@@ -21,8 +20,18 @@ struct HomeView: View {
     @State private var composerDraft: CalendarEventComposerDraft?
     @State private var editingPrep: EventPrep?
 
+    private var snapshot: HomeDashboardSnapshot {
+        HomeDashboardSnapshot(rhythms: recurringEvents, preps: eventPreps)
+    }
+
     private var activeNudges: [RecurringEvent] {
-        recurringEvents.filter { !$0.isMuted }
+        let ids = Set(snapshot.rhythmIDs)
+        return recurringEvents.filter { ids.contains($0.id) }
+    }
+
+    private var activePreps: [EventPrep] {
+        let ids = Set(snapshot.prepIDs)
+        return eventPreps.filter { ids.contains($0.id) }
     }
 
     var body: some View {
@@ -36,8 +45,6 @@ struct HomeView: View {
                     ProgressView(L10n.Home.loading)
                         .pretendard(.body)
                         .tint(ColorTheme.primaryNudge)
-                } else if viewModel.calendarAccessDenied {
-                    calendarPermissionView
                 } else if let errorMessage = viewModel.errorMessage {
                     EmptyStateView(
                         icon: .reminder,
@@ -49,14 +56,18 @@ struct HomeView: View {
                     }
                 } else {
                     HomeDashboard(
-                        preps: eventPreps,
+                        snapshot: snapshot,
+                        preps: activePreps,
                         nudges: activeNudges,
                         onOpenSettings: { isSettingsPresented = true },
+                        onViewAllPreps: { appState.navigate(to: .preps) },
+                        onViewAllRhythms: { appState.navigate(to: .rhythms) },
                         onOpenPrep: { editingPrep = $0 },
                         onSchedule: { composerDraft = draft(for: $0) },
                         onSnooze: snooze,
                         onSkip: skip,
-                        onToggleMute: toggleMute
+                        onToggleMute: toggleMute,
+                        onDelete: delete
                     )
                 }
             }
@@ -119,18 +130,6 @@ struct HomeView: View {
         }
     }
 
-    private var calendarPermissionView: some View {
-        EmptyStateView(
-            icon: .empty,
-            title: L10n.Home.Permission.title,
-            message: L10n.Home.Permission.message,
-            actionTitle: L10n.Home.Permission.openSettings
-        ) {
-            guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-            UIApplication.shared.open(url)
-        }
-    }
-
     private var messageBinding: Binding<Bool> {
         Binding(
             get: {
@@ -183,6 +182,14 @@ struct HomeView: View {
         }
     }
 
+    private func delete(_ event: RecurringEvent) {
+        nudgeViewModel.delete(
+            event,
+            modelContext: modelContext,
+            nudgeManager: appState.nudgeManager
+        )
+    }
+
     private func handleNavigation(_ destination: AppNavigationDestination?) {
         guard case let .scheduleRhythm(rhythmID) = destination else { return }
         if let rhythmID,
@@ -225,33 +232,54 @@ struct HomeView: View {
 }
 
 private struct HomeDashboard: View {
+    let snapshot: HomeDashboardSnapshot
     let preps: [EventPrep]
     let nudges: [RecurringEvent]
     let onOpenSettings: () -> Void
+    let onViewAllPreps: () -> Void
+    let onViewAllRhythms: () -> Void
     let onOpenPrep: (EventPrep) -> Void
     let onSchedule: (RecurringEvent) -> Void
     let onSnooze: (RecurringEvent) -> Void
     let onSkip: (RecurringEvent) -> Void
     let onToggleMute: (RecurringEvent) -> Void
+    let onDelete: (RecurringEvent) -> Void
 
     var body: some View {
+        let previewIDs = Set(snapshot.rhythmPreviewIDs)
+        let rhythmPreview = nudges.filter { previewIDs.contains($0.id) }
+
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
                 HomeGreetingHeader(onOpenSettings: onOpenSettings)
-                HomeWeekCalendar(preps: preps, nudges: nudges)
-                HomeSummaryBanner(prepCount: preps.count, nudgeCount: nudges.count)
-
-                HomePrepSection(
-                    preps: Array(preps.prefix(2)),
-                    onOpen: onOpenPrep
+                HomeWeekCalendar(
+                    preps: preps,
+                    nudges: nudges,
+                    itemCount: snapshot.itemCount
                 )
+                HomeSummaryBanner(itemCount: snapshot.itemCount)
 
-                HomeRhythmSection(
-                    nudges: Array(nudges.prefix(2)),
+                HomePrioritySection(
+                    priority: snapshot.priority,
+                    preps: preps,
+                    nudges: nudges,
+                    onViewAll: snapshot.priority.isRhythm ? onViewAllRhythms : onViewAllPreps,
+                    onOpenPrep: onOpenPrep,
                     onSchedule: onSchedule,
                     onSnooze: onSnooze,
                     onSkip: onSkip,
-                    onToggleMute: onToggleMute
+                    onToggleMute: onToggleMute,
+                    onDelete: onDelete
+                )
+
+                HomeRhythmSection(
+                    nudges: rhythmPreview,
+                    onViewAll: onViewAllRhythms,
+                    onSchedule: onSchedule,
+                    onSnooze: onSnooze,
+                    onSkip: onSkip,
+                    onToggleMute: onToggleMute,
+                    onDelete: onDelete
                 )
             }
             .padding(.horizontal, 16)
@@ -260,6 +288,13 @@ private struct HomeDashboard: View {
         }
         .scrollIndicators(.hidden)
         .accessibilityIdentifier("home.dashboard")
+    }
+}
+
+private extension HomeDashboardSnapshot.Item? {
+    var isRhythm: Bool {
+        guard case .some(.rhythm) = self else { return false }
+        return true
     }
 }
 
@@ -302,16 +337,13 @@ private struct HomeGreetingHeader: View {
 private struct HomeWeekCalendar: View {
     let preps: [EventPrep]
     let nudges: [RecurringEvent]
+    let itemCount: Int
 
     private var dates: [Date] {
         let calendar = Calendar.autoupdatingCurrent
         let start = calendar.dateInterval(of: .weekOfYear, for: .now)?.start
             ?? calendar.startOfDay(for: .now)
         return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
-    }
-
-    private var scheduledCount: Int {
-        min(2, preps.count + nudges.count)
     }
 
     var body: some View {
@@ -327,7 +359,7 @@ private struct HomeWeekCalendar: View {
                     Circle()
                         .fill(ColorTheme.accentCoral)
                         .frame(width: 6, height: 6)
-                    Text(L10n.Home.Today.itemCount(scheduledCount))
+                    Text(L10n.Home.Today.itemCount(itemCount))
                         .pretendard(.caption2, weight: .medium)
                         .foregroundStyle(ColorTheme.secondaryText)
                 }
@@ -397,8 +429,7 @@ private struct HomeWeekDay: View {
 }
 
 private struct HomeSummaryBanner: View {
-    let prepCount: Int
-    let nudgeCount: Int
+    let itemCount: Int
 
     var body: some View {
         HStack(spacing: 8) {
@@ -407,14 +438,20 @@ private struct HomeSummaryBanner: View {
                     .pretendard(.caption2, weight: .bold)
                     .foregroundStyle(ColorTheme.primaryNudge)
 
-                Text(L10n.Home.Today.summaryTitle(max(1, min(2, prepCount + nudgeCount))))
+                Text(
+                    itemCount == 0
+                        ? L10n.Home.Today.summaryEmpty
+                        : L10n.Home.Today.summaryTitle(itemCount)
+                )
                     .pretendard(.headline, weight: .bold)
                     .foregroundStyle(ColorTheme.primaryText)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text(L10n.Home.Today.summaryDuration)
-                    .pretendard(.caption2)
-                    .foregroundStyle(ColorTheme.secondaryText)
+                if itemCount > 0 {
+                    Text(L10n.Home.Today.summaryDuration)
+                        .pretendard(.caption2)
+                        .foregroundStyle(ColorTheme.secondaryText)
+                }
             }
 
             Spacer(minLength: 0)
@@ -431,6 +468,9 @@ private struct HomeSummaryBanner: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(ColorTheme.primaryNudge.opacity(0.12), lineWidth: 1)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("home.summary")
+        .accessibilityValue("\(itemCount)")
     }
 }
 
@@ -481,18 +521,58 @@ private struct HomeCalendarArtwork: View {
     }
 }
 
-private struct HomePrepSection: View {
+private struct HomePrioritySection: View {
+    let priority: HomeDashboardSnapshot.Item?
     let preps: [EventPrep]
-    let onOpen: (EventPrep) -> Void
+    let nudges: [RecurringEvent]
+    let onViewAll: () -> Void
+    let onOpenPrep: (EventPrep) -> Void
+    let onSchedule: (RecurringEvent) -> Void
+    let onSnooze: (RecurringEvent) -> Void
+    let onSkip: (RecurringEvent) -> Void
+    let onToggleMute: (RecurringEvent) -> Void
+    let onDelete: (RecurringEvent) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HomeSectionHeader(title: L10n.Home.Today.prepSection, actionTitle: L10n.Home.Today.viewAll)
+            HomeSectionHeader(
+                title: L10n.Home.Today.prepSection,
+                actionTitle: L10n.Home.Today.viewAll,
+                action: onViewAll,
+                accessibilityIdentifier: "home.priority.viewAll",
+                titleAccessibilityIdentifier: "home.priority"
+            )
 
-            if let prep = preps.first {
-                HomePrepCard(prep: prep) { onOpen(prep) }
-            } else {
-                HomeCompactEmptyState(message: L10n.Home.Prep.empty)
+            switch priority {
+            case let .prep(id):
+                if let prep = preps.first(where: { $0.id == id }) {
+                    HomePrepCard(prep: prep) { onOpenPrep(prep) }
+                } else {
+                    HomeCompactEmptyState(message: L10n.Home.Priority.empty)
+                }
+            case let .rhythm(id):
+                if let event = nudges.first(where: { $0.id == id }) {
+                    HomeRhythmRow(
+                        event: event,
+                        onSchedule: { onSchedule(event) },
+                        onSnooze: { onSnooze(event) },
+                        onSkip: { onSkip(event) },
+                        onToggleMute: { onToggleMute(event) },
+                        onDelete: { onDelete(event) }
+                    )
+                    .background(
+                        ColorTheme.cardBackground,
+                        in: RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .stroke(ColorTheme.separator, lineWidth: 1)
+                    }
+                } else {
+                    HomeCompactEmptyState(message: L10n.Home.Priority.empty)
+                }
+            case nil:
+                HomeCompactEmptyState(message: L10n.Home.Priority.empty)
             }
         }
     }
@@ -605,14 +685,22 @@ private struct HomeDateBadge: View {
 
 private struct HomeRhythmSection: View {
     let nudges: [RecurringEvent]
+    let onViewAll: () -> Void
     let onSchedule: (RecurringEvent) -> Void
     let onSnooze: (RecurringEvent) -> Void
     let onSkip: (RecurringEvent) -> Void
     let onToggleMute: (RecurringEvent) -> Void
+    let onDelete: (RecurringEvent) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HomeSectionHeader(title: L10n.Home.Today.rhythmSection, actionTitle: L10n.Home.Today.viewAll)
+            HomeSectionHeader(
+                title: L10n.Home.Today.rhythmSection,
+                actionTitle: L10n.Home.Today.viewAll,
+                action: onViewAll,
+                accessibilityIdentifier: "home.rhythms.viewAll",
+                titleAccessibilityIdentifier: "home.rhythms.title"
+            )
 
             if nudges.isEmpty {
                 HomeCompactEmptyState(message: L10n.Home.Nudge.emptyMessage)
@@ -624,7 +712,8 @@ private struct HomeRhythmSection: View {
                             onSchedule: { onSchedule(event) },
                             onSnooze: { onSnooze(event) },
                             onSkip: { onSkip(event) },
-                            onToggleMute: { onToggleMute(event) }
+                            onToggleMute: { onToggleMute(event) },
+                            onDelete: { onDelete(event) }
                         )
 
                         if index < nudges.count - 1 {
@@ -650,6 +739,9 @@ private struct HomeRhythmRow: View {
     let onSnooze: () -> Void
     let onSkip: () -> Void
     let onToggleMute: () -> Void
+    let onDelete: () -> Void
+
+    @State private var isDeleteConfirmationPresented = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -687,6 +779,11 @@ private struct HomeRhythmRow: View {
                     action: onToggleMute
                 )
                 .accessibilityIdentifier("nudge.toggleMute")
+                Divider()
+                Button(L10n.Nudge.Action.delete, role: .destructive) {
+                    isDeleteConfirmationPresented = true
+                }
+                .accessibilityIdentifier("nudge.delete")
             } label: {
                 NudgeAssetIcon(name: "glyph_more", size: 17)
                     .foregroundStyle(ColorTheme.secondaryText)
@@ -697,22 +794,39 @@ private struct HomeRhythmRow: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
+        .confirmationDialog(
+            L10n.Selection.deleteTitle(1),
+            isPresented: $isDeleteConfirmationPresented,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.Nudge.Action.delete, role: .destructive, action: onDelete)
+                .accessibilityIdentifier("nudge.confirmDelete")
+            Button(L10n.Common.cancel, role: .cancel) {}
+        } message: {
+            Text(L10n.Selection.deleteMessage)
+        }
     }
 }
 
 private struct HomeSectionHeader: View {
     let title: String
     let actionTitle: String
+    let action: () -> Void
+    let accessibilityIdentifier: String
+    let titleAccessibilityIdentifier: String
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
                 .pretendard(.headline, weight: .bold)
                 .foregroundStyle(ColorTheme.primaryText)
+                .accessibilityIdentifier(titleAccessibilityIdentifier)
             Spacer()
-            Text(actionTitle)
+            Button(actionTitle, action: action)
                 .pretendard(.caption2)
                 .foregroundStyle(ColorTheme.secondaryText)
+                .frame(minWidth: 44, minHeight: 44)
+                .accessibilityIdentifier(accessibilityIdentifier)
         }
         .padding(.horizontal, 4)
     }

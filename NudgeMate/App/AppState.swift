@@ -4,8 +4,10 @@ import SwiftData
 
 enum AppNavigationDestination: Equatable {
     case today
+    case rhythms
     case rhythm(UUID?)
     case scheduleRhythm(UUID?)
+    case preps
     case prep(UUID?)
     case recap
 }

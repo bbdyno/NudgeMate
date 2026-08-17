@@ -186,6 +186,7 @@
 "home.prep.title" = "準備トラッカー";
 "home.prep.subtitle" = "大切な日に向けて忘れずに準備しましょう";
 "home.prep.empty" = "準備中の大切な予定はまだありません。";
+"home.priority.empty" = "今すぐ優先して確認することはありません。";
 "home.nudge.title" = "次のナッジ";
 "home.nudge.subtitle" = "過去の予定パターンをもとに提案します";
 "home.nudge.emptyTitle" = "まだ予測できる予定がありません";
@@ -195,6 +196,7 @@
 "home.today.itemCount" = "今日%d件";
 "home.today.summaryLabel" = "今日のナッジ";
 "home.today.summaryTitle" = "今日は%dつだけ準備すれば十分です。";
+"home.today.summaryEmpty" = "今日確認することはありません。";
 "home.today.summaryDuration" = "準備時間の目安 20分";
 "home.today.prepSection" = "先に準備すること";
 "home.today.rhythmSection" = "リズムが戻ってきました";
@@ -208,6 +210,7 @@
 "nudge.card.interval" = "約%d日ごと · %@";
 "nudge.action.enable" = "通知をオン";
 "nudge.action.disable" = "通知をオフ";
+"nudge.action.delete" = "リズムを削除";
 "nudge.action.schedule" = "予定を確認";
 "nudge.action.snooze" = "1週間延期";
 "nudge.action.skip" = "スキップ";

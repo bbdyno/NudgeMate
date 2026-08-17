@@ -186,6 +186,7 @@
 "home.prep.title" = "Prep Trackers";
 "home.prep.subtitle" = "Stay prepared for the days that matter";
 "home.prep.empty" = "No important events are being prepared yet.";
+"home.priority.empty" = "There is nothing you need to handle first right now.";
 "home.nudge.title" = "Upcoming Nudges";
 "home.nudge.subtitle" = "Suggestions based on your past event patterns";
 "home.nudge.emptyTitle" = "Nothing to Predict Yet";
@@ -195,6 +196,7 @@
 "home.today.itemCount" = "%d today";
 "home.today.summaryLabel" = "TODAY'S NUDGE";
 "home.today.summaryTitle" = "Just %d things will be enough for today.";
+"home.today.summaryEmpty" = "Nothing needs your attention today.";
 "home.today.summaryDuration" = "About 20 min to prepare";
 "home.today.prepSection" = "Prepare first";
 "home.today.rhythmSection" = "Your rhythms are back";
@@ -208,6 +210,7 @@
 "nudge.card.interval" = "About every %d days · %@";
 "nudge.action.enable" = "Enable";
 "nudge.action.disable" = "Mute";
+"nudge.action.delete" = "Delete Rhythm";
 "nudge.action.schedule" = "Review Schedule";
 "nudge.action.snooze" = "Snooze 1 Week";
 "nudge.action.skip" = "Skip";

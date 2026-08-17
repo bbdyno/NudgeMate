@@ -56,6 +56,7 @@ struct PrepListView: View {
                         selectedCount: selectedIDs.count,
                         onDelete: { isDeleteConfirmationPresented = true }
                     )
+                    .padding(.bottom, NudgeLayoutMetrics.mainTabBarClearance)
                 }
             }
             .background {
@@ -159,12 +160,10 @@ struct PrepListView: View {
 
     private func deleteSelected() {
         let targets = preps.filter { selectedIDs.contains($0.id) }
-        targets.forEach { prep in
-            appState.nudgeManager.cancelPrepReminder(for: prep.id)
-            modelContext.delete(prep)
-        }
+        let targetIDs = targets.map(\.id)
         do {
-            try modelContext.save()
+            try PrepDeletionService().delete(targets, in: modelContext)
+            targetIDs.forEach { appState.nudgeManager.cancelPrepReminder(for: $0) }
             selectedIDs.removeAll()
             isSelecting = false
         } catch {
@@ -173,9 +172,13 @@ struct PrepListView: View {
     }
 
     private func delete(_ prep: EventPrep) {
-        appState.nudgeManager.cancelPrepReminder(for: prep.id)
-        modelContext.delete(prep)
-        do { try modelContext.save() } catch { errorMessage = error.localizedDescription }
+        let prepID = prep.id
+        do {
+            try PrepDeletionService().delete([prep], in: modelContext)
+            appState.nudgeManager.cancelPrepReminder(for: prepID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func handleNavigation(_ destination: AppNavigationDestination?) {
@@ -473,6 +476,7 @@ private struct PrepReadinessControl: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(selection == status ? .isSelected : [])
+                    .accessibilityIdentifier("prep.status.\(status.rawValue)")
                 }
             }
         }

@@ -24,6 +24,114 @@ protocol SettingsRepository {
 }
 
 @MainActor
+struct RhythmDeletionService {
+    private let calendar: Calendar
+
+    init(calendar: Calendar = .autoupdatingCurrent) {
+        self.calendar = calendar
+    }
+
+    func delete(_ rhythms: [RecurringEvent], in context: ModelContext, now: Date = .now) throws {
+        guard !rhythms.isEmpty else { return }
+
+        let rhythmIDs = Set(rhythms.map(\.id))
+        let normalizer = EventNormalizer()
+        let signatures = Set(
+            rhythms
+                .filter { $0.origin == .discovered }
+                .flatMap { [$0.normalizedName, normalizer.normalize($0.displayName)] }
+                .filter { !$0.isEmpty }
+        )
+
+        do {
+            let occurrences = try context.fetch(FetchDescriptor<RhythmOccurrenceRecord>())
+            occurrences
+                .filter { rhythmIDs.contains($0.rhythmID) }
+                .forEach(context.delete)
+
+            let instances = try context.fetch(FetchDescriptor<NudgeInstanceRecord>())
+            instances
+                .filter { rhythmIDs.contains($0.rhythmID) }
+                .forEach(context.delete)
+
+            if !signatures.isEmpty {
+                let candidates = try context.fetch(FetchDescriptor<PatternCandidateRecord>())
+                candidates
+                    .filter { signatures.contains($0.normalizedKey) }
+                    .forEach(context.delete)
+
+                let suppressUntil = calendar.date(byAdding: .year, value: 100, to: now)
+                    ?? now.addingTimeInterval(3_155_760_000)
+                let existingSuppressions = try context.fetch(
+                    FetchDescriptor<SuppressedPatternRecord>()
+                )
+
+                for signature in signatures {
+                    let calendarIDs = Array(
+                        Set(
+                            rhythms
+                                .filter {
+                                    $0.normalizedName == signature
+                                        || normalizer.normalize($0.displayName) == signature
+                                }
+                                .flatMap(\.sourceCalendarIdentifiers)
+                        )
+                    ).sorted()
+
+                    if let suppression = existingSuppressions.first(where: {
+                        $0.normalizedSignature == signature
+                    }) {
+                        suppression.rejectedAt = now
+                        suppression.suppressUntil = max(suppression.suppressUntil, suppressUntil)
+                        suppression.sourceCalendarIdentifiers = calendarIDs
+                        suppression.reason = .notInterested
+                    } else {
+                        context.insert(
+                            SuppressedPatternRecord(
+                                value: SuppressedPattern(
+                                    id: UUID(),
+                                    normalizedSignature: signature,
+                                    rejectedAt: now,
+                                    suppressUntil: suppressUntil,
+                                    sourceCalendarIdentifiers: calendarIDs,
+                                    reason: .notInterested
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+
+            rhythms.forEach(context.delete)
+            try context.save()
+        } catch {
+            context.rollback()
+            throw error
+        }
+    }
+}
+
+@MainActor
+struct PrepDeletionService {
+    func delete(_ preps: [EventPrep], in context: ModelContext) throws {
+        guard !preps.isEmpty else { return }
+        let prepIDs = Set(preps.map(\.id))
+
+        do {
+            let checkIns = try context.fetch(FetchDescriptor<PrepCheckInRecord>())
+            checkIns
+                .filter { prepIDs.contains($0.prepPlanID) }
+                .forEach(context.delete)
+            preps.forEach(context.delete)
+            try context.save()
+        } catch {
+            context.rollback()
+            throw error
+        }
+    }
+}
+
+@MainActor
 final class SwiftDataRhythmRepository: RhythmRepository {
     private let context: ModelContext
 

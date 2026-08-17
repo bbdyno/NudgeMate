@@ -61,7 +61,7 @@ struct MainTabView: View {
 
     var body: some View {
         NudgeSelectedTabContent(selection: selection)
-        .overlay(alignment: .bottom) {
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             NudgeMainTabBar(selection: $selection) {
                 isQuickAddPresented = true
             }
@@ -141,10 +141,16 @@ struct MainTabView: View {
         case .today:
             selection = .today
             appState.consumeNavigation(destination)
+        case .rhythms:
+            selection = .rhythms
+            appState.consumeNavigation(destination)
         case .rhythm:
             selection = .rhythms
         case .scheduleRhythm:
             selection = .today
+        case .preps:
+            selection = .prep
+            appState.consumeNavigation(destination)
         case .prep:
             selection = .prep
         case .recap:

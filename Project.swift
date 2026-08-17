@@ -18,10 +18,13 @@ let project = Project(
             name: "NudgeMate",
             destinations: .iOS,
             product: .app,
-            bundleId: "com.nudgemate.app",
+            bundleId: "com.bbdyno.app.nudgemate",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingDefault(with: [
                 "CFBundleDisplayName": "NudgeMate",
+                "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+                "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+                "ITSAppUsesNonExemptEncryption": false,
                 "CFBundleLocalizations": [
                     "ko",
                     "en",
@@ -50,8 +53,8 @@ let project = Project(
                 base: [
                     "CODE_SIGN_STYLE": "Automatic",
                     "ASSETCATALOG_COMPILER_APPICON_NAME": "AppIcon",
-                    "CURRENT_PROJECT_VERSION": "1",
-                    "MARKETING_VERSION": "1.0.0",
+                    "CURRENT_PROJECT_VERSION": "2026081701",
+                    "MARKETING_VERSION": "1.1.0",
                     "PRODUCT_NAME": "NudgeMate",
                     "SWIFT_EMIT_LOC_STRINGS": "NO",
                     "TARGETED_DEVICE_FAMILY": "1,2"

@@ -186,6 +186,7 @@
 "home.prep.title" = "準備追蹤";
 "home.prep.subtitle" = "為重要的日子做好準備";
 "home.prep.empty" = "目前沒有正在準備的重要行程。";
+"home.priority.empty" = "目前沒有需要優先處理的事項。";
 "home.nudge.title" = "即將到來的提醒";
 "home.nudge.subtitle" = "根據過往行程規律提供建議";
 "home.nudge.emptyTitle" = "暫時沒有可預測的行程";
@@ -195,6 +196,7 @@
 "home.today.itemCount" = "今天 %d 項";
 "home.today.summaryLabel" = "今日提醒";
 "home.today.summaryTitle" = "今天只要準備 %d 件事就足夠了。";
+"home.today.summaryEmpty" = "今天沒有需要留意的事項。";
 "home.today.summaryDuration" = "預計準備 20 分鐘";
 "home.today.prepSection" = "優先準備";
 "home.today.rhythmSection" = "您的節奏又到了";
@@ -208,6 +210,7 @@
 "nudge.card.interval" = "約每 %d 天 · %@";
 "nudge.action.enable" = "開啟提醒";
 "nudge.action.disable" = "關閉提醒";
+"nudge.action.delete" = "刪除節奏";
 "nudge.action.schedule" = "確認行程";
 "nudge.action.snooze" = "延後一週";
 "nudge.action.skip" = "略過";

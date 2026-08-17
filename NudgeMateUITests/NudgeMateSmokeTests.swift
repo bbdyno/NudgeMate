@@ -58,7 +58,7 @@ final class NudgeMateSmokeTests: XCTestCase {
         let app = seededApp(opening: "--open-today")
         app.launch()
 
-        let prepCard = app.buttons["home.prep.card"].firstMatch
+        let prepCard = app.descendants(matching: .any)["home.prep.card"].firstMatch
         XCTAssertTrue(prepCard.waitForExistence(timeout: 5))
         XCTAssertTrue(prepCard.isHittable)
         prepCard.tap()
@@ -73,15 +73,18 @@ final class NudgeMateSmokeTests: XCTestCase {
         let actions = app.buttons.matching(identifier: "nudge.moreActions")
         XCTAssertTrue(actions.firstMatch.waitForExistence(timeout: 5))
         let lastAction = actions.element(boundBy: 1)
+        let tabBar = app.otherElements["main.tabbar"]
+        XCTAssertTrue(tabBar.waitForExistence(timeout: 2))
         var attempts = 0
-        while !lastAction.isHittable && attempts < 4 {
+        while (
+            !lastAction.isHittable
+                || lastAction.frame.maxY > tabBar.frame.minY
+        ) && attempts < 6 {
             app.swipeUp()
             attempts += 1
         }
 
         XCTAssertTrue(lastAction.isHittable)
-        let tabBar = app.otherElements["main.tabbar"]
-        XCTAssertTrue(tabBar.waitForExistence(timeout: 2))
         XCTAssertLessThanOrEqual(
             lastAction.frame.maxY,
             tabBar.frame.minY,
@@ -90,6 +93,85 @@ final class NudgeMateSmokeTests: XCTestCase {
         lastAction.tap()
         XCTAssertTrue(app.buttons["nudge.skip"].waitForExistence(timeout: 2))
         XCTAssertTrue(app.buttons["nudge.toggleMute"].exists)
+        XCTAssertTrue(app.buttons["nudge.delete"].exists)
+    }
+
+    func testTodaySummaryAndTurningOffRhythmStayInSync() {
+        let app = seededApp(opening: "--open-today")
+        app.launch()
+
+        let summary = app.descendants(matching: .any)["home.summary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 5))
+        XCTAssertEqual(summary.value as? String, "6")
+        XCTAssertTrue(app.descendants(matching: .any)["home.priority"].exists)
+
+        let actions = app.buttons.matching(identifier: "nudge.moreActions").firstMatch
+        var attempts = 0
+        while (!actions.exists || !actions.isHittable) && attempts < 6 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(actions.isHittable)
+        actions.tap()
+
+        let turnOff = app.buttons["nudge.toggleMute"]
+        XCTAssertTrue(turnOff.waitForExistence(timeout: 2))
+        turnOff.tap()
+
+        let summaryUpdated = NSPredicate { evaluated, _ in
+            (evaluated as? XCUIElement)?.value as? String == "5"
+        }
+        expectation(for: summaryUpdated, evaluatedWith: summary)
+        waitForExpectations(timeout: 3)
+    }
+
+    func testTodayRhythmViewAllOpensRhythmList() {
+        let app = seededApp(opening: "--open-today")
+        app.launch()
+
+        let viewAll = app.buttons["home.rhythms.viewAll"]
+        var attempts = 0
+        while (!viewAll.exists || !viewAll.isHittable) && attempts < 8 {
+            app.swipeUp()
+            attempts += 1
+        }
+
+        XCTAssertTrue(viewAll.isHittable)
+        viewAll.tap()
+
+        XCTAssertTrue(app.scrollViews["rhythm.list"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["main.tab.rhythms"].isSelected)
+    }
+
+    func testTodayCanDeleteRhythmFromItsMenu() {
+        let app = seededApp(opening: "--open-today")
+        app.launch()
+
+        let summary = app.descendants(matching: .any)["home.summary"]
+        XCTAssertTrue(summary.waitForExistence(timeout: 5))
+        XCTAssertEqual(summary.value as? String, "6")
+
+        let actions = app.buttons.matching(identifier: "nudge.moreActions").firstMatch
+        var attempts = 0
+        while (!actions.exists || !actions.isHittable) && attempts < 6 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(actions.isHittable)
+        actions.tap()
+
+        let delete = app.buttons["nudge.delete"]
+        XCTAssertTrue(delete.waitForExistence(timeout: 2))
+        delete.tap()
+        let confirmDelete = app.buttons.matching(identifier: "nudge.confirmDelete").firstMatch
+        XCTAssertTrue(confirmDelete.waitForExistence(timeout: 2))
+        confirmDelete.tap()
+
+        let summaryUpdated = NSPredicate { evaluated, _ in
+            (evaluated as? XCUIElement)?.value as? String == "5"
+        }
+        expectation(for: summaryUpdated, evaluatedWith: summary)
+        waitForExpectations(timeout: 3)
     }
 
     func testRhythmListSupportsSelectAll() {
@@ -164,9 +246,9 @@ final class NudgeMateSmokeTests: XCTestCase {
         XCTAssertEqual(select.frame.height, add.frame.height, accuracy: 1)
 
         let firstStatusRow = [
-            app.buttons["Not Ready"].firstMatch,
-            app.buttons["In Progress"].firstMatch,
-            app.buttons["Ready"].firstMatch
+            app.descendants(matching: .any)["prep.status.notReady"].firstMatch,
+            app.descendants(matching: .any)["prep.status.inProgress"].firstMatch,
+            app.descendants(matching: .any)["prep.status.ready"].firstMatch
         ]
         for button in firstStatusRow {
             XCTAssertTrue(button.waitForExistence(timeout: 2))

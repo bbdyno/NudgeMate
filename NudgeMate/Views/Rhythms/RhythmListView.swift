@@ -56,6 +56,7 @@ struct RhythmListView: View {
                         selectedCount: selectedIDs.count,
                         onDelete: { isDeleteConfirmationPresented = true }
                     )
+                    .padding(.bottom, NudgeLayoutMetrics.mainTabBarClearance)
                 }
             }
             .background {
@@ -145,12 +146,10 @@ struct RhythmListView: View {
 
     private func deleteSelected() {
         let targets = rhythms.filter { selectedIDs.contains($0.id) }
-        targets.forEach { rhythm in
-            appState.nudgeManager.cancelNudge(for: rhythm.id)
-            modelContext.delete(rhythm)
-        }
+        let targetIDs = targets.map(\.id)
         do {
-            try modelContext.save()
+            try RhythmDeletionService().delete(targets, in: modelContext)
+            targetIDs.forEach { appState.nudgeManager.cancelNudge(for: $0) }
             selectedIDs.removeAll()
             isSelecting = false
         } catch {
@@ -190,10 +189,10 @@ struct RhythmListView: View {
     }
 
     private func delete(_ rhythm: RecurringEvent) {
-        appState.nudgeManager.cancelNudge(for: rhythm.id)
-        modelContext.delete(rhythm)
+        let rhythmID = rhythm.id
         do {
-            try modelContext.save()
+            try RhythmDeletionService().delete([rhythm], in: modelContext)
+            appState.nudgeManager.cancelNudge(for: rhythmID)
         } catch {
             errorMessage = error.localizedDescription
         }

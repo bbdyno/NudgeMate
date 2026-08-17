@@ -11,6 +11,7 @@ enum NudgeLayoutMetrics {
     static let compactControlSize: CGFloat = 44
     static let cardHeaderIconSize: CGFloat = 44
     static let listSpacing: CGFloat = 12
+    static let mainTabBarClearance: CGFloat = 86
 
     /// Keeps the final action clear of the floating tab bar on current iOS layouts.
     static let listBottomClearance: CGFloat = 128
