@@ -482,12 +482,15 @@ function applyLocale(locale, updateURL = false) {
     const key = element.dataset.i18nAlt;
     if (strings[key]) element.alt = strings[key];
   });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    const key = element.dataset.i18nAriaLabel;
+    if (strings[key]) element.setAttribute("aria-label", strings[key]);
+  });
 
-  const storeBadge = document.querySelector("[data-store-badge]");
-  if (storeBadge) {
-    const badgeLocale = storeBadgeLocales[locale] || storeBadgeLocales.en;
-    storeBadge.src = `https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/${badgeLocale}?size=250x83`;
-  }
+  const badgeLocale = storeBadgeLocales[locale] || storeBadgeLocales.en;
+  document.querySelectorAll("[data-store-badge]").forEach((storeBadge) => {
+    storeBadge.src = `https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/${badgeLocale}`;
+  });
 
   document.querySelector('meta[name="description"]')?.setAttribute("content", strings.metaDescription);
   document.querySelector('meta[property="og:title"]')?.setAttribute("content", strings.metaTitle);

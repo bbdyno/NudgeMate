@@ -235,29 +235,12 @@ input {
 }
 
 .language-select:focus-visible,
-.nav-cta:focus-visible,
 .button:focus-visible,
 .app-store-badge-link:focus-visible,
 .brand:focus-visible,
 .footer-links a:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 3px;
-}
-
-.nav-cta {
-  min-height: 38px;
-  padding: 8px 15px;
-  border-radius: 11px;
-  background: var(--cream);
-  color: var(--navy-950);
-  font-size: 13px;
-  font-weight: 700;
-  transition: transform 180ms ease, background-color 180ms ease;
-}
-
-.nav-cta:hover {
-  background: white;
-  transform: translateY(-1px);
 }
 
 .hero {
@@ -341,6 +324,7 @@ input {
 
 .hero-actions {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 11px;
   margin-top: 30px;
@@ -371,17 +355,6 @@ input {
 
 .button-primary:hover {
   background: #ff735c;
-}
-
-.button-ghost {
-  border-color: rgba(255, 255, 255, 0.17);
-  background: rgba(255, 255, 255, 0.055);
-  backdrop-filter: blur(12px);
-}
-
-.button-ghost:hover {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.09);
 }
 
 .availability {
@@ -1421,14 +1394,21 @@ input {
 
 .app-store-badge-link {
   display: inline-flex;
-  margin-top: 24px;
-  padding: 14px;
-  border-radius: 12px;
+  width: fit-content;
+  padding: 10px;
+  line-height: 0;
 }
 
 .app-store-badge {
-  width: 181px;
-  height: auto;
+  display: block;
+  width: auto;
+  height: 40px;
+  max-width: none;
+  object-fit: contain;
+}
+
+.app-store-badge-link--final {
+  margin-top: 24px;
 }
 
 .site-footer {
@@ -1570,10 +1550,6 @@ input {
   .brand img {
     width: 34px;
     height: 34px;
-  }
-
-  .nav-cta {
-    display: none;
   }
 
   .language-select {
