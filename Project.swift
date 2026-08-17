@@ -1,7 +1,7 @@
 import ProjectDescription
 
-let marketingVersion = "1.0.0"
-let releaseBuildNumber = "2026081001"
+let marketingVersion = "1.1.0"
+let releaseBuildNumber = "2026081701"
 let developmentTeam = "M79H9K226Y"
 
 let project = Project(

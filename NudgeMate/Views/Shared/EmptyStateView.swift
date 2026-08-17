@@ -22,8 +22,8 @@ struct EmptyStateView: View {
     }
 
     var body: some View {
-        VStack(spacing: 16) {
-            NudgeSymbolBadge(symbol: icon, size: 112)
+        VStack(spacing: 14) {
+            NudgeSymbolBadge(symbol: icon, size: 96)
 
             Text(title)
                 .pretendard(.title2, weight: .semibold)
@@ -37,16 +37,18 @@ struct EmptyStateView: View {
                 .fixedSize(horizontal: false, vertical: true)
 
             if let actionTitle, let action {
-                Button(actionTitle, action: action)
-                    .pretendard(.headline, weight: .semibold)
-                    .buttonStyle(.borderedProminent)
-                    .tint(ColorTheme.primaryNudge)
-                    .controlSize(.large)
+                Button(action: action) {
+                    Text(actionTitle)
+                        .pretendard(.headline, weight: .semibold)
+                        .padding(.horizontal, 18)
+                        .frame(minHeight: 48)
+                }
+                    .buttonStyle(NudgePrimaryButtonStyle())
                     .padding(.top, 4)
             }
         }
         .frame(maxWidth: 420)
-        .padding(24)
+        .padding(20)
         .accessibilityElement(children: .contain)
     }
 }

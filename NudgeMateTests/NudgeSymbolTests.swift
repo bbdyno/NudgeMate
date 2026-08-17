@@ -3,16 +3,16 @@ import XCTest
 @testable import NudgeMate
 
 final class NudgeSymbolTests: XCTestCase {
-    func testEveryCategoryUsesAnAvailableDistinctSystemSymbol() {
-        let symbolNames = RhythmCategory.allCases.map(\.systemSymbolName)
+    func testEveryCategoryUsesAnAvailableDistinctBrandGlyph() {
+        let assetNames = RhythmCategory.allCases.map(\.iconAssetName)
 
-        XCTAssertEqual(Set(symbolNames).count, RhythmCategory.allCases.count)
-        for symbolName in symbolNames {
-            XCTAssertNotNil(UIImage(systemName: symbolName), "Missing SF Symbol: \(symbolName)")
+        XCTAssertEqual(Set(assetNames).count, RhythmCategory.allCases.count)
+        for assetName in assetNames {
+            XCTAssertNotNil(UIImage(named: assetName), "Missing brand glyph: \(assetName)")
         }
     }
 
-    func testEverySharedAppSymbolIsAvailable() {
+    func testEverySharedAppBrandGlyphIsAvailable() {
         let symbols: [NudgeSymbol] = [
             .calendar,
             .reminder,
@@ -24,7 +24,26 @@ final class NudgeSymbolTests: XCTestCase {
         ]
 
         for symbol in symbols {
-            XCTAssertNotNil(UIImage(systemName: symbol.systemName), "Missing SF Symbol: \(symbol.systemName)")
+            XCTAssertNotNil(UIImage(named: symbol.assetName), "Missing brand glyph: \(symbol.assetName)")
+        }
+    }
+
+    func testEveryNavigationAndActionBrandGlyphIsAvailable() {
+        let assetNames = [
+            "glyph_tab_today",
+            "glyph_tab_rhythms",
+            "glyph_tab_prep",
+            "glyph_tab_more",
+            "glyph_add",
+            "glyph_more",
+            "glyph_select_all",
+            "glyph_clear_selection",
+            "glyph_disclosure",
+            "glyph_settings"
+        ]
+
+        for assetName in assetNames {
+            XCTAssertNotNil(UIImage(named: assetName), "Missing brand glyph: \(assetName)")
         }
     }
 }

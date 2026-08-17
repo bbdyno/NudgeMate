@@ -52,6 +52,20 @@ final class NudgeViewModel {
         }
     }
 
+    func delete(
+        _ event: RecurringEvent,
+        modelContext: ModelContext,
+        nudgeManager: NudgeManager
+    ) {
+        let eventID = event.id
+        do {
+            try RhythmDeletionService().delete([event], in: modelContext)
+            nudgeManager.cancelNudge(for: eventID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     func clearError() {
         errorMessage = nil
     }

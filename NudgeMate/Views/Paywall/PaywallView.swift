@@ -18,9 +18,9 @@ struct PaywallView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 22) {
+                VStack(spacing: 20) {
                     ArtworkAssetImage(asset: .paywallHero)
-                        .frame(width: 180, height: 144)
+                        .frame(width: 168, height: 134)
                         .accessibilityHidden(true)
 
                     VStack(spacing: 8) {
@@ -54,7 +54,17 @@ struct PaywallView: View {
                     } else {
                         VStack(spacing: 10) {
                             ForEach(manager.products, id: \.id) { product in
-                                pricingCard(product)
+                                PaywallPricingCard(
+                                    title: productTitle(
+                                        for: SubscriptionProductID(rawValue: product.id)
+                                    ),
+                                    trial: introductoryOfferText(product),
+                                    price: product.displayPrice,
+                                    isBestValue: SubscriptionProductID(rawValue: product.id) == .yearly,
+                                    isSelected: SubscriptionProductID(rawValue: product.id) == selectedProductID
+                                ) {
+                                    selectProduct(product)
+                                }
                             }
                         }
                     }
@@ -73,9 +83,7 @@ struct PaywallView: View {
                         .pretendard(.headline, weight: .semibold)
                         .frame(maxWidth: .infinity, minHeight: 54)
                     }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.white)
-                    .background(ColorTheme.primaryNudge, in: Capsule())
+                    .buttonStyle(NudgePrimaryButtonStyle())
                     .disabled(manager.isPurchasing || (!isScreenshotMode && selectedProduct == nil))
                     .opacity(!isScreenshotMode && selectedProduct == nil ? 0.5 : 1)
 
@@ -95,23 +103,22 @@ struct PaywallView: View {
                         Button(L10n.Paywall.manage) {
                             if let url = AppConfiguration.manageSubscriptionsURL { openURL(url) }
                         }
-                        HStack(spacing: 16) {
-                            Button(L10n.Paywall.terms) {
+                        PaywallLegalLinks(
+                            showPrivacy: AppConfiguration.privacyPolicyURL != nil,
+                            onOpenTerms: {
                                 if let url = AppConfiguration.termsOfServiceURL { openURL(url) }
+                            },
+                            onOpenPrivacy: {
+                                if let url = AppConfiguration.privacyPolicyURL { openURL(url) }
                             }
-                            if let url = AppConfiguration.privacyPolicyURL {
-                                Button(L10n.Paywall.privacy) {
-                                    openURL(url)
-                                }
-                            }
-                        }
+                        )
                     }
                     .pretendard(.footnote)
                     .foregroundStyle(ColorTheme.secondaryText)
                 }
                 .padding(20)
             }
-            .background(ColorTheme.background)
+            .background(NudgeScreenBackground())
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(L10n.Common.close) { dismiss() }
@@ -164,49 +171,12 @@ struct PaywallView: View {
         }
     }
 
-    private func pricingCard(_ product: Product) -> some View {
+    private func selectProduct(_ product: Product) {
         let id = SubscriptionProductID(rawValue: product.id)
-        let isSelected = id == selectedProductID
-        return Button {
-            guard let id else { return }
-            withAnimation(.spring(response: 0.36, dampingFraction: 0.84)) {
-                selectedProductID = id
-            }
-        } label: {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Text(productTitle(for: id))
-                            .pretendard(.headline, weight: .semibold)
-                        if id == .yearly {
-                            Text(L10n.Paywall.bestValue)
-                                .pretendard(.caption2, weight: .bold)
-                                .foregroundStyle(ColorTheme.proAccent)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(ColorTheme.proAccent.opacity(0.14), in: Capsule())
-                        }
-                    }
-                    if let trial = introductoryOfferText(product) {
-                        Text(trial)
-                            .pretendard(.caption)
-                            .foregroundStyle(ColorTheme.secondarySnooze)
-                    }
-                }
-                Spacer()
-                Text(product.displayPrice)
-                    .pretendard(.headline, weight: .bold)
-                    .foregroundStyle(isSelected ? ColorTheme.primaryNudge : ColorTheme.primaryText)
-            }
-            .padding(16)
-            .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(isSelected ? ColorTheme.primaryNudge : ColorTheme.separator.opacity(0.5), lineWidth: isSelected ? 2 : 0.5)
-            }
+        guard let id else { return }
+        withAnimation(.spring(response: 0.36, dampingFraction: 0.84)) {
+            selectedProductID = id
         }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private func screenshotPricingCard(_ id: SubscriptionProductID, price: String) -> some View {
@@ -287,5 +257,130 @@ struct PaywallView: View {
                 message = error.localizedDescription
             }
         }
+    }
+}
+
+private struct PaywallPricingCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let title: String
+    let trial: String?
+    let price: String
+    let isBestValue: Bool
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    VStack(alignment: .leading, spacing: 10) {
+                        heading
+                        trialLabel
+                        priceLabel
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                } else {
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            heading
+                            trialLabel
+                        }
+                        Spacer(minLength: 8)
+                        priceLabel
+                    }
+                }
+            }
+            .padding(16)
+            .background(
+                ColorTheme.cardBackground,
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(
+                        isSelected ? ColorTheme.primaryNudge : ColorTheme.separator.opacity(0.5),
+                        lineWidth: isSelected ? 2 : 0.5
+                    )
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var heading: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                titleLabel
+                if isBestValue { bestValueBadge }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                titleLabel
+                if isBestValue { bestValueBadge }
+            }
+        }
+    }
+
+    private var titleLabel: some View {
+        Text(title)
+            .pretendard(.headline, weight: .semibold)
+            .foregroundStyle(ColorTheme.primaryText)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var bestValueBadge: some View {
+        Text(L10n.Paywall.bestValue)
+            .pretendard(.caption2, weight: .bold)
+            .foregroundStyle(ColorTheme.proAccent)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(ColorTheme.proAccent.opacity(0.14), in: Capsule())
+            .fixedSize(horizontal: true, vertical: false)
+    }
+
+    @ViewBuilder
+    private var trialLabel: some View {
+        if let trial {
+            Text(trial)
+                .pretendard(.caption)
+                .foregroundStyle(ColorTheme.secondarySnooze)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var priceLabel: some View {
+        Text(price)
+            .pretendard(.headline, weight: .bold)
+            .foregroundStyle(isSelected ? ColorTheme.primaryNudge : ColorTheme.primaryText)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+}
+
+private struct PaywallLegalLinks: View {
+    let showPrivacy: Bool
+    let onOpenTerms: () -> Void
+    let onOpenPrivacy: () -> Void
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 16) {
+                termsButton
+                if showPrivacy { privacyButton }
+            }
+
+            VStack(spacing: 10) {
+                termsButton
+                if showPrivacy { privacyButton }
+            }
+        }
+    }
+
+    private var termsButton: some View {
+        Button(L10n.Paywall.terms, action: onOpenTerms)
+    }
+
+    private var privacyButton: some View {
+        Button(L10n.Paywall.privacy, action: onOpenPrivacy)
     }
 }

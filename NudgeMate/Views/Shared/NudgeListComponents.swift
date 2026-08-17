@@ -4,22 +4,28 @@ import UIKit
 private typealias L10n = NudgeMateStrings.Localizable
 
 enum NudgeLayoutMetrics {
+    static let screenHorizontalPadding: CGFloat = 20
+    static let listHorizontalPadding: CGFloat = 20
+    static let cardPadding: CGFloat = 16
+    static let cardCornerRadius: CGFloat = 22
+    static let compactControlSize: CGFloat = 44
+    static let cardHeaderIconSize: CGFloat = 44
+    static let listSpacing: CGFloat = 12
+    static let mainTabBarClearance: CGFloat = 86
+
     /// Keeps the final action clear of the floating tab bar on current iOS layouts.
-    static let listBottomClearance: CGFloat = 116
+    static let listBottomClearance: CGFloat = 128
 }
 
 struct NudgeScreenBackground: View {
     var body: some View {
-        LinearGradient(
-            colors: [ColorTheme.background, ColorTheme.backgroundDeep],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .ignoresSafeArea()
+        ColorTheme.background.ignoresSafeArea()
     }
 }
 
 struct NudgeScreenHeader: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let title: String
     let subtitle: String
     let itemCount: Int
@@ -30,70 +36,236 @@ struct NudgeScreenHeader: View {
     let onAdd: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 12) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(title)
-                        .pretendard(.largeTitle, weight: .bold)
-                        .foregroundStyle(ColorTheme.primaryText)
+        VStack(alignment: .leading, spacing: 11) {
+            NudgeHeaderTitleRow(title: title, itemCount: itemCount)
+
+            if dynamicTypeSize.isAccessibilitySize {
+                Text(subtitle)
+                    .pretendard(.subheadline)
+                    .foregroundStyle(ColorTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("screen.subtitle")
+
+                HStack {
+                    Spacer(minLength: 0)
+                    NudgeHeaderActions(
+                        isSelecting: isSelecting,
+                        allSelected: allSelected,
+                        onToggleSelectionMode: onToggleSelectionMode,
+                        onToggleAll: onToggleAll,
+                        onAdd: onAdd
+                    )
+                }
+            } else {
+                HStack(alignment: .center, spacing: 12) {
                     Text(subtitle)
                         .pretendard(.subheadline)
                         .foregroundStyle(ColorTheme.secondaryText)
+                        .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
-                }
+                        .accessibilityIdentifier("screen.subtitle")
 
-                Spacer(minLength: 8)
+                    Spacer(minLength: 8)
 
-                Text(L10n.Common.itemCount(itemCount))
-                    .pretendard(.caption, weight: .bold)
-                    .foregroundStyle(ColorTheme.primaryNudge)
-                    .padding(.horizontal, 11)
-                    .frame(minHeight: 31)
-                    .background(ColorTheme.brandSoft, in: Capsule())
-                    .accessibilityIdentifier("screen.itemCount")
-            }
-
-            HStack(spacing: 8) {
-                Spacer()
-                if isSelecting {
-                    NudgeTextAction(
-                        title: allSelected ? L10n.Selection.deselectAll : L10n.Selection.selectAll,
-                        foreground: ColorTheme.primaryNudge,
-                        background: ColorTheme.brandSoft,
-                        accessibilityIdentifier: "selection.toggleAll",
-                        action: onToggleAll
+                    NudgeHeaderActions(
+                        isSelecting: isSelecting,
+                        allSelected: allSelected,
+                        onToggleSelectionMode: onToggleSelectionMode,
+                        onToggleAll: onToggleAll,
+                        onAdd: onAdd
                     )
-                    NudgeTextAction(
-                        title: L10n.Common.done,
-                        foreground: ColorTheme.cardBackground,
-                        background: ColorTheme.primaryNudge,
-                        accessibilityIdentifier: "selection.done",
-                        action: onToggleSelectionMode
-                    )
-                } else {
-                    NudgeTextAction(
-                        title: L10n.Common.select,
-                        foreground: ColorTheme.primaryNudge,
-                        background: ColorTheme.brandSoft,
-                        accessibilityIdentifier: "selection.start",
-                        action: onToggleSelectionMode
-                    )
-                    Button(action: onAdd) {
-                        Image(systemName: "plus")
-                            .font(.system(size: 17, weight: .bold))
-                            .foregroundStyle(ColorTheme.cardBackground)
-                            .frame(width: 44, height: 44)
-                            .background(ColorTheme.primaryNudge, in: Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(L10n.Common.add)
-                    .accessibilityIdentifier("screen.add")
                 }
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 14)
-        .padding(.bottom, 18)
+        .padding(.horizontal, NudgeLayoutMetrics.screenHorizontalPadding)
+        .padding(.top, 10)
+        .padding(.bottom, 15)
+    }
+}
+
+private struct NudgeHeaderTitleRow: View {
+    let title: String
+    let itemCount: Int
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .center, spacing: 12) {
+                NudgeHeaderTitle(title: title)
+
+                Spacer(minLength: 6)
+
+                NudgeItemCountBadge(itemCount: itemCount)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                NudgeHeaderTitle(title: title)
+
+                HStack {
+                    Spacer(minLength: 0)
+                    NudgeItemCountBadge(itemCount: itemCount)
+                }
+            }
+        }
+    }
+}
+
+private struct NudgeHeaderTitle: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .pretendard(.largeTitle, weight: .bold)
+            .foregroundStyle(ColorTheme.primaryText)
+            .fixedSize(horizontal: true, vertical: false)
+            .accessibilityIdentifier("screen.title")
+    }
+}
+
+private struct NudgeItemCountBadge: View {
+    let itemCount: Int
+
+    var body: some View {
+        Text(L10n.Common.itemCount(itemCount))
+            .pretendard(.caption, weight: .bold)
+            .foregroundStyle(ColorTheme.primaryNudge)
+            .padding(.horizontal, 10)
+            .frame(minHeight: 30)
+            .background(ColorTheme.brandSoft, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(ColorTheme.accentLavender.opacity(0.2), lineWidth: 1)
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .accessibilityIdentifier("screen.itemCount")
+    }
+}
+
+private struct NudgeHeaderActions: View {
+    let isSelecting: Bool
+    let allSelected: Bool
+    let onToggleSelectionMode: () -> Void
+    let onToggleAll: () -> Void
+    let onAdd: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if isSelecting {
+                NudgeIconAction(
+                    assetName: allSelected ? "glyph_clear_selection" : "glyph_select_all",
+                    accessibilityLabel: allSelected ? L10n.Selection.deselectAll : L10n.Selection.selectAll,
+                    foreground: ColorTheme.primaryNudge,
+                    background: ColorTheme.brandSoft,
+                    accessibilityIdentifier: "selection.toggleAll",
+                    action: onToggleAll
+                )
+                NudgeIconAction(
+                    assetName: "glyph_success",
+                    accessibilityLabel: L10n.Common.done,
+                    foreground: ColorTheme.cardBackground,
+                    background: ColorTheme.primaryNudge,
+                    accessibilityIdentifier: "selection.done",
+                    action: onToggleSelectionMode
+                )
+            } else {
+                NudgeIconAction(
+                    assetName: "glyph_tab_prep",
+                    accessibilityLabel: L10n.Common.select,
+                    foreground: ColorTheme.primaryNudge,
+                    background: ColorTheme.brandSoft,
+                    accessibilityIdentifier: "selection.start",
+                    action: onToggleSelectionMode
+                )
+                NudgeIconAction(
+                    assetName: "glyph_add",
+                    accessibilityLabel: L10n.Common.add,
+                    foreground: ColorTheme.cardBackground,
+                    background: ColorTheme.primaryNudge,
+                    accessibilityIdentifier: "screen.add",
+                    action: onAdd
+                )
+            }
+        }
+    }
+}
+
+struct NudgeIconAction: View {
+    let assetName: String
+    let accessibilityLabel: String
+    let foreground: Color
+    let background: Color
+    let accessibilityIdentifier: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            NudgeAssetIcon(name: assetName, size: 20)
+                .foregroundStyle(foreground)
+                .frame(
+                    width: NudgeLayoutMetrics.compactControlSize,
+                    height: NudgeLayoutMetrics.compactControlSize
+                )
+                .background(background, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                        .stroke(foreground.opacity(0.12), lineWidth: 1)
+                }
+                .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+        }
+        .buttonStyle(NudgePressableButtonStyle())
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityIdentifier(accessibilityIdentifier)
+    }
+}
+
+struct NudgeMoreActionLabel: View {
+    var tint: Color = ColorTheme.secondaryText
+
+    var body: some View {
+        NudgeAssetIcon(name: "glyph_more", size: 19)
+            .foregroundStyle(tint)
+            .frame(
+                width: NudgeLayoutMetrics.compactControlSize,
+                height: NudgeLayoutMetrics.compactControlSize
+            )
+            .background(ColorTheme.backgroundDeep.opacity(0.72), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .stroke(tint.opacity(0.1), lineWidth: 1)
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+            .accessibilityHidden(true)
+    }
+}
+
+private struct NudgePressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.94 : 1)
+            .opacity(configuration.isPressed ? 0.82 : 1)
+            .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
+
+struct NudgePrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(ColorTheme.cardBackground)
+            .background(
+                ColorTheme.primaryNudge,
+                in: RoundedRectangle(cornerRadius: 17, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 17, style: .continuous)
+                    .stroke(ColorTheme.cardBackground.opacity(0.12), lineWidth: 1)
+            }
+            .shadow(
+                color: ColorTheme.primaryNudge.opacity(configuration.isPressed ? 0.08 : 0.15),
+                radius: configuration.isPressed ? 3 : 7,
+                y: configuration.isPressed ? 1 : 3
+            )
+            .scaleEffect(configuration.isPressed ? 0.985 : 1)
+            .opacity(configuration.isPressed ? 0.9 : 1)
+            .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
     }
 }
 
@@ -111,9 +283,9 @@ struct NudgeTextAction: View {
                 .foregroundStyle(foreground)
                 .padding(.horizontal, 13)
                 .frame(minHeight: 44)
-                .background(background, in: Capsule())
+                .background(background, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(NudgePressableButtonStyle())
         .accessibilityIdentifier(accessibilityIdentifier)
     }
 }
@@ -131,8 +303,7 @@ struct NudgeSelectionIndicator: View {
                     lineWidth: 1.5
                 )
             if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 10, weight: .bold))
+                NudgeAssetIcon(name: "glyph_success", size: 13)
                     .foregroundStyle(ColorTheme.cardBackground)
             }
         }
@@ -142,36 +313,36 @@ struct NudgeSelectionIndicator: View {
 }
 
 struct NudgeSelectionActionBar: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let selectedCount: Int
     let onDelete: () -> Void
 
     var body: some View {
-        HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(L10n.Selection.count(selectedCount))
-                    .pretendard(.headline, weight: .semibold)
-                    .foregroundStyle(ColorTheme.primaryText)
-                    .accessibilityIdentifier("selection.count")
-                Text(L10n.Selection.dragHint)
-                    .pretendard(.caption)
-                    .foregroundStyle(ColorTheme.secondaryText)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    NudgeSelectionSummary(selectedCount: selectedCount)
+                    NudgeSelectionDeleteButton(
+                        selectedCount: selectedCount,
+                        action: onDelete
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+            } else {
+                HStack(spacing: 14) {
+                    NudgeSelectionSummary(selectedCount: selectedCount)
+                    Spacer(minLength: 8)
+                    NudgeSelectionDeleteButton(
+                        selectedCount: selectedCount,
+                        action: onDelete
+                    )
+                }
             }
-            Spacer()
-            Button(action: onDelete) {
-                Text(L10n.Selection.deleteAction(selectedCount))
-                    .pretendard(.subheadline, weight: .semibold)
-                    .foregroundStyle(ColorTheme.cardBackground)
-                    .padding(.horizontal, 18)
-                    .frame(minHeight: 44)
-                    .background(ColorTheme.destructive, in: Capsule())
-            }
-            .buttonStyle(.plain)
-            .disabled(selectedCount == 0)
-            .opacity(selectedCount == 0 ? 0.45 : 1)
-            .accessibilityIdentifier("selection.delete")
         }
         .padding(.horizontal, 18)
-        .padding(.vertical, 12)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
         .background(ColorTheme.elevatedBackground)
         .overlay(alignment: .top) {
             Rectangle()
@@ -181,35 +352,87 @@ struct NudgeSelectionActionBar: View {
     }
 }
 
+private struct NudgeSelectionSummary: View {
+    let selectedCount: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(L10n.Selection.count(selectedCount))
+                .pretendard(.headline, weight: .semibold)
+                .foregroundStyle(ColorTheme.primaryText)
+                .accessibilityIdentifier("selection.count")
+            Text(L10n.Selection.dragHint)
+                .pretendard(.caption)
+                .foregroundStyle(ColorTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+private struct NudgeSelectionDeleteButton: View {
+    let selectedCount: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(L10n.Selection.deleteAction(selectedCount))
+                .pretendard(.subheadline, weight: .semibold)
+                .foregroundStyle(ColorTheme.cardBackground)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 18)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .background(ColorTheme.destructive, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .fixedSize(horizontal: false, vertical: true)
+        .disabled(selectedCount == 0)
+        .opacity(selectedCount == 0 ? 0.45 : 1)
+        .accessibilityIdentifier("selection.delete")
+    }
+}
+
 struct NudgeCardSurface: ViewModifier {
     let isSelected: Bool
 
     func body(content: Content) -> some View {
         content
-            .padding(16)
-            .background(
-                isSelected ? ColorTheme.selectionFill : ColorTheme.cardBackground,
-                in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-            )
+            .padding(NudgeLayoutMetrics.cardPadding)
+            .background {
+                RoundedRectangle(cornerRadius: NudgeLayoutMetrics.cardCornerRadius, style: .continuous)
+                    .fill(isSelected ? ColorTheme.selectionFill : ColorTheme.cardBackground)
+            }
             .overlay {
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                RoundedRectangle(cornerRadius: NudgeLayoutMetrics.cardCornerRadius, style: .continuous)
                     .stroke(
-                        isSelected ? ColorTheme.primaryNudge.opacity(0.8) : ColorTheme.separator.opacity(0.45),
-                        lineWidth: isSelected ? 1.5 : 1
+                        isSelected ? ColorTheme.primaryNudge.opacity(0.8) : ColorTheme.separator.opacity(0.34),
+                        lineWidth: isSelected ? 1.5 : 0.8
                     )
                     .allowsHitTesting(false)
             }
             .shadow(
-                color: ColorTheme.primaryText.opacity(isSelected ? 0.09 : 0.055),
-                radius: isSelected ? 14 : 9,
-                y: 4
+                color: ColorTheme.primaryText.opacity(isSelected ? 0.09 : 0.045),
+                radius: isSelected ? 14 : 8,
+                y: 3
             )
+    }
+}
+
+private struct NudgeFormStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .scrollContentBackground(.hidden)
+            .background(NudgeScreenBackground())
+            .tint(ColorTheme.primaryNudge)
     }
 }
 
 extension View {
     func nudgeCardSurface(isSelected: Bool = false) -> some View {
         modifier(NudgeCardSurface(isSelected: isSelected))
+    }
+
+    func nudgeFormStyle() -> some View {
+        modifier(NudgeFormStyle())
     }
 
     func nudgeSelectionFrame(id: UUID) -> some View {

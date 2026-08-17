@@ -10,7 +10,9 @@ struct NudgeMateApp: App {
     init() {
         let state = AppState()
         modelContainerResult = Result {
-            let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+            let processInfo = ProcessInfo.processInfo
+            let isRunningTests = processInfo.environment["XCTestConfigurationFilePath"] != nil
+                || processInfo.arguments.contains("--ui-testing")
             let container = try PersistenceController.makeContainer(inMemory: isRunningTests)
 #if DEBUG
             try UITestScenarioConfigurator.configureIfNeeded(modelContainer: container)
