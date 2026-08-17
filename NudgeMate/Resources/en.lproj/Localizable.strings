@@ -81,18 +81,34 @@
 "recap.action.snoozed" = "Snoozed";
 
 "onboarding.welcome.title" = "Stay ahead of the things that matter";
-"onboarding.welcome.message" = "NudgeMate is your personal scheduling assistant for recurring routines and important preparation.";
+"onboarding.welcome.message" = "See recurring routines and important preparations before they become urgent.";
 "onboarding.rhythm.title" = "Discover your scheduling rhythm";
 "onboarding.rhythm.message" = "Event titles and dates are analyzed on this device to predict what comes next. Your analysis never leaves the device.";
 "onboarding.permission.title" = "Scan only calendars you choose";
 "onboarding.permission.message" = "After granting full access, you choose what to analyze. Birthdays, holidays, and subscribed calendars are excluded by default.";
 "onboarding.permission.scan" = "Find Rhythms in Calendar";
 "onboarding.permission.manual" = "Start by Adding Manually";
+"onboarding.preview.week" = "Second week of August";
+"onboarding.preview.count" = "2 things coming up";
+"onboarding.preview.days" = "Mon,Tue,Wed,Thu,Fri";
+"onboarding.preview.personalCare.interval" = "About every 35 days";
+"onboarding.preview.personalCare.title" = "Hair appointment";
+"onboarding.preview.personalCare.timing" = "Next week is your usual time";
+"onboarding.preview.vehicle.interval" = "About every 120 days";
+"onboarding.preview.vehicle.title" = "Vehicle inspection";
+"onboarding.preview.vehicle.timing" = "In 3 weeks is your usual time";
+"onboarding.preview.accessibility" = "Preview showing the next likely dates for a hair appointment and vehicle inspection";
+"onboarding.selection.count" = "%d selected";
+"onboarding.selection.privacy" = "Analysis happens only on this device";
 
 "calendar.selection.title" = "Choose Calendars";
 "calendar.selection.loading" = "Loading calendars…";
 "calendar.selection.message" = "Select only the calendars to scan for patterns. Analysis stays on this device.";
 "calendar.selection.scan" = "Scan %d Calendars";
+"calendar.selection.scanOne" = "Scan 1 Calendar";
+"calendar.source.default" = "Default";
+"calendar.source.other" = "Other";
+"calendar.source.subscribed" = "Subscribed Calendars";
 "calendar.scan.progress" = "Calendar scan progress";
 "calendar.exclusion.birthdays" = "Birthdays excluded by default";
 "calendar.exclusion.holidays" = "Holidays excluded by default";
@@ -175,6 +191,19 @@
 "home.nudge.emptyTitle" = "Nothing to Predict Yet";
 "home.nudge.emptyMessage" = "Once an event appears at least twice in your calendar, we can suggest its next occurrence.";
 "home.calendarAdded" = "%@ was added to your calendar.";
+"home.today.greeting" = "Good morning";
+"home.today.itemCount" = "%d today";
+"home.today.summaryLabel" = "TODAY'S NUDGE";
+"home.today.summaryTitle" = "Just %d things will be enough for today.";
+"home.today.summaryDuration" = "About 20 min to prepare";
+"home.today.prepSection" = "Prepare first";
+"home.today.rhythmSection" = "Your rhythms are back";
+"home.today.viewAll" = "View all";
+"home.today.nextAction" = "Next · %@";
+"home.today.continuePrep" = "Continue prep";
+"home.today.interval" = "About every %d days";
+"home.today.expectedDate" = "%@ is your usual time";
+"home.today.schedule" = "Schedule";
 
 "nudge.card.interval" = "About every %d days · %@";
 "nudge.action.enable" = "Enable";

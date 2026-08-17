@@ -208,10 +208,10 @@ private struct PrepListContent: View {
                 action: onAdd
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, NudgeLayoutMetrics.screenHorizontalPadding)
         } else {
             ScrollView {
-                LazyVStack(spacing: 12) {
+                LazyVStack(spacing: NudgeLayoutMetrics.listSpacing) {
                     ForEach(preps) { prep in
                         PrepCard(
                             prep: prep,
@@ -224,7 +224,8 @@ private struct PrepListContent: View {
                         .nudgeSelectionFrame(id: prep.id)
                     }
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, NudgeLayoutMetrics.listHorizontalPadding)
+                .padding(.top, 1)
                 .padding(.bottom, NudgeLayoutMetrics.listBottomClearance)
             }
             .scrollIndicators(.hidden)
@@ -250,74 +251,20 @@ private struct PrepCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 10) {
-                Button(action: onOpen) {
-                    HStack(spacing: 14) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(ColorTheme.brandSoft)
-                            NudgeSymbolImage(symbol: .calendar, pointSize: 24)
-                        }
-                        .frame(width: 54, height: 54)
-                        .accessibilityHidden(true)
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(dayLabel)
-                                .pretendard(.caption2, weight: .bold)
-                                .foregroundStyle(dayLabelColor)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(dayLabelColor.opacity(0.13), in: Capsule())
-                            Text(prep.title)
-                                .pretendard(.headline, weight: .semibold)
-                                .foregroundStyle(ColorTheme.primaryText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(prep.targetDate, format: .dateTime.month(.abbreviated).day().weekday(.abbreviated))
-                                .pretendard(.subheadline)
-                                .foregroundStyle(ColorTheme.secondaryText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-
-                if isSelecting {
-                    Button(action: onOpen) {
-                        NudgeSelectionIndicator(isSelected: isSelected)
-                            .frame(width: 44, height: 44)
-                            .contentShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(isSelected ? L10n.Selection.deselect : L10n.Selection.select)
-                } else {
-                    Menu {
-                        Button(L10n.Common.delete, role: .destructive, action: onDelete)
-                    } label: {
-                        VStack(spacing: 2) {
-                            Image(systemName: "ellipsis")
-                                .font(.system(size: 16, weight: .semibold))
-                            Text(L10n.Common.moreActions)
-                                .pretendard(.caption2, weight: .medium)
-                        }
-                        .foregroundStyle(ColorTheme.secondaryText)
-                        .frame(minWidth: 54, minHeight: 48)
-                        .background(ColorTheme.backgroundDeep.opacity(0.75), in: Capsule())
-                    }
-                    .accessibilityLabel(L10n.Common.moreActions)
-                }
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            PrepCardHeader(
+                title: prep.title,
+                targetDate: prep.targetDate,
+                dayLabel: dayLabel,
+                dayLabelColor: dayLabelColor,
+                isSelecting: isSelecting,
+                isSelected: isSelected,
+                onOpen: onOpen,
+                onDelete: onDelete
+            )
 
             if !prep.nextActionNote.isEmpty {
-                Text(prep.nextActionNote)
-                    .pretendard(.caption)
-                    .foregroundStyle(ColorTheme.secondarySnooze)
-                    .lineLimit(2)
-                    .padding(.horizontal, 11)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(ColorTheme.backgroundDeep.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+                PrepNextActionNote(text: prep.nextActionNote)
             }
 
             if !isSelecting && prep.status != .ready && prep.targetDate >= .now {
@@ -340,29 +287,193 @@ private struct PrepCard: View {
     }
 }
 
+private struct PrepCardHeader: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let title: String
+    let targetDate: Date
+    let dayLabel: String
+    let dayLabelColor: Color
+    let isSelecting: Bool
+    let isSelected: Bool
+    let onOpen: () -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        HStack(alignment: dynamicTypeSize.isAccessibilitySize ? .top : .center, spacing: 10) {
+            Button(action: onOpen) {
+                HStack(alignment: dynamicTypeSize.isAccessibilitySize ? .top : .center, spacing: 12) {
+                    NudgeSymbolBadge(
+                        symbol: .calendar,
+                        size: NudgeLayoutMetrics.cardHeaderIconSize
+                    )
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(title)
+                            .pretendard(.headline, weight: .semibold)
+                            .foregroundStyle(ColorTheme.primaryText)
+                            .lineLimit(2)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        PrepDateMetadata(
+                            targetDate: targetDate,
+                            dayLabel: dayLabel,
+                            dayLabelColor: dayLabelColor
+                        )
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if isSelecting {
+                Button(action: onOpen) {
+                    NudgeSelectionIndicator(isSelected: isSelected)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(isSelected ? L10n.Selection.deselect : L10n.Selection.select)
+            } else {
+                Menu {
+                    Button(L10n.Common.delete, role: .destructive, action: onDelete)
+                } label: {
+                    NudgeMoreActionLabel()
+                }
+                .accessibilityLabel(L10n.Common.moreActions)
+                .accessibilityIdentifier("prep.card.moreActions")
+            }
+        }
+    }
+}
+
+private struct PrepDateMetadata: View {
+    let targetDate: Date
+    let dayLabel: String
+    let dayLabelColor: Color
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 7) {
+                dayBadge
+                dateLabel
+            }
+
+            VStack(alignment: .leading, spacing: 5) {
+                dayBadge
+                dateLabel
+            }
+        }
+    }
+
+    private var dayBadge: some View {
+        Text(dayLabel)
+            .pretendard(.caption2, weight: .bold)
+            .foregroundStyle(dayLabelColor)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(dayLabelColor.opacity(0.12), in: Capsule())
+    }
+
+    private var dateLabel: some View {
+        Text(targetDate, format: .dateTime.month(.abbreviated).day().weekday(.abbreviated))
+            .pretendard(.caption)
+            .foregroundStyle(ColorTheme.secondaryText)
+            .lineLimit(2)
+            .minimumScaleFactor(0.85)
+    }
+}
+
+private struct PrepNextActionNote: View {
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            NudgeAssetIcon(name: "glyph_next", size: 15)
+                .foregroundStyle(ColorTheme.secondarySnooze)
+            Text(text)
+                .pretendard(.caption)
+                .foregroundStyle(ColorTheme.secondarySnooze)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, 11)
+        .padding(.vertical, 9)
+        .background(
+            ColorTheme.secondarySnooze.opacity(0.07),
+            in: RoundedRectangle(cornerRadius: 13, style: .continuous)
+        )
+    }
+}
+
 private struct PrepReadinessControl: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let selection: PrepStatus
     let onSelectionChanged: (PrepStatus) -> Void
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(PrepStatus.allCases) { status in
-                Button {
-                    onSelectionChanged(status)
-                } label: {
-                    Text(status.localizedTitle)
-                        .pretendard(.caption2, weight: selection == status ? .bold : .medium)
-                        .foregroundStyle(
-                            selection == status ? ColorTheme.cardBackground : ColorTheme.secondaryText
-                        )
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(
-                            selection == status ? ColorTheme.primaryNudge : ColorTheme.backgroundDeep,
-                            in: Capsule()
-                        )
+        if dynamicTypeSize.isAccessibilitySize {
+            Menu {
+                ForEach(PrepStatus.allCases) { status in
+                    Button(status.localizedTitle) {
+                        onSelectionChanged(status)
+                    }
                 }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(selection == status ? .isSelected : [])
+            } label: {
+                HStack(spacing: 10) {
+                    Capsule()
+                        .fill(ColorTheme.cardBackground.opacity(0.58))
+                        .frame(width: 4, height: 22)
+
+                    Text(selection.localizedTitle)
+                        .pretendard(.subheadline, weight: .bold)
+                        .lineLimit(2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    NudgeAssetIcon(name: "glyph_disclosure", size: 17)
+                        .rotationEffect(.degrees(90))
+                }
+                .foregroundStyle(ColorTheme.cardBackground)
+                .padding(.horizontal, 15)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .background(
+                    ColorTheme.primaryNudge,
+                    in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(selection.localizedTitle)
+            .accessibilityIdentifier("prep.status.menu")
+        } else {
+            HStack(spacing: 5) {
+                ForEach(PrepStatus.allCases) { status in
+                    Button {
+                        onSelectionChanged(status)
+                    } label: {
+                        Text(status.localizedTitle)
+                            .pretendard(.caption2, weight: selection == status ? .bold : .medium)
+                            .foregroundStyle(
+                                selection == status ? ColorTheme.cardBackground : ColorTheme.secondaryText
+                            )
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .background(
+                                selection == status ? ColorTheme.primaryNudge : ColorTheme.backgroundDeep,
+                                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            )
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(
+                                        selection == status ? Color.clear : ColorTheme.separator.opacity(0.16),
+                                        lineWidth: 0.8
+                                    )
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selection == status ? .isSelected : [])
+                }
             }
         }
     }
@@ -420,6 +531,7 @@ struct PrepEditorView: View {
                 }
             }
             .pretendard(.body)
+            .nudgeFormStyle()
             .navigationTitle(prep == nil ? L10n.Prep.Editor.newTitle : L10n.Prep.Editor.editTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

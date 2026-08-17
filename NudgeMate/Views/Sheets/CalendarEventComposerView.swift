@@ -91,6 +91,7 @@ struct CalendarEventComposerView: View {
                 )
             }
             .pretendard(.body)
+            .nudgeFormStyle()
             .navigationTitle(
                 rhythm == nil
                     ? L10n.Calendar.Composer.newTitle

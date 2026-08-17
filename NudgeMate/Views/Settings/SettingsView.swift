@@ -33,6 +33,7 @@ struct SettingsView: View {
                 aboutSection
             }
             .pretendard(.body)
+            .nudgeFormStyle()
             .navigationTitle(L10n.Settings.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -67,9 +68,7 @@ struct SettingsView: View {
                                 .pretendard(.headline, weight: .semibold)
                                 .frame(maxWidth: .infinity, minHeight: 52)
                         }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.white)
-                        .background(ColorTheme.primaryNudge, in: Capsule())
+                        .buttonStyle(NudgePrimaryButtonStyle())
                     }
                 }
                 .padding(24)
@@ -113,16 +112,10 @@ struct SettingsView: View {
 
     private var accountSection: some View {
         Section(L10n.Settings.Sync.title) {
-            HStack {
-                Label {
-                    Text(L10n.Settings.Sync.appleCalendar)
-                } icon: {
-                    NudgeSymbolBadge(symbol: .calendar, size: 28)
-                }
-                Spacer()
-                Text(calendarStatusText)
-                    .foregroundStyle(calendarState == .fullAccess ? ColorTheme.success : ColorTheme.secondaryText)
-            }
+            SettingsCalendarConnectionRow(
+                status: calendarStatusText,
+                isConnected: calendarState == .fullAccess
+            )
             Button(L10n.Settings.Sync.chooseCalendars) {
                 if calendarState == .fullAccess {
                     isCalendarFlowPresented = true
@@ -392,6 +385,42 @@ struct SettingsView: View {
     }
 }
 
+private struct SettingsCalendarConnectionRow: View {
+    let status: String
+    let isConnected: Bool
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                calendarLabel
+                Spacer(minLength: 8)
+                statusLabel
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                calendarLabel
+                statusLabel
+                    .padding(.leading, 38)
+            }
+        }
+    }
+
+    private var calendarLabel: some View {
+        Label {
+            Text(L10n.Settings.Sync.appleCalendar)
+                .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            NudgeSymbolBadge(symbol: .calendar, size: 28)
+        }
+    }
+
+    private var statusLabel: some View {
+        Text(status)
+            .foregroundStyle(isConnected ? ColorTheme.success : ColorTheme.secondaryText)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+}
+
 private struct PrivacyInformationView: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -399,7 +428,7 @@ private struct PrivacyInformationView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    NudgeSymbolBadge(symbol: .privacy, size: 120)
+                    NudgeSymbolBadge(symbol: .privacy, size: 108)
                         .frame(maxWidth: .infinity)
                     Text(L10n.Settings.Privacy.Info.title)
                         .pretendard(.title2, weight: .bold)
@@ -409,6 +438,7 @@ private struct PrivacyInformationView: View {
                 }
                 .padding(24)
             }
+            .background(NudgeScreenBackground())
             .navigationTitle(L10n.Settings.Privacy.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

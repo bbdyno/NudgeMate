@@ -25,10 +25,18 @@ struct CalendarDiscoveryFlowView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
+            ZStack {
+                NudgeScreenBackground()
+
                 switch step {
                 case .selection:
-                    selectionView
+                    CalendarSelectionScreen(
+                        calendars: calendars,
+                        selection: $selection,
+                        isLoading: isLoading,
+                        scanProgress: scanProgress,
+                        onScan: { Task { await scan() } }
+                    )
                 case .review:
                     CandidateReviewView {
                         do {
@@ -44,14 +52,14 @@ struct CalendarDiscoveryFlowView: View {
                     }
                 }
             }
-            .background(ColorTheme.background.ignoresSafeArea())
-            .navigationTitle(step == .selection ? L10n.Calendar.Selection.title : L10n.Candidate.title)
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(L10n.Common.close) { dismiss() }
+                        .pretendard(.subheadline, weight: .semibold)
+                        .foregroundStyle(ColorTheme.primaryNudge)
                 }
             }
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
         .task { await requestAndLoadCalendars() }
         .alert(L10n.Common.error, isPresented: Binding(
@@ -66,82 +74,6 @@ struct CalendarDiscoveryFlowView: View {
         } message: {
             Text(errorMessage ?? "")
         }
-    }
-
-    private var selectionView: some View {
-        VStack(spacing: 0) {
-            if isLoading {
-                Spacer()
-                ProgressView(L10n.Calendar.Selection.loading)
-                    .tint(ColorTheme.primaryNudge)
-                Spacer()
-            } else {
-                List {
-                    Section {
-                        Text(L10n.Calendar.Selection.message)
-                            .pretendard(.subheadline)
-                            .foregroundStyle(ColorTheme.secondaryText)
-                    }
-
-                    ForEach(groupedSources, id: \.0) { source, values in
-                        Section(source) {
-                            ForEach(values) { calendar in
-                                Toggle(isOn: binding(for: calendar.identifier)) {
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        Text(calendar.title)
-                                            .pretendard(.body)
-                                        if let reason = calendar.defaultExclusionReason {
-                                            Text(reason.localizedExplanation)
-                                                .pretendard(.caption)
-                                                .foregroundStyle(ColorTheme.secondaryText)
-                                        }
-                                    }
-                                }
-                                .tint(ColorTheme.primaryNudge)
-                            }
-                        }
-                    }
-                }
-                .listStyle(.insetGrouped)
-
-                VStack(spacing: 10) {
-                    if scanProgress > 0 {
-                        ProgressView(value: scanProgress)
-                            .tint(ColorTheme.primaryNudge)
-                            .accessibilityLabel(L10n.Calendar.Scan.progress)
-                    }
-                    Button {
-                        Task { await scan() }
-                    } label: {
-                        Text(L10n.Calendar.Selection.scan(selection.count))
-                            .pretendard(.headline, weight: .semibold)
-                            .frame(maxWidth: .infinity, minHeight: 52)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.white)
-                    .background(ColorTheme.primaryNudge, in: Capsule())
-                    .disabled(selection.isEmpty || scanProgress > 0)
-                    .opacity(selection.isEmpty ? 0.45 : 1)
-                }
-                .padding(20)
-                .background(.bar)
-            }
-        }
-    }
-
-    private var groupedSources: [(String, [CalendarDescriptor])] {
-        Dictionary(grouping: calendars, by: \.sourceTitle)
-            .map { ($0.key, $0.value.sorted { $0.title < $1.title }) }
-            .sorted { $0.0 < $1.0 }
-    }
-
-    private func binding(for id: String) -> Binding<Bool> {
-        Binding(
-            get: { selection.contains(id) },
-            set: { isSelected in
-                if isSelected { selection.insert(id) } else { selection.remove(id) }
-            }
-        )
     }
 
     private func requestAndLoadCalendars() async {
@@ -191,6 +123,265 @@ struct CalendarDiscoveryFlowView: View {
             scanProgress = 0
             errorMessage = error.localizedDescription
         }
+    }
+}
+
+private struct CalendarSelectionScreen: View {
+    let calendars: [CalendarDescriptor]
+    @Binding var selection: Set<String>
+    let isLoading: Bool
+    let scanProgress: Double
+    let onScan: () -> Void
+
+    private var groupedSources: [(String, [CalendarDescriptor])] {
+        Dictionary(grouping: calendars, by: \.sourceTitle)
+            .map { ($0.key, $0.value.sorted { $0.title < $1.title }) }
+            .sorted { $0.0 < $1.0 }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            CalendarSelectionHeader(selectedCount: selection.count)
+
+            if isLoading {
+                Spacer()
+                ProgressView(L10n.Calendar.Selection.loading)
+                    .pretendard(.body)
+                    .tint(ColorTheme.primaryNudge)
+                Spacer()
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 22) {
+                        ForEach(groupedSources, id: \.0) { source, values in
+                            CalendarSourceGroup(
+                                source: source,
+                                calendars: values,
+                                selection: $selection
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 24)
+                    .padding(.bottom, 20)
+                }
+                .scrollIndicators(.hidden)
+
+                CalendarScanAction(
+                    selectedCount: selection.count,
+                    progress: scanProgress,
+                    action: onScan
+                )
+            }
+        }
+        .accessibilityIdentifier("calendar.selection.screen")
+    }
+}
+
+private struct CalendarSelectionHeader: View {
+    let selectedCount: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(L10n.Calendar.Selection.title)
+                    .pretendard(.largeTitle, weight: .bold)
+                    .foregroundStyle(ColorTheme.primaryText)
+
+                Spacer(minLength: 8)
+
+                Text(L10n.Onboarding.Selection.count(selectedCount))
+                    .pretendard(.caption, weight: .bold)
+                    .foregroundStyle(ColorTheme.primaryNudge)
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 32)
+                    .background(ColorTheme.brandSoft, in: Capsule())
+            }
+
+            Text(L10n.Onboarding.Permission.title)
+                .pretendard(.title3, weight: .bold)
+                .foregroundStyle(ColorTheme.primaryText)
+
+            Text(L10n.Calendar.Selection.message)
+                .pretendard(.subheadline)
+                .foregroundStyle(ColorTheme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(ColorTheme.success)
+                    .frame(width: 8, height: 8)
+                Text(L10n.Onboarding.Selection.privacy)
+                    .pretendard(.caption, weight: .semibold)
+                    .foregroundStyle(ColorTheme.success)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+        .padding(.bottom, 20)
+    }
+}
+
+private struct CalendarSourceGroup: View {
+    let source: String
+    let calendars: [CalendarDescriptor]
+    @Binding var selection: Set<String>
+
+    private var localizedSource: String {
+        switch source {
+        case "Default":
+            L10n.Calendar.Source.default
+        case "Other":
+            L10n.Calendar.Source.other
+        case "Subscribed Calendars":
+            L10n.Calendar.Source.subscribed
+        default:
+            source
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(localizedSource)
+                .pretendard(.caption, weight: .bold)
+                .foregroundStyle(ColorTheme.secondaryText)
+                .padding(.leading, 4)
+
+            VStack(spacing: 0) {
+                ForEach(Array(calendars.enumerated()), id: \.element.id) { index, calendar in
+                    CalendarSelectionRow(
+                        calendar: calendar,
+                        isSelected: selection.contains(calendar.identifier)
+                    ) {
+                        toggle(calendar.identifier)
+                    }
+
+                    if index < calendars.count - 1 {
+                        Rectangle()
+                            .fill(ColorTheme.separator)
+                            .frame(height: 1)
+                            .padding(.leading, 55)
+                    }
+                }
+            }
+            .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(ColorTheme.separator, lineWidth: 1)
+            }
+        }
+    }
+
+    private func toggle(_ id: String) {
+        if selection.contains(id) {
+            selection.remove(id)
+        } else {
+            selection.insert(id)
+        }
+    }
+}
+
+private struct CalendarSelectionRow: View {
+    let calendar: CalendarDescriptor
+    let isSelected: Bool
+    let action: () -> Void
+
+    private var dotColor: Color {
+        ColorTheme.primaryNudge
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 13) {
+                Circle()
+                    .fill(dotColor)
+                    .frame(width: 12, height: 12)
+                    .frame(width: 30, height: 30)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(calendar.title)
+                        .pretendard(.body, weight: .semibold)
+                        .foregroundStyle(ColorTheme.primaryText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    if let reason = calendar.defaultExclusionReason {
+                        Text(reason.localizedExplanation)
+                            .pretendard(.caption)
+                            .foregroundStyle(ColorTheme.secondaryText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+
+                CalendarSelectionCheck(isSelected: isSelected)
+            }
+            .padding(.horizontal, 14)
+            .frame(minHeight: 64)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+private struct CalendarSelectionCheck: View {
+    let isSelected: Bool
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(isSelected ? ColorTheme.primaryNudge : Color.clear)
+            Circle()
+                .stroke(isSelected ? ColorTheme.primaryNudge : ColorTheme.separator, lineWidth: 1.5)
+
+            if isSelected {
+                CalendarCheckMark()
+                    .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                    .padding(6)
+            }
+        }
+        .frame(width: 26, height: 26)
+    }
+}
+
+private struct CalendarCheckMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+        path.addLine(to: CGPoint(x: rect.midX * 0.94, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        return path
+    }
+}
+
+private struct CalendarScanAction: View {
+    let selectedCount: Int
+    let progress: Double
+    let action: () -> Void
+
+    var body: some View {
+        VStack(spacing: 10) {
+            if progress > 0 {
+                ProgressView(value: progress)
+                    .tint(ColorTheme.primaryNudge)
+                    .accessibilityLabel(L10n.Calendar.Scan.progress)
+            }
+
+            Button(action: action) {
+                Text(
+                    selectedCount == 1
+                        ? L10n.Calendar.Selection.scanOne
+                        : L10n.Calendar.Selection.scan(selectedCount)
+                )
+                    .pretendard(.headline, weight: .bold)
+                    .frame(maxWidth: .infinity, minHeight: 54)
+            }
+            .buttonStyle(NudgePrimaryButtonStyle())
+            .disabled(selectedCount == 0 || progress > 0)
+            .opacity(selectedCount == 0 ? 0.45 : 1)
+            .accessibilityIdentifier("calendar.selection.scan")
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 14)
     }
 }
 
@@ -253,9 +444,7 @@ private struct CandidateReviewView: View {
                         .pretendard(.headline, weight: .semibold)
                         .frame(maxWidth: .infinity, minHeight: 52)
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.white)
-                .background(ColorTheme.primaryNudge, in: Capsule())
+                .buttonStyle(NudgePrimaryButtonStyle())
                 .padding(.top, 10)
             }
             .padding(20)
@@ -387,14 +576,17 @@ private struct CandidateCard: View {
                 .pretendard(.headline, weight: .semibold)
                 .textFieldStyle(.roundedBorder)
 
-            HStack {
-                Label {
-                    Text(L10n.Candidate.interval(Int(candidate.medianIntervalDays.rounded())))
-                } icon: {
-                    NudgeSymbolImage(symbol: .calendar, pointSize: 20)
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    intervalLabel
+                    Spacer(minLength: 10)
+                    sampleLabel
                 }
-                Spacer()
-                Text(L10n.Candidate.samples(candidate.sampleCount))
+
+                VStack(alignment: .leading, spacing: 7) {
+                    intervalLabel
+                    sampleLabel
+                }
             }
             .pretendard(.subheadline)
             .foregroundStyle(ColorTheme.secondaryText)
@@ -406,21 +598,51 @@ private struct CandidateCard: View {
             }
             .pickerStyle(.menu)
 
-            HStack(spacing: 10) {
-                Button(L10n.Common.reject, action: onReject)
-                    .buttonStyle(.bordered)
-                    .tint(ColorTheme.secondaryText)
-                Button(L10n.Common.accept) {
-                    onAccept(name, category)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) {
+                    Spacer(minLength: 0)
+                    rejectButton
+                    acceptButton
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(ColorTheme.primaryNudge)
-                .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                VStack(spacing: 8) {
+                    acceptButton
+                        .frame(maxWidth: .infinity)
+                    rejectButton
+                        .frame(maxWidth: .infinity)
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(16)
-        .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .nudgeCardSurface()
+    }
+
+    private var intervalLabel: some View {
+        Label {
+            Text(L10n.Candidate.interval(Int(candidate.medianIntervalDays.rounded())))
+                .fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            NudgeSymbolImage(symbol: .calendar, pointSize: 20)
+        }
+    }
+
+    private var sampleLabel: some View {
+        Text(L10n.Candidate.samples(candidate.sampleCount))
+            .fixedSize(horizontal: true, vertical: false)
+    }
+
+    private var rejectButton: some View {
+        Button(L10n.Common.reject, action: onReject)
+            .buttonStyle(.bordered)
+            .tint(ColorTheme.secondaryText)
+    }
+
+    private var acceptButton: some View {
+        Button(L10n.Common.accept) {
+            onAccept(name, category)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(ColorTheme.primaryNudge)
+        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 }
 

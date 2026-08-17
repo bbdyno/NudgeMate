@@ -26,24 +26,24 @@ enum NudgeSymbol {
     case privacy
     case category(RhythmCategory)
 
-    var systemName: String {
+    var assetName: String {
         switch self {
         case .calendar:
-            "calendar"
+            "glyph_calendar"
         case .reminder:
-            "bell.badge.fill"
+            "glyph_reminder"
         case .empty:
-            "tray.fill"
+            "glyph_empty"
         case .refresh:
-            "arrow.triangle.2.circlepath"
+            "glyph_tab_rhythms"
         case .success:
-            "checkmark.circle.fill"
+            "glyph_success"
         case .pro:
-            "crown.fill"
+            "glyph_pro"
         case .privacy:
-            "lock.shield.fill"
+            "glyph_privacy"
         case let .category(category):
-            category.systemSymbolName
+            category.iconAssetName
         }
     }
 
@@ -77,14 +77,30 @@ enum NudgeSymbol {
         case .empty:
             ColorTheme.backgroundDeep
         case .refresh:
-            ColorTheme.accentSky.opacity(0.15)
+            ColorTheme.brandSoft
         case .success:
             ColorTheme.success.opacity(0.15)
         case .pro:
             ColorTheme.proAccent.opacity(0.16)
         case let .category(category):
-            category.symbolTint.opacity(0.15)
+            category == .health
+                ? ColorTheme.selectionFill
+                : ColorTheme.brandSoft
         }
+    }
+}
+
+struct NudgeAssetIcon: View {
+    let name: String
+    let size: CGFloat
+
+    var body: some View {
+        Image(name)
+            .resizable()
+            .renderingMode(.template)
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
     }
 }
 
@@ -93,9 +109,7 @@ struct NudgeSymbolImage: View {
     let pointSize: CGFloat
 
     var body: some View {
-        Image(systemName: symbol.systemName)
-            .font(.system(size: pointSize, weight: .semibold))
-            .symbolRenderingMode(.hierarchical)
+        NudgeAssetIcon(name: symbol.assetName, size: pointSize)
             .foregroundStyle(symbol.tint)
             .accessibilityHidden(true)
     }
@@ -106,56 +120,61 @@ struct NudgeSymbolBadge: View {
     let size: CGFloat
 
     var body: some View {
-        NudgeSymbolImage(symbol: symbol, pointSize: size * 0.45)
+        NudgeSymbolImage(symbol: symbol, pointSize: size * 0.53)
             .frame(width: size, height: size)
             .background(
                 symbol.background,
-                in: RoundedRectangle(cornerRadius: size * 0.30, style: .continuous)
+                in: RoundedRectangle(cornerRadius: size * 0.29, style: .continuous)
             )
-            .accessibilityHidden(true)
+        .frame(width: size, height: size)
+        .overlay {
+            RoundedRectangle(cornerRadius: size * 0.31, style: .continuous)
+                .stroke(symbol.tint.opacity(0.08), lineWidth: 1)
+        }
+        .accessibilityHidden(true)
     }
 }
 
 extension RhythmCategory {
-    var systemSymbolName: String {
+    var iconAssetName: String {
         switch self {
         case .personalCare:
-            "sparkles"
+            "glyph_personal_care"
         case .health:
-            "heart.fill"
+            "glyph_health"
         case .vehicle:
-            "car.fill"
+            "glyph_vehicle"
         case .home:
-            "house.fill"
+            "glyph_home"
         case .pet:
-            "pawprint.fill"
+            "glyph_pet"
         case .finance:
-            "creditcard.fill"
+            "glyph_finance"
         case .work:
-            "briefcase.fill"
+            "glyph_work"
         case .other:
-            "square.grid.2x2.fill"
+            "glyph_other"
         }
     }
 
     var symbolTint: Color {
         switch self {
         case .personalCare:
-            ColorTheme.accentLavender
+            ColorTheme.primaryNudge
         case .health:
             ColorTheme.accentCoral
         case .vehicle:
-            ColorTheme.accentSky
+            ColorTheme.primaryNudge
         case .home:
-            ColorTheme.accentAmber
+            ColorTheme.primaryNudge
         case .pet:
-            ColorTheme.accentLavender
+            ColorTheme.primaryNudge
         case .finance:
-            ColorTheme.success
+            ColorTheme.primaryNudge
         case .work:
             ColorTheme.primaryNudge
         case .other:
-            ColorTheme.secondaryText
+            ColorTheme.primaryNudge
         }
     }
 }

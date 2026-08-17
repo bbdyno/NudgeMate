@@ -81,18 +81,34 @@
 "recap.action.snoozed" = "已推迟";
 
 "onboarding.welcome.title" = "重要事项，提前为你提醒";
-"onboarding.welcome.message" = "NudgeMate 是帮助你管理周期日程和重要准备的个人日程助手。";
+"onboarding.welcome.message" = "在事情变得紧迫前，提前提醒周期日程和重要准备。";
 "onboarding.rhythm.title" = "发现你的日程节奏";
 "onboarding.rhythm.message" = "应用仅在设备上分析日程标题和日期，预测下一次时间，分析数据不会离开设备。";
 "onboarding.permission.title" = "只分析你选择的日历";
 "onboarding.permission.message" = "授予完全访问后可自行选择分析范围。生日、节假日和订阅日历默认排除。";
 "onboarding.permission.scan" = "从日历查找节奏";
 "onboarding.permission.manual" = "从手动添加开始";
+"onboarding.preview.week" = "8月第二周";
+"onboarding.preview.count" = "即将到来2项";
+"onboarding.preview.days" = "一,二,三,四,五";
+"onboarding.preview.personalCare.interval" = "约每35天";
+"onboarding.preview.personalCare.title" = "理发预约";
+"onboarding.preview.personalCare.timing" = "下周是您通常的时间";
+"onboarding.preview.vehicle.interval" = "约每120天";
+"onboarding.preview.vehicle.title" = "车辆检查";
+"onboarding.preview.vehicle.timing" = "3周后是您通常的时间";
+"onboarding.preview.accessibility" = "显示理发预约和车辆检查预计时间的预览";
+"onboarding.selection.count" = "已选择%d项";
+"onboarding.selection.privacy" = "分析仅在此设备上进行";
 
 "calendar.selection.title" = "选择日历";
 "calendar.selection.loading" = "正在加载日历…";
 "calendar.selection.message" = "只选择需要查找重复模式的日历。分析结果仅保存在此设备。";
 "calendar.selection.scan" = "扫描 %d 个日历";
+"calendar.selection.scanOne" = "扫描 1 个日历";
+"calendar.source.default" = "默认";
+"calendar.source.other" = "其他";
+"calendar.source.subscribed" = "订阅的日历";
 "calendar.scan.progress" = "日历分析进度";
 "calendar.exclusion.birthdays" = "生日默认排除";
 "calendar.exclusion.holidays" = "节假日默认排除";
@@ -175,6 +191,19 @@
 "home.nudge.emptyTitle" = "暂时没有可预测的日程";
 "home.nudge.emptyMessage" = "同一日程在日历中出现至少两次后，我们会预测下一次时间。";
 "home.calendarAdded" = "已将%@添加到日历。";
+"home.today.greeting" = "早上好";
+"home.today.itemCount" = "今天 %d 项";
+"home.today.summaryLabel" = "今日提醒";
+"home.today.summaryTitle" = "今天只需准备 %d 件事就足够了。";
+"home.today.summaryDuration" = "预计准备 20 分钟";
+"home.today.prepSection" = "优先准备";
+"home.today.rhythmSection" = "你的节奏又到了";
+"home.today.viewAll" = "查看全部";
+"home.today.nextAction" = "下一步 · %@";
+"home.today.continuePrep" = "继续准备";
+"home.today.interval" = "约每 %d 天";
+"home.today.expectedDate" = "%@是你通常的时间";
+"home.today.schedule" = "安排日程";
 
 "nudge.card.interval" = "约每 %d 天 · %@";
 "nudge.action.enable" = "开启提醒";

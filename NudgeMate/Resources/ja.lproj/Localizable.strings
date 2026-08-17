@@ -81,18 +81,34 @@
 "recap.action.snoozed" = "延期";
 
 "onboarding.welcome.title" = "大切な予定を先回り";
-"onboarding.welcome.message" = "NudgeMateは、繰り返す習慣と大切な準備を支えるスケジュールアシスタントです。";
+"onboarding.welcome.message" = "繰り返す予定や大切な準備を、慌てる前にお知らせします。";
 "onboarding.rhythm.title" = "予定のリズムを見つけます";
 "onboarding.rhythm.message" = "端末内で予定名と日付を分析し、次の時期を予測します。分析データは端末外へ送信されません。";
 "onboarding.permission.title" = "選んだカレンダーだけを確認";
 "onboarding.permission.message" = "フルアクセスを許可した後、分析対象を選べます。誕生日・祝日・購読カレンダーは初期状態で除外されます。";
 "onboarding.permission.scan" = "カレンダーからリズムを探す";
 "onboarding.permission.manual" = "手動追加で始める";
+"onboarding.preview.week" = "8月第2週";
+"onboarding.preview.count" = "もうすぐ2件";
+"onboarding.preview.days" = "月,火,水,木,金";
+"onboarding.preview.personalCare.interval" = "約35日ごと";
+"onboarding.preview.personalCare.title" = "美容院の予約";
+"onboarding.preview.personalCare.timing" = "来週がいつもの時期です";
+"onboarding.preview.vehicle.interval" = "約120日ごと";
+"onboarding.preview.vehicle.title" = "車両点検";
+"onboarding.preview.vehicle.timing" = "3週間後がいつもの時期です";
+"onboarding.preview.accessibility" = "美容院の予約と車両点検の次の時期を示すプレビュー";
+"onboarding.selection.count" = "%d件選択";
+"onboarding.selection.privacy" = "分析はこのデバイス内でのみ行われます";
 
 "calendar.selection.title" = "カレンダーを選択";
 "calendar.selection.loading" = "カレンダーを読み込み中…";
 "calendar.selection.message" = "パターンを探すカレンダーだけを選択してください。分析結果は端末内に保存されます。";
 "calendar.selection.scan" = "%d件のカレンダーをスキャン";
+"calendar.selection.scanOne" = "1件のカレンダーをスキャン";
+"calendar.source.default" = "デフォルト";
+"calendar.source.other" = "その他";
+"calendar.source.subscribed" = "照会カレンダー";
 "calendar.scan.progress" = "カレンダー分析の進行状況";
 "calendar.exclusion.birthdays" = "誕生日は初期状態で除外";
 "calendar.exclusion.holidays" = "祝日は初期状態で除外";
@@ -175,6 +191,19 @@
 "home.nudge.emptyTitle" = "まだ予測できる予定がありません";
 "home.nudge.emptyMessage" = "同じ予定がカレンダーに2回以上登録されると、次の時期を提案します。";
 "home.calendarAdded" = "%@をカレンダーに追加しました。";
+"home.today.greeting" = "おはようございます";
+"home.today.itemCount" = "今日%d件";
+"home.today.summaryLabel" = "今日のナッジ";
+"home.today.summaryTitle" = "今日は%dつだけ準備すれば十分です。";
+"home.today.summaryDuration" = "準備時間の目安 20分";
+"home.today.prepSection" = "先に準備すること";
+"home.today.rhythmSection" = "リズムが戻ってきました";
+"home.today.viewAll" = "すべて見る";
+"home.today.nextAction" = "次のタスク · %@";
+"home.today.continuePrep" = "準備を続ける";
+"home.today.interval" = "約%d日ごと";
+"home.today.expectedDate" = "%@がいつもの時期です";
+"home.today.schedule" = "予定を入れる";
 
 "nudge.card.interval" = "約%d日ごと · %@";
 "nudge.action.enable" = "通知をオン";

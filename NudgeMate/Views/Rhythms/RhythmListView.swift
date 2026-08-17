@@ -229,10 +229,10 @@ private struct RhythmListContent: View {
                 action: onAdd
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, NudgeLayoutMetrics.screenHorizontalPadding)
         } else {
             ScrollView {
-                LazyVStack(spacing: 12) {
+                LazyVStack(spacing: NudgeLayoutMetrics.listSpacing) {
                     ForEach(rhythms) { rhythm in
                         RhythmCard(
                             rhythm: rhythm,
@@ -245,7 +245,8 @@ private struct RhythmListContent: View {
                         .nudgeSelectionFrame(id: rhythm.id)
                     }
                 }
-                .padding(.horizontal, 18)
+                .padding(.horizontal, NudgeLayoutMetrics.listHorizontalPadding)
+                .padding(.top, 1)
                 .padding(.bottom, NudgeLayoutMetrics.listBottomClearance)
             }
             .scrollIndicators(.hidden)
@@ -263,69 +264,23 @@ private struct RhythmCard: View {
     let onDelete: () -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
-            Button(action: onOpen) {
-                HStack(spacing: 14) {
-                    NudgeSymbolBadge(symbol: .category(rhythm.category), size: 54)
-
-                    VStack(alignment: .leading, spacing: 7) {
-                        HStack(spacing: 7) {
-                            Text(categoryTitle)
-                                .pretendard(.caption2, weight: .semibold)
-                                .foregroundStyle(ColorTheme.primaryNudge)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(ColorTheme.brandSoft, in: Capsule())
-                            if rhythm.isMuted {
-                                Text(L10n.Rhythm.paused)
-                                    .pretendard(.caption2, weight: .semibold)
-                                    .foregroundStyle(ColorTheme.secondarySnooze)
-                            }
-                        }
-                        Text(rhythm.displayName)
-                            .pretendard(.headline, weight: .semibold)
-                            .foregroundStyle(ColorTheme.primaryText)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text(L10n.Rhythm.Row.detail(
-                            rhythm.baseIntervalDays,
-                            rhythm.nextExpectedCenterDate.formatted(date: .abbreviated, time: .omitted)
-                        ))
-                        .pretendard(.subheadline)
-                        .foregroundStyle(ColorTheme.secondaryText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            if isSelecting {
-                Button(action: onOpen) {
-                    NudgeSelectionIndicator(isSelected: isSelected)
-                        .frame(width: 44, height: 44)
-                        .contentShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(isSelected ? L10n.Selection.deselect : L10n.Selection.select)
-            } else {
-                Menu {
-                    Button(rhythm.isMuted ? L10n.Rhythm.resume : L10n.Rhythm.pause, action: onToggle)
-                    Button(L10n.Common.delete, role: .destructive, action: onDelete)
-                } label: {
-                    VStack(spacing: 2) {
-                        Image(systemName: "ellipsis")
-                            .font(.system(size: 16, weight: .semibold))
-                        Text(L10n.Common.moreActions)
-                            .pretendard(.caption2, weight: .medium)
-                    }
-                    .foregroundStyle(ColorTheme.secondaryText)
-                    .frame(minWidth: 54, minHeight: 48)
-                    .background(ColorTheme.backgroundDeep.opacity(0.75), in: Capsule())
-                }
-                .accessibilityLabel(L10n.Common.moreActions)
-            }
-        }
+        RhythmCardLayout(
+            title: rhythm.displayName,
+            detail: L10n.Rhythm.Row.detail(
+                rhythm.baseIntervalDays,
+                rhythm.nextExpectedCenterDate.formatted(date: .abbreviated, time: .omitted)
+            ),
+            categoryTitle: categoryTitle,
+            symbol: .category(rhythm.category),
+            isMuted: rhythm.isMuted,
+            isSelecting: isSelecting,
+            isSelected: isSelected,
+            onOpen: onOpen,
+            onToggle: onToggle,
+            onDelete: onDelete
+        )
         .nudgeCardSurface(isSelected: isSelected)
+        .opacity(rhythm.isMuted ? 0.78 : 1)
         .accessibilityValue(isSelected ? L10n.Selection.selected : "")
     }
 
@@ -339,6 +294,167 @@ private struct RhythmCard: View {
         case .finance: L10n.Category.finance
         case .work: L10n.Category.work
         case .other: L10n.Category.other
+        }
+    }
+}
+
+private struct RhythmCardLayout: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let title: String
+    let detail: String
+    let categoryTitle: String
+    let symbol: NudgeSymbol
+    let isMuted: Bool
+    let isSelecting: Bool
+    let isSelected: Bool
+    let onOpen: () -> Void
+    let onToggle: () -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .center) {
+                    Button(action: onOpen) {
+                        NudgeSymbolBadge(
+                            symbol: symbol,
+                            size: NudgeLayoutMetrics.cardHeaderIconSize
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer(minLength: 12)
+
+                    RhythmCardTrailingAction(
+                        isMuted: isMuted,
+                        isSelecting: isSelecting,
+                        isSelected: isSelected,
+                        onOpen: onOpen,
+                        onToggle: onToggle,
+                        onDelete: onDelete
+                    )
+                }
+
+                Button(action: onOpen) {
+                    RhythmCardTextContent(
+                        title: title,
+                        detail: detail,
+                        categoryTitle: categoryTitle,
+                        isMuted: isMuted,
+                        usesExpandedLayout: true
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+        } else {
+            HStack(alignment: .center, spacing: 10) {
+                Button(action: onOpen) {
+                    HStack(spacing: 12) {
+                        NudgeSymbolBadge(
+                            symbol: symbol,
+                            size: NudgeLayoutMetrics.cardHeaderIconSize
+                        )
+
+                        RhythmCardTextContent(
+                            title: title,
+                            detail: detail,
+                            categoryTitle: categoryTitle,
+                            isMuted: isMuted,
+                            usesExpandedLayout: false
+                        )
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                RhythmCardTrailingAction(
+                    isMuted: isMuted,
+                    isSelecting: isSelecting,
+                    isSelected: isSelected,
+                    onOpen: onOpen,
+                    onToggle: onToggle,
+                    onDelete: onDelete
+                )
+            }
+        }
+    }
+}
+
+private struct RhythmCardTextContent: View {
+    let title: String
+    let detail: String
+    let categoryTitle: String
+    let isMuted: Bool
+    let usesExpandedLayout: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: usesExpandedLayout ? 8 : 5) {
+            HStack(spacing: 6) {
+                Text(categoryTitle)
+                    .pretendard(.caption2, weight: .semibold)
+                    .foregroundStyle(ColorTheme.primaryNudge)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(ColorTheme.brandSoft, in: Capsule())
+                    .lineLimit(1)
+
+                if isMuted {
+                    Text(L10n.Rhythm.paused)
+                        .pretendard(.caption2, weight: .semibold)
+                        .foregroundStyle(ColorTheme.secondarySnooze)
+                }
+            }
+
+            Text(title)
+                .pretendard(.headline, weight: .semibold)
+                .foregroundStyle(ColorTheme.primaryText)
+                .lineLimit(usesExpandedLayout ? 3 : 2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(detail)
+                .pretendard(.subheadline)
+                .foregroundStyle(ColorTheme.secondaryText)
+                .lineLimit(usesExpandedLayout ? nil : 2)
+                .fixedSize(horizontal: false, vertical: usesExpandedLayout)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+    }
+}
+
+private struct RhythmCardTrailingAction: View {
+    let isMuted: Bool
+    let isSelecting: Bool
+    let isSelected: Bool
+    let onOpen: () -> Void
+    let onToggle: () -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        if isSelecting {
+            Button(action: onOpen) {
+                NudgeSelectionIndicator(isSelected: isSelected)
+                    .frame(
+                        width: NudgeLayoutMetrics.compactControlSize,
+                        height: NudgeLayoutMetrics.compactControlSize
+                    )
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isSelected ? L10n.Selection.deselect : L10n.Selection.select)
+        } else {
+            Menu {
+                Button(isMuted ? L10n.Rhythm.resume : L10n.Rhythm.pause, action: onToggle)
+                Button(L10n.Common.delete, role: .destructive, action: onDelete)
+            } label: {
+                NudgeMoreActionLabel()
+            }
+            .accessibilityLabel(L10n.Common.moreActions)
+            .accessibilityIdentifier("rhythm.card.moreActions")
         }
     }
 }
@@ -398,6 +514,7 @@ private struct RhythmEditorView: View {
                 }
             }
             .pretendard(.body)
+            .nudgeFormStyle()
             .navigationTitle(rhythm == nil ? L10n.Rhythm.Editor.newTitle : L10n.Rhythm.Editor.editTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

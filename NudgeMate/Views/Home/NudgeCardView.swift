@@ -14,9 +14,12 @@ struct NudgeCardView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
-                NudgeSymbolBadge(symbol: .category(event.category), size: 48)
+                NudgeSymbolBadge(
+                    symbol: .category(event.category),
+                    size: NudgeLayoutMetrics.cardHeaderIconSize
+                )
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(event.title)
@@ -32,51 +35,129 @@ struct NudgeCardView: View {
                 Spacer(minLength: 8)
             }
 
-            ViewThatFits(in: .horizontal) {
-                actionButtons(axis: .horizontal)
-                actionButtons(axis: .vertical)
-            }
+            NudgeCardActions(
+                onSchedule: onSchedule,
+                onSnooze: onSnooze,
+                onSkip: onSkip,
+                onToggleMute: onToggleMute,
+                isMuted: event.isMuted
+            )
         }
-        .padding(16)
-        .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(ColorTheme.separator.opacity(0.35), lineWidth: 0.5)
-                .allowsHitTesting(false)
-        }
+        .nudgeCardSurface()
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: event.nextPredictedDate)
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: event.isMuted)
         .accessibilityElement(children: .contain)
     }
+}
 
-    @ViewBuilder
-    private func actionButtons(axis: Axis) -> some View {
-        let layout = axis == .horizontal
-            ? AnyLayout(HStackLayout(spacing: 10))
-            : AnyLayout(VStackLayout(alignment: .leading, spacing: 8))
-        layout {
-            Button(L10n.Nudge.Action.schedule, action: onSchedule)
-                .buttonStyle(.borderedProminent)
-                .tint(ColorTheme.primaryNudge)
-            Button(L10n.Nudge.Action.snooze, action: onSnooze)
-                .buttonStyle(.bordered)
-                .tint(ColorTheme.secondarySnooze)
-            Menu {
-                Button(L10n.Nudge.Action.skip, action: onSkip)
-                    .accessibilityIdentifier("nudge.skip")
-                Button(
-                    event.isMuted ? L10n.Nudge.Action.enable : L10n.Nudge.Action.disable,
-                    action: onToggleMute
+private struct NudgeCardActions: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let onSchedule: () -> Void
+    let onSnooze: () -> Void
+    let onSkip: () -> Void
+    let onToggleMute: () -> Void
+    let isMuted: Bool
+
+    var body: some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: 8) {
+                NudgeCardActionButton(
+                    title: L10n.Nudge.Action.schedule,
+                    style: .primary,
+                    action: onSchedule
                 )
-                .accessibilityIdentifier("nudge.toggleMute")
-            } label: {
-                Label(L10n.Common.moreActions, systemImage: "ellipsis")
+                HStack(spacing: 8) {
+                    NudgeCardActionButton(
+                        title: L10n.Nudge.Action.snooze,
+                        style: .secondary,
+                        action: onSnooze
+                    )
+                    NudgeCardMoreAction(
+                        isMuted: isMuted,
+                        onSkip: onSkip,
+                        onToggleMute: onToggleMute
+                    )
+                }
             }
-            .buttonStyle(.bordered)
-            .tint(ColorTheme.secondaryText)
-            .accessibilityIdentifier("nudge.moreActions")
+        } else {
+            HStack(spacing: 8) {
+                NudgeCardActionButton(
+                    title: L10n.Nudge.Action.schedule,
+                    style: .primary,
+                    action: onSchedule
+                )
+                NudgeCardActionButton(
+                    title: L10n.Nudge.Action.snooze,
+                    style: .secondary,
+                    action: onSnooze
+                )
+                NudgeCardMoreAction(
+                    isMuted: isMuted,
+                    onSkip: onSkip,
+                    onToggleMute: onToggleMute
+                )
+            }
         }
-        .pretendard(.subheadline, weight: .semibold)
-        .controlSize(.regular)
+    }
+}
+
+private struct NudgeCardActionButton: View {
+    enum Style: Equatable {
+        case primary
+        case secondary
+    }
+
+    let title: String
+    let style: Style
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .pretendard(.caption, weight: .semibold)
+                .foregroundStyle(
+                    style == .primary ? ColorTheme.cardBackground : ColorTheme.secondarySnooze
+                )
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 10)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(
+                    style == .primary ? ColorTheme.primaryNudge : ColorTheme.selectionFill.opacity(0.78),
+                    in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(
+                            style == .primary ? Color.clear : ColorTheme.secondarySnooze.opacity(0.12),
+                            lineWidth: 1
+                        )
+                }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct NudgeCardMoreAction: View {
+    let isMuted: Bool
+    let onSkip: () -> Void
+    let onToggleMute: () -> Void
+
+    var body: some View {
+        Menu {
+            Button(L10n.Nudge.Action.skip, action: onSkip)
+                .accessibilityIdentifier("nudge.skip")
+            Button(
+                isMuted ? L10n.Nudge.Action.enable : L10n.Nudge.Action.disable,
+                action: onToggleMute
+            )
+            .accessibilityIdentifier("nudge.toggleMute")
+        } label: {
+            NudgeMoreActionLabel()
+        }
+        .accessibilityLabel(L10n.Common.moreActions)
+        .accessibilityIdentifier("nudge.moreActions")
     }
 }

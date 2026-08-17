@@ -59,7 +59,7 @@ struct DailyRecapSheet: View {
                         }
                         .padding(20)
                     }
-                    .background(ColorTheme.background)
+                    .background(NudgeScreenBackground())
                 }
             }
             .navigationTitle(L10n.Recap.title)
@@ -97,23 +97,14 @@ struct DailyRecapSheet: View {
                 }
             }
 
-            HStack(spacing: 10) {
-                Button(L10n.Recap.Action.ready) {
-                    update(prep, status: .ready)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(ColorTheme.primaryNudge)
-
-                Button(L10n.Recap.Action.notReady) {
-                    update(prep, status: .notReady)
-                }
-                .buttonStyle(.bordered)
-                .tint(ColorTheme.secondarySnooze)
-            }
-            .pretendard(.subheadline, weight: .semibold)
+            RecapActionRow(
+                primaryTitle: L10n.Recap.Action.ready,
+                secondaryTitle: L10n.Recap.Action.notReady,
+                onPrimary: { update(prep, status: .ready) },
+                onSecondary: { update(prep, status: .notReady) }
+            )
         }
-        .padding(16)
-        .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .nudgeCardSurface()
         .animation(.spring(response: 0.38, dampingFraction: 0.82), value: prep.status)
     }
 
@@ -129,13 +120,11 @@ struct DailyRecapSheet: View {
                         .foregroundStyle(ColorTheme.secondaryText)
                 }
             }
-            HStack(spacing: 10) {
-                Button(L10n.Recap.Action.done) {
-                    complete(rhythm)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(ColorTheme.primaryNudge)
-                Button(L10n.Recap.Action.snoozed) {
+            RecapActionRow(
+                primaryTitle: L10n.Recap.Action.done,
+                secondaryTitle: L10n.Recap.Action.snoozed,
+                onPrimary: { complete(rhythm) },
+                onSecondary: {
                     Task {
                         do {
                             try await appState.nudgeManager.snooze(
@@ -147,12 +136,9 @@ struct DailyRecapSheet: View {
                         }
                     }
                 }
-                .buttonStyle(.bordered)
-                .tint(ColorTheme.secondarySnooze)
-            }
+            )
         }
-        .padding(16)
-        .background(ColorTheme.cardBackground, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .nudgeCardSurface()
     }
 
     private var errorBinding: Binding<Bool> {
@@ -209,5 +195,41 @@ struct DailyRecapSheet: View {
                 errorMessage = error.localizedDescription
             }
         }
+    }
+}
+
+private struct RecapActionRow: View {
+    let primaryTitle: String
+    let secondaryTitle: String
+    let onPrimary: () -> Void
+    let onSecondary: () -> Void
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                primaryButton
+                secondaryButton
+            }
+
+            VStack(spacing: 8) {
+                primaryButton
+                    .frame(maxWidth: .infinity)
+                secondaryButton
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .pretendard(.subheadline, weight: .semibold)
+    }
+
+    private var primaryButton: some View {
+        Button(primaryTitle, action: onPrimary)
+            .buttonStyle(.borderedProminent)
+            .tint(ColorTheme.primaryNudge)
+    }
+
+    private var secondaryButton: some View {
+        Button(secondaryTitle, action: onSecondary)
+            .buttonStyle(.bordered)
+            .tint(ColorTheme.secondarySnooze)
     }
 }
