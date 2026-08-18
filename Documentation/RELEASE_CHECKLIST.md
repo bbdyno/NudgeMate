@@ -36,7 +36,8 @@
 - [ ] Debug 빌드는 Google 테스트 광고 ID, Release 빌드는 운영 광고 ID를 사용하는지 확인
 - [ ] 무료 사용자에게 Daily Recap 완료 후 최대 24시간에 한 번만 노출되는지 확인
 - [ ] Pro 사용자에게 UMP 요청, 광고 SDK 시작, 광고 로드와 노출이 없는지 확인
-- [ ] `https://bbdyno.github.io/NudgeMate/app-ads.txt` 내용과 AdMob 인증 상태 확인
+- [ ] `bbdyno/bbdyno.github.io` 저장소의 루트 `app-ads.txt`와 `https://bbdyno.github.io/app-ads.txt` 응답 확인
+- [ ] AdMob 앱 인증을 완료한 뒤 앱 준비 상태가 `준비됨`인지 확인
 - [ ] 광고 로드 실패·동의 거부·오프라인 상태에서도 Recap 완료 흐름이 막히지 않는지 확인
 
 ## 기능 QA
