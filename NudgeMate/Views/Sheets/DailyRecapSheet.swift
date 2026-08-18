@@ -67,7 +67,7 @@ struct DailyRecapSheet: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(L10n.Common.done) {
-                        appState.dismissDailyRecap()
+                        appState.dismissDailyRecap(completed: true)
                         dismiss()
                     }
                     .pretendard(.headline, weight: .semibold)

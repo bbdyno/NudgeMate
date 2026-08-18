@@ -11,6 +11,9 @@ enum AppConfiguration {
         configuredURL(forInfoDictionaryKey: "NudgeMatePrivacyPolicyURL")
     }
     static let manageSubscriptionsURL = URL(string: "https://apps.apple.com/account/subscriptions")
+    static let adReportURL = URL(
+        string: "https://github.com/bbdyno/NudgeMate/issues/new?labels=ad-report&title=Ad%20report%3A%20"
+    )
 
     private static func configuredURL(forInfoDictionaryKey key: String) -> URL? {
         guard let rawValue = Bundle.main.object(forInfoDictionaryKey: key) as? String,

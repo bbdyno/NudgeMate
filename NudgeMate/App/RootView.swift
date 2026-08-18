@@ -23,8 +23,19 @@ struct RootView: View {
         .task {
             appState.bootstrap(modelContext: modelContext)
             appState.startCalendarChangeObservation(modelContext: modelContext)
+            if appState.onboardingCompleted {
+                await appState.prepareMonetization()
+            }
             await appState.synchronizeAdaptiveRhythms(modelContext: modelContext)
             try? await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext)
+        }
+        .onChange(of: appState.subscriptionManager.isPro) { _, _ in
+            guard appState.isBootstrapped, appState.onboardingCompleted else { return }
+            Task { await appState.updateAdEntitlement() }
+        }
+        .onChange(of: appState.onboardingCompleted) { _, isCompleted in
+            guard isCompleted else { return }
+            Task { await appState.prepareMonetization() }
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }

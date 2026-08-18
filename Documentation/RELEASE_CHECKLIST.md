@@ -21,9 +21,23 @@
 
 - [ ] 실제 HTTPS 개인정보처리방침 게시
 - [ ] `NudgeMatePrivacyPolicyURL` Info.plist 값 설정
+- [ ] UMP 유럽 규정 메시지 게시 상태와 개인정보 선택 재호출 확인
+- [ ] Archive의 앱·Google SDK Privacy Manifest를 App Privacy 답변과 대조
+- [ ] 추적 데이터의 기기 ID와 광고 SDK 데이터 유형을 App Store Connect에 신고
+- [ ] ATT를 사용하지 않는 현재 빌드에 `NSUserTrackingUsageDescription`이 없는지 확인
 - [ ] 표준 EULA 또는 별도 이용약관 결정
 - [ ] App Privacy 답변을 제출 빌드와 재대조
 - [ ] Pretendard SIL OFL과 앱 Apache 2.0 고지 확인
+
+## 광고와 수익화
+
+- [ ] AdMob 앱 ID `ca-app-pub-8965771939775493~6712972291` 확인
+- [ ] Daily Recap 전면 광고 ID `ca-app-pub-8965771939775493/7478475235` 확인
+- [ ] Debug 빌드는 Google 테스트 광고 ID, Release 빌드는 운영 광고 ID를 사용하는지 확인
+- [ ] 무료 사용자에게 Daily Recap 완료 후 최대 24시간에 한 번만 노출되는지 확인
+- [ ] Pro 사용자에게 UMP 요청, 광고 SDK 시작, 광고 로드와 노출이 없는지 확인
+- [ ] `https://bbdyno.github.io/NudgeMate/app-ads.txt` 내용과 AdMob 인증 상태 확인
+- [ ] 광고 로드 실패·동의 거부·오프라인 상태에서도 Recap 완료 흐름이 막히지 않는지 확인
 
 ## 기능 QA
 

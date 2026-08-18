@@ -296,8 +296,13 @@
 "settings.privacy.info.localMessage" = "日历标题和日期仅在本设备分析，不会发送到外部服务器。";
 "settings.privacy.info.calendarTitle" = "仅访问所选范围";
 "settings.privacy.info.calendarMessage" = "只读取所选日历，不会将完整原始日程复制到应用存储。";
+"settings.privacy.info.adsTitle" = "免费版的有限广告";
+"settings.privacy.info.adsMessage" = "免费版可能在完成每日回顾后最多每24小时显示一次Google AdMob广告。日历日程和准备信息不会包含在广告请求中。";
 "settings.privacy.info.controlTitle" = "始终由你控制";
 "settings.privacy.info.controlMessage" = "可随时更改权限、导出数据或彻底删除数据。";
+"settings.privacy.ads.explanation" = "免费版可能在每日回顾后最多每24小时显示一次广告。Pro不会请求广告。";
+"settings.privacy.ads.choices" = "广告隐私选项";
+"settings.privacy.ads.report" = "报告广告问题";
 "settings.data.title" = "数据";
 "settings.export.action" = "导出数据";
 "settings.export.ready" = "导出文件已准备好";

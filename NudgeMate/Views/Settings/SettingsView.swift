@@ -228,6 +228,23 @@ struct SettingsView: View {
             Button(L10n.Settings.Privacy.explanation) {
                 isPrivacyInfoPresented = true
             }
+            Text(L10n.Settings.Privacy.Ads.explanation)
+                .foregroundStyle(ColorTheme.secondaryText)
+            if !appState.subscriptionManager.isPro,
+               appState.adMobManager.privacyOptionsRequired {
+                Button(L10n.Settings.Privacy.Ads.choices) {
+                    Task {
+                        do {
+                            try await appState.adMobManager.presentPrivacyOptions()
+                        } catch {
+                            errorMessage = error.localizedDescription
+                        }
+                    }
+                }
+            }
+            if let url = AppConfiguration.adReportURL {
+                Link(L10n.Settings.Privacy.Ads.report, destination: url)
+            }
             if let url = AppConfiguration.privacyPolicyURL {
                 Link(L10n.Paywall.privacy, destination: url)
             }
@@ -435,6 +452,7 @@ private struct PrivacyInformationView: View {
                         .pretendard(.title2, weight: .bold)
                     privacyItem(L10n.Settings.Privacy.Info.localTitle, L10n.Settings.Privacy.Info.localMessage)
                     privacyItem(L10n.Settings.Privacy.Info.calendarTitle, L10n.Settings.Privacy.Info.calendarMessage)
+                    privacyItem(L10n.Settings.Privacy.Info.adsTitle, L10n.Settings.Privacy.Info.adsMessage)
                     privacyItem(L10n.Settings.Privacy.Info.controlTitle, L10n.Settings.Privacy.Info.controlMessage)
                 }
                 .padding(24)
