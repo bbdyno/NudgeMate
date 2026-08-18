@@ -196,12 +196,47 @@ final class NudgeManager {
     }
 
     func skip(_ event: RecurringEvent, modelContext: ModelContext) async throws {
+        try AdaptiveRhythmService(
+            modelContext: modelContext,
+            calendar: calendar
+        ).recordSkipped(for: event)
         event.nextExpectedStartDate = addingDays(event.baseIntervalDays, to: event.nextExpectedStartDate)
         event.nextExpectedCenterDate = addingDays(event.baseIntervalDays, to: event.nextExpectedCenterDate)
         event.nextExpectedEndDate = addingDays(event.baseIntervalDays, to: event.nextExpectedEndDate)
         event.updatedAt = .now
         try modelContext.save()
         try await scheduleNudge(for: event)
+    }
+
+    func complete(
+        _ event: RecurringEvent,
+        source: OccurrenceSource = .userConfirmed,
+        modelContext: ModelContext,
+        now: Date = .now
+    ) async throws {
+        try AdaptiveRhythmService(
+            modelContext: modelContext,
+            calendar: calendar
+        ).recordCompletion(for: event, source: source, at: now)
+        try await scheduleNudge(for: event)
+    }
+
+    func recordScheduledOccurrence(
+        for event: RecurringEvent,
+        at date: Date,
+        calendarIdentifier: String?,
+        eventIdentifier: String,
+        modelContext: ModelContext
+    ) throws {
+        try AdaptiveRhythmService(
+            modelContext: modelContext,
+            calendar: calendar
+        ).recordScheduled(
+            for: event,
+            at: date,
+            calendarIdentifier: calendarIdentifier,
+            eventIdentifier: eventIdentifier
+        )
     }
 
     func cancelNudge(for id: UUID) {

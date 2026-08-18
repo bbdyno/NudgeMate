@@ -163,34 +163,13 @@ struct DailyRecapSheet: View {
     }
 
     private func complete(_ rhythm: RecurringEvent) {
-        let previousHistoryDates = rhythm.historyDates
-        let previousLastOccurrenceDate = rhythm.lastOccurrenceDate
-        let previousNextPredictedDate = rhythm.nextPredictedDate
-        let previousUpdatedAt = rhythm.updatedAt
-        let now = Date.now
-        rhythm.historyDates.append(now)
-        rhythm.lastOccurrenceDate = now
-        let center = Calendar.autoupdatingCurrent.date(
-            byAdding: .day,
-            value: rhythm.baseIntervalDays,
-            to: now
-        ) ?? now.addingTimeInterval(TimeInterval(rhythm.baseIntervalDays * 86_400))
-        rhythm.nextPredictedDate = center
-        rhythm.updatedAt = now
         Task {
             do {
-                try modelContext.save()
-            } catch {
-                rhythm.historyDates = previousHistoryDates
-                rhythm.lastOccurrenceDate = previousLastOccurrenceDate
-                rhythm.nextPredictedDate = previousNextPredictedDate
-                rhythm.updatedAt = previousUpdatedAt
-                errorMessage = error.localizedDescription
-                return
-            }
-
-            do {
-                try await appState.nudgeManager.scheduleNudge(for: rhythm)
+                try await appState.nudgeManager.complete(
+                    rhythm,
+                    source: .dailyRecap,
+                    modelContext: modelContext
+                )
             } catch {
                 errorMessage = error.localizedDescription
             }

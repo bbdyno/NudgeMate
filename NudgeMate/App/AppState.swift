@@ -39,7 +39,19 @@ final class AppState {
     private let defaults: UserDefaults
 
     @ObservationIgnored
+    private let calendarChangeObserver: CalendarChangeObserver
+
+    @ObservationIgnored
+    private var calendarChangeTask: Task<Void, Never>?
+
+    @ObservationIgnored
+    private var isSynchronizingRhythms = false
+
+    @ObservationIgnored
     private let lastRecapDateKey = "NudgeMate.lastDailyRecapDate"
+
+    @ObservationIgnored
+    private let lastRhythmSyncDateKey = "NudgeMate.lastRhythmSyncDate"
 
     init(
         calendar: Calendar = .autoupdatingCurrent,
@@ -50,6 +62,7 @@ final class AppState {
         subscriptionManager = .shared
         self.calendar = calendar
         self.defaults = defaults
+        calendarChangeObserver = CalendarChangeObserver()
     }
 
     init(
@@ -64,6 +77,7 @@ final class AppState {
         self.subscriptionManager = subscriptionManager
         self.calendar = calendar
         self.defaults = defaults
+        calendarChangeObserver = CalendarChangeObserver()
     }
 
     func configure(modelContainer: ModelContainer) {
@@ -125,6 +139,74 @@ final class AppState {
         isBootstrapped = false
         isDailyRecapPresented = false
         pendingNavigation = nil
+        defaults.removeObject(forKey: lastRhythmSyncDateKey)
+    }
+
+    func startCalendarChangeObservation(modelContext: ModelContext) {
+        guard calendarChangeTask == nil else { return }
+        calendarChangeTask = Task { [weak self] in
+            guard let self else { return }
+            for await _ in calendarChangeObserver.changes() {
+                await synchronizeAdaptiveRhythms(
+                    modelContext: modelContext,
+                    force: true
+                )
+            }
+        }
+    }
+
+    func synchronizeAdaptiveRhythms(
+        modelContext: ModelContext,
+        force: Bool = false,
+        now: Date = .now
+    ) async {
+        guard isBootstrapped,
+              onboardingCompleted,
+              !selectedCalendarIdentifiers.isEmpty,
+              !isSynchronizingRhythms else {
+            return
+        }
+        if !force,
+           let lastSyncDate = defaults.object(forKey: lastRhythmSyncDateKey) as? Date,
+           now.timeIntervalSince(lastSyncDate) < 15 * 60 {
+            return
+        }
+
+        isSynchronizingRhythms = true
+        defer { isSynchronizingRhythms = false }
+
+        do {
+            await eventKitManager.refreshAuthorizationState()
+            guard eventKitManager.authorizationState == .fullAccess else { return }
+            let events = try await eventKitManager.fetchEvents(
+                pastMonths: 12,
+                futureDays: 0,
+                calendarIdentifiers: selectedCalendarIdentifiers,
+                referenceDate: now
+            )
+            let rhythms = try modelContext.fetch(FetchDescriptor<RecurringEvent>())
+            let changedRhythms = try AdaptiveRhythmService(
+                modelContext: modelContext,
+                calendar: calendar
+            ).reconcile(
+                events: events,
+                rhythms: rhythms,
+                selectedCalendarIdentifiers: selectedCalendarIdentifiers,
+                reconcileRemovals: true,
+                now: now
+            )
+            for rhythm in changedRhythms where rhythm.notificationsEnabled {
+                try? await nudgeManager.scheduleNudge(for: rhythm)
+            }
+
+            var settings = try SwiftDataSettingsRepository(context: modelContext).load()
+            settings.lastCalendarScanDate = now
+            settings.updatedAt = now
+            try SwiftDataSettingsRepository(context: modelContext).save(settings)
+            defaults.set(now, forKey: lastRhythmSyncDateKey)
+        } catch {
+            appErrorMessage = error.localizedDescription
+        }
     }
 
     func evaluateDailyRecapPresentation(at date: Date = .now) {

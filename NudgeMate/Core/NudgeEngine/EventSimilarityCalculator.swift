@@ -43,6 +43,29 @@ struct EventSimilarityCalculator: Sendable {
         return min(1, max(0, result))
     }
 
+    func shouldMerge(
+        _ lhs: CalendarEventSnapshot,
+        _ rhs: CalendarEventSnapshot,
+        threshold: Double? = nil
+    ) -> Bool {
+        guard !lhs.normalizedTitle.isEmpty,
+              !rhs.normalizedTitle.isEmpty else {
+            return false
+        }
+
+        if lhs.normalizedTitle == rhs.normalizedTitle {
+            guard isGenericSingleToken(lhs.normalizedTitle) else { return true }
+            return hasGenericTitleCorroboration(lhs, rhs)
+        }
+
+        return score(lhs, rhs) >= (threshold ?? configuration.mergeThreshold)
+    }
+
+    func isGenericSingleToken(_ normalizedTitle: String) -> Bool {
+        let tokens = normalizedTitle.split(separator: " ").map(String.init)
+        return tokens.count == 1 && configuration.genericTokens.contains(tokens[0])
+    }
+
     private func jaccard(_ lhs: Set<String>, _ rhs: Set<String>) -> Double {
         let union = lhs.union(rhs)
         guard !union.isEmpty else { return 0 }
@@ -69,5 +92,21 @@ struct EventSimilarityCalculator: Sendable {
         let left = lhs.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
         let right = rhs.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
         return diceBigrams(left, right)
+    }
+
+    private func hasGenericTitleCorroboration(
+        _ lhs: CalendarEventSnapshot,
+        _ rhs: CalendarEventSnapshot
+    ) -> Bool {
+        guard lhs.calendarIdentifier == rhs.calendarIdentifier else { return false }
+
+        let leftLocation = lhs.locationName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let rightLocation = rhs.locationName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let leftLocation, !leftLocation.isEmpty,
+           let rightLocation, !rightLocation.isEmpty {
+            return optionalTextScore(leftLocation, rightLocation) >= 0.65
+        }
+
+        return true
     }
 }

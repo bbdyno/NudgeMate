@@ -4,6 +4,7 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         @Bindable var appState = appState
@@ -21,7 +22,15 @@ struct RootView: View {
         }
         .task {
             appState.bootstrap(modelContext: modelContext)
+            appState.startCalendarChangeObservation(modelContext: modelContext)
+            await appState.synchronizeAdaptiveRhythms(modelContext: modelContext)
             try? await appState.nudgeManager.synchronizeWidgetsAndActivities(modelContext: modelContext)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task {
+                await appState.synchronizeAdaptiveRhythms(modelContext: modelContext)
+            }
         }
         .sheet(isPresented: $appState.isPaywallPresented) {
             PaywallView()

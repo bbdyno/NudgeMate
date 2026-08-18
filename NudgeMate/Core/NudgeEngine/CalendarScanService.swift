@@ -25,13 +25,15 @@ struct CalendarScanService: Sendable {
     func scan(
         events: [CalendarEventSnapshot],
         suppressedSignatures: Set<String> = [],
+        knownSignatures: Set<String> = [],
         referenceDate: Date = .now
     ) -> CalendarScanResult {
+        let excludedSignatures = suppressedSignatures.union(knownSignatures)
         let candidates = detector.groups(from: events)
             .compactMap { group in
                 makeCandidate(
                     from: group,
-                    suppressedSignatures: suppressedSignatures,
+                    suppressedSignatures: excludedSignatures,
                     referenceDate: referenceDate
                 )
             }

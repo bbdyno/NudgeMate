@@ -225,7 +225,7 @@ struct CalendarEventComposerView: View {
 
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         do {
-            _ = try await appState.eventKitManager.createCalendarEvent(
+            let eventIdentifier = try await appState.eventKitManager.createCalendarEvent(
                 title: trimmedTitle,
                 startDate: startDate,
                 duration: TimeInterval(durationMinutes * 60),
@@ -235,7 +235,9 @@ struct CalendarEventComposerView: View {
             hasCreatedEvent = true
             onSaved(trimmedTitle)
             do {
-                try await updateRhythmAfterCreationIfNeeded()
+                try await updateRhythmAfterCreationIfNeeded(
+                    eventIdentifier: eventIdentifier
+                )
             } catch {
                 postSaveWarning = L10n.Calendar.Composer.postSaveWarning(
                     error.localizedDescription
@@ -248,7 +250,7 @@ struct CalendarEventComposerView: View {
         }
     }
 
-    private func updateRhythmAfterCreationIfNeeded() async throws {
+    private func updateRhythmAfterCreationIfNeeded(eventIdentifier: String) async throws {
         guard let rhythm else { return }
         rhythm.preferredCalendarIdentifier = calendarIdentifier
         rhythm.defaultEventDurationMinutes = durationMinutes
@@ -264,7 +266,13 @@ struct CalendarEventComposerView: View {
             to: startDate
         ) ?? startDate.addingTimeInterval(TimeInterval(rhythm.baseIntervalDays * 86_400))
         rhythm.updatedAt = .now
-        try modelContext.save()
+        try appState.nudgeManager.recordScheduledOccurrence(
+            for: rhythm,
+            at: startDate,
+            calendarIdentifier: calendarIdentifier,
+            eventIdentifier: eventIdentifier,
+            modelContext: modelContext
+        )
         try await appState.nudgeManager.scheduleNudge(for: rhythm)
     }
 }
