@@ -107,9 +107,20 @@ struct CalendarDiscoveryFlowView: View {
                     .filter { $0.suppressUntil > .now }
                     .map(\.normalizedSignature)
             )
+            let existingRhythms = try modelContext.fetch(FetchDescriptor<RecurringEvent>())
+            let existingCandidates = try modelContext.fetch(
+                FetchDescriptor<PatternCandidateRecord>()
+            )
+            let knownSignatures = Set(
+                existingRhythms.flatMap { [$0.normalizedName, EventNormalizer().normalize($0.displayName)] }
+                    + existingCandidates
+                        .filter { $0.decision != .rejected }
+                        .map(\.normalizedKey)
+            ).filter { !$0.isEmpty }
             let result = CalendarScanService().scan(
                 events: events,
-                suppressedSignatures: activeSignatures
+                suppressedSignatures: activeSignatures,
+                knownSignatures: knownSignatures
             )
             for candidate in result.candidates {
                 modelContext.insert(try PatternCandidateRecord(value: candidate))
@@ -501,10 +512,13 @@ private struct CandidateReviewView: View {
             record.decision = .accepted
             modelContext.insert(event)
             do {
+                try AdaptiveRhythmService(modelContext: modelContext).seed(
+                    rhythm: event,
+                    from: candidate.eventReferences
+                )
                 try modelContext.save()
             } catch {
-                modelContext.delete(event)
-                record.decision = .pending
+                modelContext.rollback()
                 throw error
             }
 
