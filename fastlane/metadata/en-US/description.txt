@@ -9,7 +9,7 @@ Highlights
 • Daily Recap for a calm end-of-day review
 • JSON data export and complete local deletion
 
-Privacy comes first. Calendar and preparation information is processed on your device and is not sent to an external server. NudgeMate uses no advertising, external analytics SDK, or cross-app tracking.
+Privacy comes first. Calendar and preparation information is processed on your device and is not sent to the ads SDK. Free users may see an ad after completing Daily Recap, at most once every 24 hours; Pro does not request ads.
 
 The free version includes unlimited manual rhythms, up to three adaptive rhythms, and one active preparation tracker. NudgeMate Pro removes the adaptive rhythm and preparation limits. Choose a monthly or yearly auto-renewing subscription, or a lifetime purchase. Subscriptions can be managed or cancelled at any time in your App Store account settings.
 

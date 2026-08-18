@@ -296,8 +296,13 @@
 "settings.privacy.info.localMessage" = "カレンダー名と日付はこの端末だけで分析され、外部サーバーには送信されません。";
 "settings.privacy.info.calendarTitle" = "選択した範囲だけ";
 "settings.privacy.info.calendarMessage" = "選択したカレンダーだけを読み、元の予定全体はアプリの保存領域に複製しません。";
+"settings.privacy.info.adsTitle" = "無料版の限定広告";
+"settings.privacy.info.adsMessage" = "無料版では、デイリー振り返りの完了後に最大24時間に1回、Google AdMob広告を表示することがあります。カレンダー予定や準備情報は広告リクエストに含めません。";
 "settings.privacy.info.controlTitle" = "いつでも管理";
 "settings.privacy.info.controlMessage" = "権限の変更、データの書き出し、完全削除をいつでも行えます。";
+"settings.privacy.ads.explanation" = "無料版では、デイリー振り返り後に最大24時間に1回広告を表示することがあります。Proでは広告をリクエストしません。";
+"settings.privacy.ads.choices" = "広告のプライバシー設定";
+"settings.privacy.ads.report" = "広告の問題を報告";
 "settings.data.title" = "データ";
 "settings.export.action" = "データを書き出す";
 "settings.export.ready" = "書き出しファイルの準備完了";

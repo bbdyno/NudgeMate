@@ -18,6 +18,7 @@ final class AppState {
     let eventKitManager: EventKitManager
     let nudgeManager: NudgeManager
     let subscriptionManager: SubscriptionManager
+    let adMobManager: AdMobManager
 
     var isDailyRecapPresented = false
     var isPaywallPresented = false
@@ -48,6 +49,9 @@ final class AppState {
     private var isSynchronizingRhythms = false
 
     @ObservationIgnored
+    private var shouldPresentAdAfterDailyRecap = false
+
+    @ObservationIgnored
     private let lastRecapDateKey = "NudgeMate.lastDailyRecapDate"
 
     @ObservationIgnored
@@ -60,6 +64,7 @@ final class AppState {
         eventKitManager = EventKitManager()
         nudgeManager = NudgeManager()
         subscriptionManager = .shared
+        adMobManager = AdMobManager(defaults: defaults)
         self.calendar = calendar
         self.defaults = defaults
         calendarChangeObserver = CalendarChangeObserver()
@@ -69,12 +74,14 @@ final class AppState {
         eventKitManager: EventKitManager,
         nudgeManager: NudgeManager,
         subscriptionManager: SubscriptionManager,
+        adMobManager: AdMobManager? = nil,
         calendar: Calendar = .autoupdatingCurrent,
         defaults: UserDefaults = .standard
     ) {
         self.eventKitManager = eventKitManager
         self.nudgeManager = nudgeManager
         self.subscriptionManager = subscriptionManager
+        self.adMobManager = adMobManager ?? AdMobManager(defaults: defaults)
         self.calendar = calendar
         self.defaults = defaults
         calendarChangeObserver = CalendarChangeObserver()
@@ -138,6 +145,7 @@ final class AppState {
         onboardingCompleted = false
         isBootstrapped = false
         isDailyRecapPresented = false
+        shouldPresentAdAfterDailyRecap = false
         pendingNavigation = nil
         defaults.removeObject(forKey: lastRhythmSyncDateKey)
     }
@@ -242,8 +250,27 @@ final class AppState {
         }
     }
 
-    func dismissDailyRecap() {
+    func dismissDailyRecap(completed: Bool = false) {
+        shouldPresentAdAfterDailyRecap = completed && !subscriptionManager.isPro
         isDailyRecapPresented = false
+    }
+
+    func prepareMonetization() async {
+        await subscriptionManager.refreshEntitlements()
+        await adMobManager.prepare(isPro: subscriptionManager.isPro)
+    }
+
+    func updateAdEntitlement() async {
+        if subscriptionManager.isPro {
+            shouldPresentAdAfterDailyRecap = false
+        }
+        await adMobManager.updateEntitlement(isPro: subscriptionManager.isPro)
+    }
+
+    func presentPendingDailyRecapAd() async {
+        guard shouldPresentAdAfterDailyRecap else { return }
+        shouldPresentAdAfterDailyRecap = false
+        _ = await adMobManager.presentRecapInterstitialIfEligible()
     }
 
     func presentPaywall() {

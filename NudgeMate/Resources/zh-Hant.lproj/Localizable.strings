@@ -296,8 +296,13 @@
 "settings.privacy.info.localMessage" = "行事曆標題與日期僅在本裝置分析，不會傳送至外部伺服器。";
 "settings.privacy.info.calendarTitle" = "僅取用所選範圍";
 "settings.privacy.info.calendarMessage" = "只讀取所選行事曆，不會將完整原始行程複製到App儲存空間。";
+"settings.privacy.info.adsTitle" = "免費版的有限廣告";
+"settings.privacy.info.adsMessage" = "免費版可能在完成每日回顧後最多每24小時顯示一次Google AdMob廣告。行事曆行程與準備資訊不會包含在廣告請求中。";
 "settings.privacy.info.controlTitle" = "始終由你控制";
 "settings.privacy.info.controlMessage" = "可隨時更改權限、匯出資料或徹底刪除資料。";
+"settings.privacy.ads.explanation" = "免費版可能在每日回顧後最多每24小時顯示一次廣告。Pro不會請求廣告。";
+"settings.privacy.ads.choices" = "廣告隱私選項";
+"settings.privacy.ads.report" = "回報廣告問題";
 "settings.data.title" = "資料";
 "settings.export.action" = "匯出資料";
 "settings.export.ready" = "匯出檔案已準備好";

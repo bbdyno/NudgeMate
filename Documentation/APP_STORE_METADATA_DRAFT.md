@@ -9,9 +9,9 @@
 
 상세 설명:
 
-NudgeMate는 반복되는 일정을 놓치기 전에 다음 시점을 예상합니다. 선택한 Apple 캘린더의 과거 기록에서 후보를 찾고, 사용자가 확인한 리듬만 저장합니다. 중요한 일정에는 준비 전·진행 중·완료 상태에 맞춘 체크인을 제공합니다. 분석 데이터는 외부 서버로 전송하지 않으며 언제든 내보내거나 삭제할 수 있습니다.
+NudgeMate는 반복되는 일정을 놓치기 전에 다음 시점을 예상합니다. 선택한 Apple 캘린더의 과거 기록에서 후보를 찾고, 사용자가 확인한 리듬만 저장합니다. 중요한 일정에는 준비 전·진행 중·완료 상태에 맞춘 체크인을 제공합니다. 캘린더와 준비 데이터는 광고 SDK로 전달하지 않으며 언제든 내보내거나 삭제할 수 있습니다.
 
-Pro는 적응형 리듬과 준비 트래커 한도를 해제합니다. 월간과 연간 구독은 자동 갱신되며 App Store 계정 설정에서 취소할 수 있고 평생 이용권도 선택할 수 있습니다.
+무료 사용자는 Daily Recap 완료 후 최대 24시간에 한 번 광고를 볼 수 있습니다. Pro는 광고를 제거하고 적응형 리듬과 준비 트래커 한도를 해제합니다. 월간과 연간 구독은 자동 갱신되며 App Store 계정 설정에서 취소할 수 있고 평생 이용권도 선택할 수 있습니다.
 
 ## English
 
@@ -22,6 +22,6 @@ Pro는 적응형 리듬과 준비 트래커 한도를 해제합니다. 월간과
 
 Long description:
 
-NudgeMate predicts when recurring tasks may be due based on calendar history you choose to scan. Suggestions become rhythms only after your review. For important dates, adaptive check-ins respond to Not Ready, In Progress, and Ready. Analysis stays on device, and your app data can be exported or deleted at any time.
+NudgeMate predicts when recurring tasks may be due based on calendar history you choose to scan. Suggestions become rhythms only after your review. For important dates, adaptive check-ins respond to Not Ready, In Progress, and Ready. Calendar and preparation data is not sent to the ads SDK, and your app data can be exported or deleted at any time.
 
-Pro removes limits on adaptive rhythms and prep trackers. Monthly and yearly subscriptions renew automatically and can be managed in App Store account settings; a lifetime purchase is also available.
+Free users may see an ad after completing Daily Recap, at most once every 24 hours. Pro removes ads and limits on adaptive rhythms and prep trackers. Monthly and yearly subscriptions renew automatically and can be managed in App Store account settings; a lifetime purchase is also available.

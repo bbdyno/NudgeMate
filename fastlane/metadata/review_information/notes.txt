@@ -6,4 +6,4 @@ Core review flow:
 3. Open Settings using the gear button, then select NudgeMate Pro to review the monthly, yearly, and lifetime purchase options.
 4. Widgets can be added from the iOS widget gallery. A Live Activity starts when a preparation item is moved to In Progress and Live Activities are allowed in system settings.
 
-Calendar titles and dates are processed on device. No user data is sent to an external server, no account is created, and no tracking or third-party analytics SDK is used. StoreKit handles all purchases. The app provides Restore Purchases and Manage Subscription controls in the paywall.
+Calendar titles, dates, rhythms, and preparation items are processed on device and are never sent to the advertising SDK. Free users may see one Google Mobile Ads interstitial after completing Daily Recap, limited to once per 24 hours. Consent is managed with Google's User Messaging Platform, and privacy choices can be reopened in Settings where required. Pro users do not initialize or request ads. StoreKit handles all purchases. The app provides Restore Purchases and Manage Subscription controls in the paywall.

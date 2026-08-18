@@ -73,7 +73,9 @@ struct HomeView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
-        .sheet(isPresented: $appState.isDailyRecapPresented) {
+        .sheet(isPresented: $appState.isDailyRecapPresented, onDismiss: {
+            Task { await appState.presentPendingDailyRecapAd() }
+        }) {
             DailyRecapSheet()
                 .environment(appState)
                 .presentationDetents([.medium, .large])

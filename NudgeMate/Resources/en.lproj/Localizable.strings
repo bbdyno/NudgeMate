@@ -296,8 +296,13 @@
 "settings.privacy.info.localMessage" = "Calendar titles and dates are analyzed only on this device and are never sent to an external server.";
 "settings.privacy.info.calendarTitle" = "Only What You Select";
 "settings.privacy.info.calendarMessage" = "Only selected calendars are read, and complete source events are not copied into app storage.";
+"settings.privacy.info.adsTitle" = "Limited Free-Tier Ads";
+"settings.privacy.info.adsMessage" = "The free version may show one Google AdMob ad at most every 24 hours after Daily Recap is completed. Calendar events and prep details are never included in ad requests.";
 "settings.privacy.info.controlTitle" = "You Stay in Control";
 "settings.privacy.info.controlMessage" = "Change permissions in Settings, export your data, or delete it completely at any time.";
+"settings.privacy.ads.explanation" = "The free version may show an ad at most once every 24 hours after Daily Recap. Pro never requests ads.";
+"settings.privacy.ads.choices" = "Ad Privacy Choices";
+"settings.privacy.ads.report" = "Report an Ad Issue";
 "settings.data.title" = "Data";
 "settings.export.action" = "Export Data";
 "settings.export.ready" = "Your Export Is Ready";

@@ -296,8 +296,13 @@
 "settings.privacy.info.localMessage" = "캘린더의 제목과 날짜는 이 기기에서만 분석되며 외부 서버로 전송되지 않습니다.";
 "settings.privacy.info.calendarTitle" = "선택한 범위만 접근";
 "settings.privacy.info.calendarMessage" = "사용자가 선택한 캘린더만 읽고, 원본 일정 전체를 앱 저장소에 복제하지 않습니다.";
+"settings.privacy.info.adsTitle" = "제한된 무료 광고";
+"settings.privacy.info.adsMessage" = "무료 버전에서만 일일 리캡 완료 뒤 최대 24시간에 한 번 Google AdMob 광고를 표시할 수 있습니다. 캘린더 일정과 준비 정보는 광고 요청에 포함하지 않습니다.";
 "settings.privacy.info.controlTitle" = "언제든 직접 제어";
 "settings.privacy.info.controlMessage" = "설정에서 권한을 변경하고, 앱 데이터는 내보내거나 완전히 삭제할 수 있습니다.";
+"settings.privacy.ads.explanation" = "무료 버전은 일일 리캡을 마친 뒤 최대 24시간에 한 번 광고를 표시할 수 있습니다. Pro에서는 광고를 요청하지 않습니다.";
+"settings.privacy.ads.choices" = "광고 개인정보 설정";
+"settings.privacy.ads.report" = "광고 문제 신고";
 "settings.data.title" = "데이터";
 "settings.export.action" = "데이터 내보내기";
 "settings.export.ready" = "내보낼 파일이 준비됐어요";
