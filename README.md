@@ -21,9 +21,10 @@ NudgeMate는 과거 일정의 간격을 분석해 다음 시점을 예상하고,
 
 ## 실행
 
-요구 환경은 Xcode 15 이상, Swift 5.9, Tuist 4입니다.
+요구 환경은 Xcode 15 이상, Swift 5.9, Tuist 4.203.1입니다. 저장소의 `.mise.toml`을 사용하면 동일한 Tuist 버전을 설치할 수 있습니다.
 
 ```sh
+mise install
 tuist generate
 open NudgeMate.xcworkspace
 ```

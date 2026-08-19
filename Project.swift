@@ -1,7 +1,7 @@
 import ProjectDescription
 
-let marketingVersion = "1.1.0"
-let releaseBuildNumber = "2026081701"
+let marketingVersion = "1.2.0"
+let releaseBuildNumber = "2026081901"
 let developmentTeam = "M79H9K226Y"
 let skAdNetworkIdentifiers = [
     "cstr6suwn9.skadnetwork",
