@@ -16,12 +16,23 @@
 - Release 기기 Archive와 앱·위젯 App Group 서명 확인
 - Archive에서 Google Mobile Ads 및 UMP Privacy Manifest 확인
 - Release Info.plist에 운영 AdMob 앱 ID와 개인정보처리방침 URL이 포함되고 `NSUserTrackingUsageDescription`이 없음을 확인
+- App Store 배포용 IPA 내보내기와 빌드 `2026081901` 업로드 성공
+- TestFlight 처리 상태 `Ready to Submit` 확인
+- App Privacy에 Google SDK Privacy Manifest 기준 7개 데이터 유형과 기기 ID 추적 사용 게시
+- App Store `1.2.0` 버전 생성 및 빌드 `2026081901` 연결
+- 한국어, 영어(미국), 중국어 간체·번체, 일본어 설명·프로모션 문구·릴리스 노트 갱신
+- 심사 메모에 무료 광고 노출 조건, UMP, Pro 광고 제외, ATT 미사용 사항 반영
+- App Review 제출 완료: `Waiting for Review`
 
-## App Store Connect 후속
+## App Review 제출
 
-- App Privacy 답변을 `Documentation/APP_PRIVACY_ANSWERS.md`와 일치하도록 갱신
-- 1.2.0 버전을 만들고 빌드 `2026081901` 업로드
-- 다국어 설명·릴리스 노트·심사 메모 반영
-- 빌드 선택 후 App Review 제출
+- 제출 시각: 2026-08-19 12:24 KST
+- 제출 ID: `d0e2465f-8530-4635-8151-bad75a68ddcf`
+- 제출 항목: iOS App `1.2.0 (2026081901)`
+- 출시 방식: 심사 승인 후 자동 출시, 모든 사용자에게 즉시 제공
+- Apple 안내: 심사 완료 시 계정 이메일로 결과 알림
 
-Apple Developer Program License Agreement가 갱신되어 있습니다. 계정 소유자가 계약을 검토하고 수락하기 전에는 기존 앱 업데이트와 신규 제출을 진행할 수 없습니다.
+## 참고
+
+- 업로드 시 GoogleMobileAds 및 UserMessagingPlatform 프레임워크의 공급사 dSYM 누락 경고가 있었으나 업로드와 처리에는 성공했습니다. 패키지 배포물에도 해당 dSYM이 없어 현재 제출을 막는 항목은 아닙니다.
+- 다음 외부 단계는 Apple 심사 결과 확인입니다. 현재 개발자 측 추가 입력이 필요한 차단 항목은 없습니다.
