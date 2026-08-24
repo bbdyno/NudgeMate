@@ -26,7 +26,7 @@
 - [x] Archive의 앱·Google SDK Privacy Manifest를 App Privacy 답변과 대조
 - [x] 추적 데이터의 기기 ID와 광고 SDK 데이터 유형을 App Store Connect에 신고
 - [x] AppTrackingTransparency 프레임워크 연결과 `NSUserTrackingUsageDescription` 5개 언어 확인
-- [ ] AdMob UMP IDFA 설명 메시지 게시 및 신규 설치 ATT 경로 확인
+- [x] AdMob UMP IDFA 설명 메시지 게시 및 신규 설치 ATT 경로 확인
 - [ ] 표준 EULA 또는 별도 이용약관 결정
 - [x] App Privacy 답변을 제출 빌드와 재대조
 - [ ] Pretendard SIL OFL과 앱 Apache 2.0 고지 확인
