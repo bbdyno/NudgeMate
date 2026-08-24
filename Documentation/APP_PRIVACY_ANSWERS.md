@@ -27,7 +27,9 @@ UMP는 대략적 위치, 성능 데이터와 제품 상호 작용을 앱 기능 
 ## 추적과 ATT
 
 - **추적: 예**로 신고하고 **기기 ID**를 선택한다. Google Mobile Ads 13.8.0의 Privacy Manifest가 기기 ID의 추적 사용을 선언하기 때문이다.
-- 현재 앱은 ATT 권한을 요청하지 않으며 `NSUserTrackingUsageDescription`도 포함하지 않는다. 따라서 IDFA 접근을 전제로 한 문구나 동의 메시지를 설정하지 않는다.
+- 무료 사용자의 첫 광고 준비 흐름에서 Google UMP의 IDFA 설명 뒤 iOS ATT 권한을 요청한다. `NSUserTrackingUsageDescription`은 지원하는 5개 언어로 제공한다.
+- ATT를 거부하면 Google Mobile Ads는 IDFA 없이 광고를 요청한다. 권한 거부는 Daily Recap 완료나 다른 앱 기능을 막지 않는다.
+- Pro 사용자는 UMP와 광고 SDK를 시작하지 않으므로 ATT 권한도 요청하지 않는다.
 - Google UMP 동의 상태가 광고 요청을 허용할 때만 무료 사용자에게 광고를 요청한다. 사용자는 설정의 개인정보 선택에서 동의를 다시 변경할 수 있다.
 
 ## 광고 노출 정책

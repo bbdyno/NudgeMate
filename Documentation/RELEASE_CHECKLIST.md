@@ -3,9 +3,9 @@
 ## 코드와 프로젝트
 
 - [x] `tuist generate` 성공
-- [ ] Debug/Release 시뮬레이터 빌드 성공
+- [x] Debug/Release 시뮬레이터 빌드 성공
 - [x] 단위 테스트 실제 실행 및 결과 기록
-- [ ] UI 테스트 실제 실행 및 결과 기록
+- [x] UI 테스트 실제 실행 및 결과 기록
 - [ ] 주요 경로의 warning, 강제 종료, 미완성 placeholder 없음
 - [ ] iOS 17 최소 지원과 iPhone/iPad 레이아웃 확인
 - [x] 앱 `com.bbdyno.app.nudgemate`, 확장 `com.bbdyno.app.nudgemate.widget` 서명 확인
@@ -25,7 +25,8 @@
 - [x] UMP 유럽 규정 메시지 게시 상태와 개인정보 선택 재호출 확인
 - [x] Archive의 앱·Google SDK Privacy Manifest를 App Privacy 답변과 대조
 - [x] 추적 데이터의 기기 ID와 광고 SDK 데이터 유형을 App Store Connect에 신고
-- [x] ATT를 사용하지 않는 현재 빌드에 `NSUserTrackingUsageDescription`이 없는지 확인
+- [x] AppTrackingTransparency 프레임워크 연결과 `NSUserTrackingUsageDescription` 5개 언어 확인
+- [ ] AdMob UMP IDFA 설명 메시지 게시 및 신규 설치 ATT 경로 확인
 - [ ] 표준 EULA 또는 별도 이용약관 결정
 - [x] App Privacy 답변을 제출 빌드와 재대조
 - [ ] Pretendard SIL OFL과 앱 Apache 2.0 고지 확인

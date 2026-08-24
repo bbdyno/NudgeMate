@@ -7,3 +7,8 @@ Core review flow:
 4. Widgets can be added from the iOS widget gallery. A Live Activity starts when a preparation item is moved to In Progress and Live Activities are allowed in system settings.
 
 Calendar titles, dates, rhythms, and preparation items are processed on device and are never sent to the advertising SDK. Free users may see one Google Mobile Ads interstitial after completing Daily Recap, limited to once per 24 hours. Consent is managed with Google's User Messaging Platform, and privacy choices can be reopened in Settings where required. Pro users do not initialize or request ads. StoreKit handles all purchases. The app provides Restore Purchases and Manage Subscription controls in the paywall.
+
+App Tracking Transparency:
+- On a fresh installation, complete onboarding as a free user. The Google UMP flow is presented after onboarding and shows the GDPR message first where required, followed by the IDFA explanation and the iOS App Tracking Transparency prompt.
+- If tracking permission is denied, Google Mobile Ads continues without the IDFA. Daily Recap completion and all app features remain available.
+- The ATT prompt is not shown to Pro users because the advertising SDK and consent flow are skipped for Pro.
