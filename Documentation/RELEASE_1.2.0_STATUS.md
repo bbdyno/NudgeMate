@@ -18,12 +18,16 @@
 - Archive에서 Google Mobile Ads 및 UMP Privacy Manifest 확인
 - Release Info.plist에 운영 AdMob 앱 ID, 개인정보처리방침 URL, 현지화된 `NSUserTrackingUsageDescription`이 포함됨
 - 기존 App Store 배포용 IPA 빌드 `2026081901`은 ATT 미구현으로 리젝됨
-- 수정 빌드 `2026082401` 업로드 및 TestFlight 처리 상태 확인 필요
+- 수정 빌드 `2026082401` 업로드 성공 및 TestFlight `Ready to Submit` 처리 완료 확인
 - App Privacy에 Google SDK Privacy Manifest 기준 7개 데이터 유형과 기기 ID 추적 사용 게시
-- App Store `1.2.0` 버전에 수정 빌드 `2026082401` 연결 필요
+- App Store `1.2.0` 버전에 수정 빌드 `2026082401` 연결 완료
 - 한국어, 영어(미국), 중국어 간체·번체, 일본어 설명·프로모션 문구·릴리스 노트 갱신
 - 심사 메모에 무료 광고 노출 조건, UMP, Pro 광고 제외, ATT 위치와 거부 시 동작 반영
-- App Review 상태: `Rejected` (Guideline 5.1.2(i)); 수정 빌드 재제출 필요
+- AdMob IDFA 설명 메시지를 NudgeMate와 5개 언어 대상으로 게시
+- 신규 설치 무료 사용자 경로에서 `Google UMP IDFA 설명 → iOS ATT → 사용자 선택 → 광고 요청` 순서를 실제 확인
+- ATT 거부 후 홈, Add 화면, 재실행 정상 동작과 권한 화면 비반복 확인
+- App Review에 수정 내용과 재현 경로 답변 전송
+- 수정 빌드 재제출 완료, App Review 상태 `Waiting for Review`
 
 ## 최초 App Review 제출
 
@@ -37,5 +41,8 @@
 ## 참고
 
 - 업로드 시 GoogleMobileAds 및 UserMessagingPlatform 프레임워크의 공급사 dSYM 누락 경고가 있었으나 업로드와 처리에는 성공했습니다. 패키지 배포물에도 해당 dSYM이 없어 현재 제출을 막는 항목은 아닙니다.
-- AdMob `NudgeMate ATT 안내` IDFA 설명 메시지는 NudgeMate와 5개 언어를 대상으로 초안 저장했습니다.
-- 다음 외부 단계는 IDFA 설명 메시지 게시, 신규 설치 ATT 경로 확인, 수정 빌드 업로드, 빌드 교체, 심사 답변 및 재제출입니다.
+- 신규 설치 실기동 검증은 iPhone 17 Pro / iOS 26.5 시뮬레이터에서 `--ui-testing` 없이 수행했습니다. ATT 요청은 13:22:27 KST, 거부 확정은 13:22:36 KST, 최초 광고 요청은 13:22:37 KST로 기록되어 광고 요청 전 동의 순서를 확인했습니다.
+- 재제출 시각: 2026-08-24 13:28 KST
+- 제출 ID: `d0e2465f-8530-4635-8151-bad75a68ddcf`
+- 제출 항목: iOS App `1.2.0 (2026082401)`
+- 출시 방식: 심사 승인 후 자동 출시, 모든 사용자에게 즉시 제공
