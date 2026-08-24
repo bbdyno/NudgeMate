@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "NudgeMate";
 "NSCalendarsFullAccessUsageDescription" = "需要完整存取日曆，以分析重複行程的規律並建議下次安排時間。";
+"NSUserTrackingUsageDescription" = "此裝置識別碼用於在免費版本中提供個人化廣告。";

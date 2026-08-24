@@ -1,7 +1,7 @@
 import ProjectDescription
 
 let marketingVersion = "1.2.0"
-let releaseBuildNumber = "2026081901"
+let releaseBuildNumber = "2026082401"
 let developmentTeam = "M79H9K226Y"
 let skAdNetworkIdentifiers = [
     "cstr6suwn9.skadnetwork",
@@ -101,6 +101,7 @@ let project = Project(
                     "ja"
                 ],
                 "NSCalendarsFullAccessUsageDescription": "NudgeMate는 반복 일정의 주기를 분석하기 위해 캘린더 전체 접근 권한이 필요합니다.",
+                "NSUserTrackingUsageDescription": "이 기기 식별자는 무료 버전에서 맞춤형 광고를 제공하는 데 사용됩니다.",
                 "CFBundleURLTypes": [
                     [
                         "CFBundleTypeRole": "Editor",
@@ -125,6 +126,7 @@ let project = Project(
             entitlements: .file(path: "NudgeMate/NudgeMate.entitlements"),
             dependencies: [
                 .target(name: "NudgeMateWidgets"),
+                .sdk(name: "AppTrackingTransparency", type: .framework),
                 .package(product: "GoogleMobileAds"),
                 .package(product: "GoogleUserMessagingPlatform")
             ],

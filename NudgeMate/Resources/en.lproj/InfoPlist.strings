@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "NudgeMate";
 "NSCalendarsFullAccessUsageDescription" = "Full calendar access is required to analyze recurring event patterns and suggest when to schedule them again.";
+"NSUserTrackingUsageDescription" = "This device identifier is used to provide personalized ads in the free version.";
